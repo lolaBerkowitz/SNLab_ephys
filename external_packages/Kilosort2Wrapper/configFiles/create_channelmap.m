@@ -4,7 +4,8 @@ function create_channelmap(basepath,varargin)
 %  kilosort 1 wrapper. Modified to not use channels that user set as 'skip'
 %  in the .xml file. Modified further to accomodate probe geometry. 
 %
-%  Default map is for neuronexus A1x64-Poly2-6mm-23s-160 
+%  Default map is for neuronexus A1x64-Poly2-6mm-23s-160. otherwise, add
+%  xcoords/ycoords,Nshanks for given probe. 
 %
 %  Modified by Eliezyer de Oliveira, 02/03/2020
 %  Modified by Laura Berkowitz, 08/11/2021
@@ -13,7 +14,7 @@ p = inputParser;
 p.addParameter('xcoords',[6,19,repmat([0,30],1,31)]');
 p.addParameter('ycoords', [linspace(0,1449.0,64)]');
 p.addParameter('Nshanks',1)
-p.addParameter('fs',30000)
+p.addParameter('fs',20000)
 p.parse(varargin{:});
 if ~exist('basepath','var')
     basepath = cd;
