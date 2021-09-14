@@ -1,7 +1,4 @@
- 
-
-
-function applyCARtoDat(filename, nChansTotal, outputDir)
+ function applyCARtoDat(filename, nChansTotal)
 % Subtracts median of each channel, then subtracts median of each time
 % point.
 %
@@ -25,7 +22,7 @@ try
     outputFilename  = [pathstr filesep name '_CAR' ext];
 %     mdTraceFilename = [pathstr filesep name '_medianTrace.mat'];
   else
-    outputFilename  = [outputDir filesep name '_CAR' ext];
+    outputFilename  = [d.folder filesep name '_CAR' ext];
 %     mdTraceFilename = [outputDir filesep name '_medianTrace.mat'];
   end
   fidOut = fopen(outputFilename, 'w');
