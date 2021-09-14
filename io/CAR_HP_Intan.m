@@ -1,4 +1,4 @@
-function filteredData = CAR_HP_Intan(dat_path, varargin)
+function CAR_HP_Intan(dat_path, varargin)
 % Loads intan amplifier.dat and performs CAR to prepare for spike sorting. 
 %
 % Subtracts median of each channel, then subtracts median of each time
@@ -8,6 +8,7 @@ function filteredData = CAR_HP_Intan(dat_path, varargin)
 % filename should be the complete path to an intan.rhd file
 % The same directory should contain the 'amplifier.dat' file that is the
 % raw data
+
 
 % from
 % https://github.com/PaulMAnderson/IntanTools/blob/master/CAR_HP_Intan.m
@@ -24,9 +25,9 @@ hi_pass = p.Results.high_pass;
 
 
 % get header file info and load
-d = dir([dat_path,'*.rhd']);
+d = dir([dat_path,filesep,'*.rhd']);
 
-intanRec = read_Intan_RHD2000_file([d.folder,filesep],d.name);
+intanRec = read_Intan_RHD2000_file_snlab([d.folder,filesep],d.name);
 
 
 % get amplifier info
@@ -51,13 +52,11 @@ fs       = intanRec.frequency_parameters.amplifier_sample_rate;
 numChunks   = ceil(numSamples./chunkSize);
 
 
-filename = [amp_info.folder filesep amp_info.name];
+filename = fullfile(amp_info.folder,amp_info.name);
 if runFilter
-    outFilename = [amp_info.folder filesep ...
-                  amp_info.name(1:end-4) '_CAR_HP.dat']; % file name: amplifier_CAR_HP.dat
+    outFilename = fullfile(amp_info.folder,[amp_info.name(1:end-4) '_CAR_HP.dat']); % file name: amplifier_CAR_HP.dat
 else
-    outFilename = [amp_info.folder filesep ...
-                  amp_info.name(1:end-4) '_CAR.dat'];
+    outFilename = fullfile(amp_info.folder, [amp_info.name(1:end-4) '_CAR.dat']);
 end
 
 fid    = fopen(filename,'r');
@@ -84,6 +83,7 @@ for chunkI = 1:numChunks
         endPoint   = chunkSize;
         chunk = amplifierMap.Data.data(:,1:chunkSize+bufferSize);
         chunk = [zeros(numChannels,bufferSize,'int16') chunk];
+    
     elseif chunkI == numChunks
         startPoint = (chunkSize * (chunkI-1)) + 1;
         endPoint   = numSamples;
@@ -110,8 +110,9 @@ for chunkI = 1:numChunks
       
     if runFilter
         fprintf('Filtering...\n')
-    
-        chunk = eegfilt(chunk,fs, loFreq, hiFreq);
+        % high pass filter data with forwards backwards filter
+        chunk = filtfilt(b1, a1, double(chunk));
+%         chunk = eegfilt(chunk,fs, loFreq, hiFreq);
     end
     %% Write out the data
     
@@ -124,8 +125,8 @@ for chunkI = 1:numChunks
 
        % filteredData(:,startPoint:endPoint) = ...
        %    chunk(:, bufferSize+1:end-bufferSize);
-toc
-end
 
+end
+toc
 fclose(fid);
 fclose(fidOut);
