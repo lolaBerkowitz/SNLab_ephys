@@ -1,7 +1,7 @@
  
 
 
-function medianTrace = applyCARtoDat(filename, nChansTotal, outputDir)
+function applyCARtoDat(filename, nChansTotal, outputDir)
 % Subtracts median of each channel, then subtracts median of each time
 % point.
 %
@@ -10,11 +10,7 @@ function medianTrace = applyCARtoDat(filename, nChansTotal, outputDir)
 %
 % should make chunk size as big as possible so that the medians of the
 % channels differ little from chunk to chunk.
-
-loFreq    = high_pass;
-hiFreq     = 0; % Zero means High-Pass filter
 chunkSize  = 2^20;
-bufferSize = 2^10;
 
 fid = []; fidOut = [];
 
@@ -27,10 +23,10 @@ try
   fid = fopen(filename, 'r');
   if nargin < 3
     outputFilename  = [pathstr filesep name '_CAR' ext];
-    mdTraceFilename = [pathstr filesep name '_medianTrace.mat'];
+%     mdTraceFilename = [pathstr filesep name '_medianTrace.mat'];
   else
     outputFilename  = [outputDir filesep name '_CAR' ext];
-    mdTraceFilename = [outputDir filesep name '_medianTrace.mat'];
+%     mdTraceFilename = [outputDir filesep name '_medianTrace.mat'];
   end
   fidOut = fopen(outputFilename, 'w');
   
@@ -44,9 +40,7 @@ try
     dat = fread(fid, [nChansTotal chunkSize], '*int16');
     
     if ~isempty(dat)
-      
-      %         theseInds = theseInds(end):theseInds(end)+chunkSize-1;
-      
+        
       dat = bsxfun(@minus, dat, median(dat,2)); % subtract median of each channel
       tm = median(dat,1);
       dat = bsxfun(@minus, dat, tm); % subtract median of each time point
@@ -60,7 +54,7 @@ try
     chunkInd = chunkInd+1;
   end
   
-  save(mdTraceFilename, 'medianTrace', '-v7.3');
+%   save(mdTraceFilename, 'medianTrace', '-v7.3');
   fclose(fid);
   fclose(fidOut);
   
