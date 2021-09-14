@@ -14,7 +14,7 @@ p = inputParser;
 p.addParameter('xcoords',[6,19,repmat([0,30],1,31)]');
 p.addParameter('ycoords', [linspace(0,1449.0,64)]');
 p.addParameter('Nshanks',1)
-p.addParameter('fs',20000)
+p.addParameter('fs',30000)
 p.parse(varargin{:});
 if ~exist('basepath','var')
     basepath = cd;
