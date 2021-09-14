@@ -6,12 +6,12 @@
 % LBerkowitz 2021
 
 % Set paths for data 
-data_folder = pwd;
-[~,basename] = fileparts(data_folder);
-probe_map = 'CED_E1_4X16_front_front.xlsx';
-ssd_path = 'C:\Kilo_temp';
+data_folder = 'D:\spike_sorting_practice\OR22\day3\';
 
-addpath(genpath('D:\Users\BClarkLab\ephys_tools\external_packages\analysis-tools'))
+% Set basename from folder
+[~,basename] = fileparts(data_folder);
+% probe_map = 'CED_E1_4X16_front_front.xlsx';
+ssd_path = 'C:\Kilo_temp';
 
 %% ##########################################################################
 
@@ -19,21 +19,21 @@ addpath(genpath('D:\Users\BClarkLab\ephys_tools\external_packages\analysis-tools
 
 % ##########################################################################
 
-%% Preprocessing (organize dat based on channel map) 
-% Channels were not organized during acquisition. This opens and saves the
-% dat file so channels are organized based on channel map. 
+%% Preprocessing (make metadata file, filter/CAR before kilosort, run kilosort, analyze in phy, ) . 
 
-%.0  Reorganize dat file if your data was not mapped when streamed to disk
-reorganize_dat_from_chanMap(data_folder,probe_map)
+%.0  Make basepath.session.info file for CellExplorer
+session = sessionTemplate(data_folder,'basename',basename); %
+save([data_folder,filesep,basename '.session.mat'],'session');
 
-% 1. Get filtered raw dat signal
-filter_raw_dat_from_dat
+% 1. get header file info and load
+d = dir([data_folder,filesep,'**\*.rhd']);
+intanRec = read_Intan_RHD2000_file_snlab([d(1).folder,filesep],d(1).name);
 
-% 2. Apply CAR to remove hypersynchronous events 
-applyCARtoDat(['amplifier','.dat'], 64, data_folder);
+% 2. Apply CAR raw dat signal
+applyCARtoDat(fullfile(data_folder,[basename,'.dat']), 64)
 
-% 3. Make xml file
-write_xml(data_folder,'channel_map_64.xlsx',30000,1250) 
+% % 3. Make xml file
+% write_xml(data_folder,'channel_map_64.xlsx',30000,1250) 
 
 %% 4. In Neuroscope, check channel map, skip bad channels, and save. 
 
