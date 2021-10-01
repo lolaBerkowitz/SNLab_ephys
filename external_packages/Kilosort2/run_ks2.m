@@ -1,15 +1,17 @@
 
-function run_ks2(basepath)
+function run_ks2(basepath,ks2_folder)
 
 %% you need to change most of the paths in this block
 rootZ = basepath; % the raw data binary file is in this folder
 rootH = basepath; % path to temporary binary file (same size as data, should be on fast SSD)
-pathToYourConfigFile = 'D:\Users\BClarkLab\ephys_tools\external_packages\Kilosort2'; % take from Github folder and put it somewhere else (together with the master_file)
+pathToYourConfigFile = 'C:\Users\schafferlab\github\Kilosort-2.5'; % take from Github folder and put it somewhere else (together with the master_file)
 
 ops.trange    = [0 Inf]; % time range to sort
 ops.NchanTOT  = 64; % total number of channels in your recording
+ops.sig       = 20;  % spatial smoothness constant for registration
+ops.nblocks   = 5; % blocks for registration. 0 turns it off, 1 does rigid registration. Replaces "datashift" option.
 
-run(fullfile(pathToYourConfigFile, 'StandardConfig_E14x16.m'))
+run(fullfile(pathToYourConfigFile, 'StandardConfig_snlab.m'))
 ops.fproc   = fullfile(rootH, 'temp_wh.dat'); % proc file on a fast SSD
 
 
@@ -22,13 +24,13 @@ ops.fbinary = fullfile(rootZ, fs(1).name);
 
 % preprocess data to create temp_wh.dat
 rez = preprocessDataSub(ops);
-%
 
-% time-reordering as a function of drift
-rez = clusterSingleBatches(rez);
-                 
+% NEW STEP TO DO DATA REGISTRATION
+rez = datashift2(rez, 1); % last input is for shifting data
+%         rez2 = datashift2(rez, 0); % last input is for shifting data
+              
 % main tracking and template matching algorithm
-rez = learnAndSolve8b(rez);
+rez = learnAndSolve8b(rez, 1);
 
 % remove double-counted spikes - solves issue in which individual spikes are assigned to multiple templates.
 % See issue 29: https://github.com/MouseLand/Kilosort/issues/29
@@ -49,9 +51,9 @@ rez.good = get_good_units(rez);
 fprintf('found %d good units \n', sum(rez.good>0))
 
 %creating a folder to save kilosort results every time
-temp = ['Kilosort2_' datestr(clock,'yyyy-mm-dd_HHMMSS')];
-ks2_folder = fullfile(basepath, temp);
-mkdir(ks2_folder);
+% temp = ['Kilosort2_' datestr(clock,'yyyy-mm-dd_HHMMSS')];
+% ks2_folder = fullfile(basepath, temp);
+% mkdir(ks2_folder);
 
 % write to Phy
 fprintf('Saving results to Phy  \n')
