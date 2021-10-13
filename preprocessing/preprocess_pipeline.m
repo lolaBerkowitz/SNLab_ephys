@@ -13,12 +13,9 @@
 % LBerkowitz 2021
 
 % Set paths for data
-data_folder = 'D:\spike_sorting_practice\2021-09-16_test_210916_135552';
-
-% Set basename from folder
-[~,basename] = fileparts(data_folder);
-% probe_map = 'CED_E1_4X16_front_front.xlsx';
-ssd_path = 'C:\Kilo_temp';
+data_folder = 'D:\spike_sorting_practice\test_01\2021-09-16_test_210916_135552';
+% probe map for probe
+probe_map = 'A1x64-Poly2-6mm-23s-160.xlsx';
 
 %% ##########################################################################
 
@@ -26,22 +23,34 @@ ssd_path = 'C:\Kilo_temp';
 
 % ##########################################################################
 
-%% Preprocessing (make metadata file, filter/CAR before kilosort, run kilosort, analyze in phy, ) .
+%% Preprocessing (update or create xml, check in neuroscope (manually), update channel map, run kilosort, annotate in phy) 
 
-% 1. creates csv for anatomical position and updates basename.session.info
-channel_mapping('basepath',data_folder,'show_gui_session',true,'fig',true)
+% Set basename from folder
+[~,basename] = fileparts(data_folder);
+% probe_map = 'CED_E1_4X16_front_front.xlsx';
+ssd_path = 'C:\Kilo_temp';
+% 
 
-% 2. get header file info and load
+% 0. rename amplifier to basename 
+if ~isempty(dir([data_folder,filesep,'amplifier.dat']))
+    disp(['renaming amplifer.dat to ',basename,'.dat'])
+    % create command
+    command = ['rename ',data_folder,filesep,'amplifier.dat',' ',basename,'.dat'];
+    system(command); % run through system command prompt
+end
+
+%% 1. Make or update xml file
 d = dir([data_folder,filesep,'**\*.rhd']);
 intanRec = read_Intan_RHD2000_file_snlab([d(1).folder,filesep],d(1).name);
 
-%% 3. Make or update xml file
-write_xml(data_folder,'A1x64-Poly2-6mm-23s-160.xlsx',30000,1250)
+% pull recording from rhd file 
+fs = intanRec.frequency_parameters.amplifier_sample_rate;
 
-channel_mapping('basepath',data_folder,'show_gui_session',true,'fig',true)
+% make or update xml file
+write_xml(data_folder,probe_map,fs,1250)
 
-%% 4. In Neuroscope, check channel map, skip bad channels, and save.
-% follow steps for chosen spike sorting method (Kilosort2.5 or Klusta)
+%% 2. In Neuroscope, check channel map, skip bad channels, and save.
+% follow steps for chosen spike sorting method (Kilosort2.5)
 
 %% ##########################################################################
 
@@ -49,21 +58,31 @@ channel_mapping('basepath',data_folder,'show_gui_session',true,'fig',true)
 
 % ##########################################################################
 
-%% For Kilosort: Create lfp file and make channel map
+%% For Kilosort: 
 
-% 5. Update channel map from basename.xml
+% 3. Update channel map from basename.xml
 create_channelmap(data_folder)
 
 %% Spike sorting
-% Move chanMap, xml, and dat to SSD folder.
-%creating a folder on the ssd for chanmap,dat, and xml
+
+% 4. creating a folder on the ssd for chanmap,dat, and xml
+temp = ['Kilosort2_' datestr(clock,'yyyy-mm-dd_HHMMSS')];
 ks2_folder = fullfile(ssd_path, basename);
 mkdir(ks2_folder);
 
-% 6. Spike sort using kilosort 2.5 (data on ssd)
+%% 5. Copy chanmap,basename.dat, and xml
+disp('Copy over channelmap, basename.dat, and basename.xml to ssd folder before continuing')
+
+%% 6. Spike sort using kilosort 2.5 (data on ssd)
 run_ks2(data_folder,ks2_folder)
 
 % 7. Clean up kilo results in Phy
+% In anaconda prompt, cd to kilosort folder. 
+% cd ks2_folder i.e. cd C:\kilo_temp\2021-09-16_test_210916_135552
+% conda activate phy2 
+% phy template-gui params.py
+% 
+
 
 %% 8. Copy back over to data file
 disp('Saving data back to data folder from ssd')
@@ -73,6 +92,9 @@ system(command);
 
 %% 9- extract spike times and waveforms for sorted clusters
 session = sessionTemplate(data_folder,'showGUI',false);
+
+%% 10
+channel_mapping('basepath',data_folder,'show_gui_session',true,'fig',true)
 f = dir([data_folder,filesep,'Kilosort*']);
 spikes = loadSpikes('session',session,'clusteringpath',[f.folder filesep f.name]);
 
