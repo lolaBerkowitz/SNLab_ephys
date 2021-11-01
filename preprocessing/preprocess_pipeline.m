@@ -4,18 +4,20 @@
 %   - external packages: neurocode,KS2Wrapper
 %   - schafferlab/github/Kilosort2.5
 %   - schafferlab/github/CellExplorer
+%   - schafferlab/github/neurocode/utils
 %
 % Data organization assumptions
 %   - Data should be organized with each recordding session saved within an animal folder i.e. 'animal_id/basename'
 %   - 'basename' is used by CellExplorer and other buzcode functions.
-%     Therefore, it is important to make this name unique. 
-%   
+%     Therefore, it is important to make this name unique.
+%
 % LBerkowitz 2021
 
 % Set paths for data
-data_folder = 'D:\spike_sorting_practice\test_01\2021-09-16_test_210916_135552';
-% probe map for probe
+data_folder = 'D:\app_ps1\data\hpc01\day02_211028_123848';
+% settings for xml creation (if needed)
 probe_map = 'A1x64-Poly2-6mm-23s-160.xlsx';
+lfp_fs = 1250;
 
 %% ##########################################################################
 
@@ -23,15 +25,14 @@ probe_map = 'A1x64-Poly2-6mm-23s-160.xlsx';
 
 % ##########################################################################
 
-%% Preprocessing (update or create xml, check in neuroscope (manually), update channel map, run kilosort, annotate in phy) 
+%% Preprocessing (update or create xml, check in neuroscope (manually), update channel map, run kilosort, annotate in phy)
 
 % Set basename from folder
 [~,basename] = fileparts(data_folder);
-% probe_map = 'CED_E1_4X16_front_front.xlsx';
-ssd_path = 'C:\Kilo_temp';
-% 
+ssd_path = 'C:\kilo_temp';
+%
 
-% 0. rename amplifier to basename 
+% 0. rename amplifier.dat to basename.dat
 if ~isempty(dir([data_folder,filesep,'amplifier.dat']))
     disp(['renaming amplifer.dat to ',basename,'.dat'])
     % create command
@@ -39,18 +40,29 @@ if ~isempty(dir([data_folder,filesep,'amplifier.dat']))
     system(command); % run through system command prompt
 end
 
-%% 1. Make or update xml file
-d = dir([data_folder,filesep,'**\*.rhd']);
-intanRec = read_Intan_RHD2000_file_snlab([d(1).folder,filesep],d(1).name);
+% lets also rename the xml if present.
+if ~isempty(dir([data_folder,filesep,'amplifier.xml']))
+    disp(['renaming amplifer.xml to ',basename,'.xml'])
+    % create command
+    command = ['rename ',data_folder,filesep,'amplifier.xml',' ',basename,'.xml'];
+    system(command); % run through system command prompt
+elseif isempty(dir([data_folder,filesep,'*.xml'])) % Make xml file
+    
+    % Check basepath for xml
+    d = dir([data_folder,filesep,'**\*.rhd']);
+    intanRec = read_Intan_RHD2000_file_snlab([d(1).folder,filesep],d(1).name);
+    
+    % pull recording from rhd file
+    fs = intanRec.frequency_parameters.amplifier_sample_rate;
+    
+    % make or update xml file
+    write_xml(data_folder,probe_map,fs,lfp_fs)
+end
 
-% pull recording from rhd file 
-fs = intanRec.frequency_parameters.amplifier_sample_rate;
 
-% make or update xml file
-write_xml(data_folder,probe_map,fs,1250)
-
-%% 2. In Neuroscope, check channel map, skip bad channels, and save.
+%% 1. In Neuroscope, verify channel map, skip bad channels, and save.
 % follow steps for chosen spike sorting method (Kilosort2.5)
+
 
 %% ##########################################################################
 
@@ -58,30 +70,41 @@ write_xml(data_folder,probe_map,fs,1250)
 
 % ##########################################################################
 
-%% For Kilosort: 
+%% For Kilosort:
 
-% 3. Update channel map from basename.xml
+% 2. Update channel map from basename.xml
 create_channelmap(data_folder)
 
 %% Spike sorting
 
-% 4. creating a folder on the ssd for chanmap,dat, and xml
-temp = ['Kilosort2_' datestr(clock,'yyyy-mm-dd_HHMMSS')];
-ks2_folder = fullfile(ssd_path, basename);
-mkdir(ks2_folder);
+% 3. creating a folder on the ssd for chanmap,dat, and xml
+ssd_folder = fullfile(ssd_path, basename);
+mkdir(ssd_folder);
 
-%% 5. Copy chanmap,basename.dat, and xml
-disp('Copy over channelmap, basename.dat, and basename.xml to ssd folder before continuing')
+%% 4. Copy chanmap,basename.dat, and xml
+disp('Copying basename.dat, basename.xml, and channelmap to ssd')
 
-%% 6. Spike sort using kilosort 2.5 (data on ssd)
-run_ks2(data_folder,ks2_folder)
+disp('Saving dat file to ssd')
+command = ['robocopy ',data_folder,' ',ssd_folder,' ',basename,'.dat'];
+system(command);
 
-% 7. Clean up kilo results in Phy
-% In anaconda prompt, cd to kilosort folder. 
+disp('Saving xml to ssd')
+command = ['robocopy ',data_folder,' ',ssd_folder,' ',basename,'.xml'];
+system(command);
+
+disp('Saving channel_map to ssd')
+command = ['robocopy ',data_folder,' ',ssd_folder,' chanMap.mat'];
+system(command);
+
+%% 5. Spike sort using kilosort 1 (data on ssd)
+run_ks1(data_folder,ssd_folder)
+
+
+%% 7. Clean up kilo results in Phy
+% In anaconda prompt, cd to kilosort folder.
 % cd ks2_folder i.e. cd C:\kilo_temp\2021-09-16_test_210916_135552
-% conda activate phy2 
+% conda activate phy2
 % phy template-gui params.py
-% 
 
 
 %% 8. Copy back over to data file
@@ -89,14 +112,8 @@ disp('Saving data back to data folder from ssd')
 command = ['robocopy ',ks2_folder,' ',data_folder,' /e'];
 system(command);
 
-
 %% 9- extract spike times and waveforms for sorted clusters
-session = sessionTemplate(data_folder,'showGUI',false);
-
-%% 10
-channel_mapping('basepath',data_folder,'show_gui_session',true,'fig',true)
-f = dir([data_folder,filesep,'Kilosort*']);
-spikes = loadSpikes('session',session,'clusteringpath',[f.folder filesep f.name]);
+session = sessionTemplate(data_folder,'showGUI',true);
 
 %% 10 - compute basic cell metrics
 cell_metrics = ProcessCellMetrics('session',session,'manualAdjustMonoSyn',false);
