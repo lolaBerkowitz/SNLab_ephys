@@ -2,7 +2,7 @@
 %
 % Dependencies
 %   - external packages: neurocode,KS2Wrapper
-%   - schafferlab/github/Kilosort2.5
+%   - schafferlab/github/Kilosort
 %   - schafferlab/github/CellExplorer
 %   - schafferlab/github/neurocode/utils
 %
@@ -16,8 +16,8 @@
 % Set paths for data
 data_folder = 'D:\app_ps1\data\hpc01\day02_211028_123848';
 % settings for xml creation (if needed)
-probe_map = 'A1x64-Poly2-6mm-23s-160.xlsx';
-lfp_fs = 1250;
+% probe_map = 'A1x64-Poly2-6mm-23s-160.xlsx';
+% lfp_fs = 1250;
 
 %% ##########################################################################
 
@@ -61,12 +61,12 @@ end
 
 
 %% 1. In Neuroscope, verify channel map, skip bad channels, and save.
-% follow steps for chosen spike sorting method (Kilosort2.5)
+% follow steps for chosen spike sorting method (Kilosort)
 
 
 %% ##########################################################################
 
-%                       Sorting using Kilosort2.5
+%                       Sorting using Kilosort
 
 % ##########################################################################
 
@@ -99,7 +99,6 @@ system(command);
 %% 5. Spike sort using kilosort 1 (data on ssd)
 run_ks1(data_folder,ssd_folder)
 
-
 %% 7. Clean up kilo results in Phy
 % In anaconda prompt, cd to kilosort folder.
 % cd ks2_folder i.e. cd C:\kilo_temp\2021-09-16_test_210916_135552
@@ -108,9 +107,8 @@ run_ks1(data_folder,ssd_folder)
 
 
 %% 8. Copy back over to data file
-disp('Saving data back to data folder from ssd')
-command = ['robocopy ',ks2_folder,' ',data_folder,' /e'];
-system(command);
+% Copy the kilosort folder from the ssd_path to the main data folder.
+%
 
 %% 9- extract spike times and waveforms for sorted clusters
 session = sessionTemplate(data_folder,'showGUI',true);
@@ -121,6 +119,19 @@ cell_metrics = ProcessCellMetrics('session',session,'manualAdjustMonoSyn',false)
 % GUI to manually curate cell classification. This is not neccesary at this point.
 % It is more useful when you have multiple sessions
 cell_metrics = CellExplorer('metrics',cell_metrics);
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 %% 11 - copy data to main session folder
 % After you have run all this, you need to copy the Kilosort folder
@@ -175,8 +186,8 @@ end
 
 % %% ##########################################################################
 %
-% %                       Sorting using Klusta (NOT WORKING ON ANALYSIS COMPUTER
-% %                       YET LB 09/14/2021)
+% %   Sorting using Klusta (NOT WORKING ON ANALYSIS COMPUTER LB 09/14/2021)
+% %                       
 %
 % % ##########################################################################
 % %% For Klusta
