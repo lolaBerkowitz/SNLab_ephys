@@ -14,7 +14,11 @@
 % LBerkowitz 2021
 
 % Set paths for data
-data_folder = 'D:\app_ps1\data\hpc01\day02_211028_123848';
+data_folder = 'D:\app_ps1\data\hpc01\day05_211101_140116';
+% Set basename from folder
+[~,basename] = fileparts(data_folder);
+ssd_path = 'C:\kilo_temp';
+
 % settings for xml creation (if needed)
 % probe_map = 'A1x64-Poly2-6mm-23s-160.xlsx';
 % lfp_fs = 1250;
@@ -26,11 +30,6 @@ data_folder = 'D:\app_ps1\data\hpc01\day02_211028_123848';
 % ##########################################################################
 
 %% Preprocessing (update or create xml, check in neuroscope (manually), update channel map, run kilosort, annotate in phy)
-
-% Set basename from folder
-[~,basename] = fileparts(data_folder);
-ssd_path = 'C:\kilo_temp';
-%
 
 % 0. rename amplifier.dat to basename.dat
 if ~isempty(dir([data_folder,filesep,'amplifier.dat']))
@@ -121,22 +120,9 @@ cell_metrics = ProcessCellMetrics('session',session,'manualAdjustMonoSyn',false)
 cell_metrics = CellExplorer('metrics',cell_metrics);
 
 
+%% 11 - create downsampled lfp
 
-
-
-
-
-
-
-
-
-
-
-
-%% 11 - copy data to main session folder
-% After you have run all this, you need to copy the Kilosort folder
-% (actully only some files are neccesary), plus spikes.cellinfo.mat and cell_metrics.cellinfo.mat
-% to the main session folder in the shared network drive
+LFPfromDat(data_folder,'outFs',1250,'useGPU',false);
 
 %% To load multiple sessions into CellExplorer
 % After you have multiple sessions spike sorted and processed, you can open
