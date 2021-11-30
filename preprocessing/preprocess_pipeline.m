@@ -1,118 +1,51 @@
-% Procedures for processing electrophysiology data in the SNLab
+% Procedure for processing electrophysiology data in the SNLab
 %
 % Dependencies
-%   - external packages: neurocode,KS2Wrapper
 %   - schafferlab/github/Kilosort
 %   - schafferlab/github/CellExplorer
-%   - schafferlab/github/neurocode/utils
+%   - schafferlab/github/neurocode
 %
 % Data organization assumptions
 %   - Data should be organized with each recordding session saved within an animal folder i.e. 'animal_id/basename'
-%   - 'basename' is used by CellExplorer and other buzcode functions.
-%     Therefore, it is important to make this name unique.
+%   - 'basename' is used for general data organization. Therefore, it is important to make this name unique.
 %
+%
+% Pipeline Overview: 
+%
+%  1.  Check xml/channel mapping 
+%  2.  Preprocess (create lfp, get digital signals, behavior tracking, kilosort)
+%  3.  Manual Curation in Phy 
+%  4.  Compile and save in CellExplorer data structure
+
+
 % LBerkowitz 2021
 
-% Set paths for data
-data_folder = 'D:\app_ps1\data\hpc01\day05_211101_140116';
-% Set basename from folder
-[~,basename] = fileparts(data_folder);
-ssd_path = 'C:\kilo_temp';
+basepath = uigetdir;
 
-% settings for xml creation (if needed)
-% probe_map = 'A1x64-Poly2-6mm-23s-160.xlsx';
-% lfp_fs = 1250;
+%% Check xml/channel mapping: verify channel map, skip bad channels, and save 
 
-%% ##########################################################################
+make_xml(basepath)
 
-%                       Setup data for clustering
+%% Preprocess (create lfp, get digital signals, behavior tracking, kilosort)
 
-% ##########################################################################
-
-%% Preprocessing (update or create xml, check in neuroscope (manually), update channel map, run kilosort, annotate in phy)
-
-% 0. rename amplifier.dat to basename.dat
-if ~isempty(dir([data_folder,filesep,'amplifier.dat']))
-    disp(['renaming amplifer.dat to ',basename,'.dat'])
-    % create command
-    command = ['rename ',data_folder,filesep,'amplifier.dat',' ',basename,'.dat'];
-    system(command); % run through system command prompt
-end
-
-% lets also rename the xml if present.
-if ~isempty(dir([data_folder,filesep,'amplifier.xml']))
-    disp(['renaming amplifer.xml to ',basename,'.xml'])
-    % create command
-    command = ['rename ',data_folder,filesep,'amplifier.xml',' ',basename,'.xml'];
-    system(command); % run through system command prompt
-elseif isempty(dir([data_folder,filesep,'*.xml'])) % Make xml file
-    
-    % Check basepath for xml
-    d = dir([data_folder,filesep,'**\*.rhd']);
-    intanRec = read_Intan_RHD2000_file_snlab([d(1).folder,filesep],d(1).name);
-    
-    % pull recording from rhd file
-    fs = intanRec.frequency_parameters.amplifier_sample_rate;
-    
-    % make or update xml file
-    write_xml(data_folder,probe_map,fs,lfp_fs)
-end
+preprocess_session(basepath)
 
 
-%% 1. In Neuroscope, verify channel map, skip bad channels, and save.
-% follow steps for chosen spike sorting method (Kilosort)
+%% Clean up kilo results in Phy
+disp ('Curate the kilosort results in Phy ')
 
-
-%% ##########################################################################
-
-%                       Sorting using Kilosort
-
-% ##########################################################################
-
-%% For Kilosort:
-
-% 2. Update channel map from basename.xml
-create_channelmap(data_folder)
-
-%% Spike sorting
-
-% 3. creating a folder on the ssd for chanmap,dat, and xml
-ssd_folder = fullfile(ssd_path, basename);
-mkdir(ssd_folder);
-
-%% 4. Copy chanmap,basename.dat, and xml
-disp('Copying basename.dat, basename.xml, and channelmap to ssd')
-
-disp('Saving dat file to ssd')
-command = ['robocopy ',data_folder,' ',ssd_folder,' ',basename,'.dat'];
-system(command);
-
-disp('Saving xml to ssd')
-command = ['robocopy ',data_folder,' ',ssd_folder,' ',basename,'.xml'];
-system(command);
-
-disp('Saving channel_map to ssd')
-command = ['robocopy ',data_folder,' ',ssd_folder,' chanMap.mat'];
-system(command);
-
-%% 5. Spike sort using kilosort 1 (data on ssd)
-run_ks1(data_folder,ssd_folder)
-
-%% 7. Clean up kilo results in Phy
 % In anaconda prompt, cd to kilosort folder.
 % cd ks2_folder i.e. cd C:\kilo_temp\2021-09-16_test_210916_135552
 % conda activate phy2
 % phy template-gui params.py
 
+%% Copy back over to data file
+disp ('Manually copy the kilosort folder from the ssd_path to the main data folder.')
 
-%% 8. Copy back over to data file
-% Copy the kilosort folder from the ssd_path to the main data folder.
-%
+%% Extract spike times and waveforms for sorted clusters
+session = sessionTemplate(basepath,'showGUI',true);
 
-%% 9- extract spike times and waveforms for sorted clusters
-session = sessionTemplate(data_folder,'showGUI',true);
-
-%% 10 - compute basic cell metrics
+%% Compute basic cell metrics
 cell_metrics = ProcessCellMetrics('session',session,'manualAdjustMonoSyn',false);
 
 % GUI to manually curate cell classification. This is not neccesary at this point.
@@ -120,9 +53,9 @@ cell_metrics = ProcessCellMetrics('session',session,'manualAdjustMonoSyn',false)
 cell_metrics = CellExplorer('metrics',cell_metrics);
 
 
-%% 11 - create downsampled lfp
+%% find ripple channels 
+rippleChannels = DetectSWR('basepath',basepath);
 
-LFPfromDat(data_folder,'outFs',1250,'useGPU',false);
 
 %% To load multiple sessions into CellExplorer
 % After you have multiple sessions spike sorted and processed, you can open
@@ -151,9 +84,38 @@ cell_metrics = loadCellMetricsBatch('basepaths',basepath,'basenames',basename);
 cell_metrics = CellExplorer('metrics',cell_metrics);
 
 
-%% Local functions below
 
-% write xml
+
+% %%                      Local Function Below
+
+function make_xml(basepath,varargin)
+p = inputParser;
+addParameter(p,'probe_map','A1x64-Poly2-6mm-23s-160.xlsx');
+addParameter(p,'lfp_fs',1250,@isnumeric);
+parse(p,varargin{:});
+probe_map = p.Results.probe_map;
+lfp_fs = p.Results.lfp_fs;
+
+addpath(fullfile('external_packages','buzcode'))
+if isempty(dir([basepath,filesep,'amplifier.xml'])) % Make xml file
+    
+    % Check basepath for xml
+    d = dir([basepath,filesep,'**\*.rhd']);
+    intanRec = read_Intan_RHD2000_file_snlab([d(1).folder,filesep],d(1).name);
+    
+    % pull recording from rhd file
+    fs = intanRec.frequency_parameters.amplifier_sample_rate;
+    
+    % make or update xml file
+    write_xml(basepath,probe_map,fs,lfp_fs)
+else
+    disp('XML found. Check channel mapping/bad channels in Neuroscope then go preprocess this session.')
+end
+rmpath(fullfile('external_packages','buzcode'))
+
+end
+
+
 function write_xml(path,map,Fold,FNew)
 % Wrapper for buzcode bz_MakeXMLFromProbeMaps with defaults
 
@@ -177,14 +139,14 @@ end
 %
 % % ##########################################################################
 % %% For Klusta
-% d   = dir([data_folder,filesep,'*.xml']);
-% parameters = LoadXml(fullfile(data_folder,d(1).name));
+% d   = dir([basepath,filesep,'*.xml']);
+% parameters = LoadXml(fullfile(basepath,d(1).name));
 %
 % % 5. create klusta_folders as well as prb and prm files
-% makeProbeMap(data_folder)
+% makeProbeMap(basepath)
 %
 % % 6. Runs klusta on each shank by calling system
-% run_klusta(data_folder)
+% run_klusta(basepath)
 %
 % %% 7. Spike sort in Phy (Spike sorting kwik files in phy will update the kwik file)
 %
