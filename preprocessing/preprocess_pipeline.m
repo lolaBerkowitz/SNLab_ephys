@@ -31,6 +31,9 @@ make_xml(basepath)
 preprocess_session(basepath)
 
 
+
+
+
 %% Clean up kilo results in Phy
 disp ('Curate the kilosort results in Phy ')
 
@@ -95,8 +98,9 @@ addParameter(p,'lfp_fs',1250,@isnumeric);
 parse(p,varargin{:});
 probe_map = p.Results.probe_map;
 lfp_fs = p.Results.lfp_fs;
+[~,basename] = fileparts(basepath);
 
-addpath(fullfile('external_packages','buzcode'))
+addpath(genpath(fullfile('external_packages','buzcode')))
 if isempty(dir([basepath,filesep,'amplifier.xml'])) % Make xml file
     
     % Check basepath for xml
@@ -108,10 +112,20 @@ if isempty(dir([basepath,filesep,'amplifier.xml'])) % Make xml file
     
     % make or update xml file
     write_xml(basepath,probe_map,fs,lfp_fs)
+    
+    % rename amplifier.dat to basename.dat
+    if ~isempty(dir([basepath,filesep,'amplifier.dat']))
+        disp(['renaming amplifer.dat to ',basename,'.dat'])
+        % create command
+        command = ['rename ',basepath,filesep,'amplifier.dat',' ',basename,'.dat'];
+        system(command); % run through system command prompt
+    end
+
+
 else
     disp('XML found. Check channel mapping/bad channels in Neuroscope then go preprocess this session.')
 end
-rmpath(fullfile('external_packages','buzcode'))
+rmpath(genpath(fullfile('external_packages','buzcode')))
 
 end
 
