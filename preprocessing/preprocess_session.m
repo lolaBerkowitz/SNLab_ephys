@@ -26,11 +26,13 @@ addParameter(p,'digitalChannels',[],@isnumeric);
 addParameter(p,'getAcceleration',true,@islogical);
 % addParameter(p,'cleanArtifacts',false,@islogical);
 addParameter(p,'getLFP',true,@islogical);
+addParameter(p,'getEMG',true,@islogical);
 addParameter(p,'stateScore',true,@islogical);
 addParameter(p,'DLC',false,@islogical);
 addParameter(p,'removeNoise',false,@islogical);
 addParameter(p,'ssd_path','C:\kilo_temp',@ischar);    % Path to SSD disk.
 addParameter(p,'lfp_fs',1250,@isnumeric);
+addParameter(p,'specialChannels',[29,3,44],@isnumeric) % default for ASYpoly2A64
 parse(p,varargin{:});
 
 analogInputs = p.Results.analogInputs;
@@ -39,6 +41,7 @@ digitalInputs = p.Results.digitalInputs;
 digitalChannels = p.Results.digitalChannels;
 getAcceleration = p.Results.getAcceleration;
 getLFP = p.Results.getLFP;
+getEMG = p.Results.getEMG;
 
 % cleanArtifacts = p.Results.cleanArtifacts;
 stateScore = p.Results.stateScore;
@@ -46,6 +49,7 @@ DLC = p.Results.DLC;
 removeNoise = p.Results.removeNoise;
 ssd_path = p.Results.ssd_path;
 lfp_fs = p.Results.lfp_fs;
+specialChannels = p.Results.specialChannels;
 
 % Prepare dat files and prepare metadata
 
@@ -111,6 +115,13 @@ if getLFP
     LFPfromDat(basepath,'outFs',lfp_fs,'useGPU',true);
 end
 
+% Calcuate estimated emg 
+if getEMG
+EMGFromLFP = getEMGFromLFP(basepath,'overwrite',overwrite,...
+                           'rejectChannels',rejectChannels,'noPrompts',noPrompts,...
+                           'saveMat',savebool,'chInfo',chInfo,'specialChannels',specialChannels);
+end
+
 % Get brain states
 % an automatic way of flaging bad channels is needed 
 if stateScore 
@@ -119,7 +130,7 @@ if stateScore
             SleepScoreMaster(basepath,'noPrompts',true,'ignoretime',pulses.intsPeriods); % try to sleep score
             thetaEpochs(basepath); 
         else
-            SleepScoreMaster(basepath,'noPrompts',true,'SingleShank',true,'EMGxLFPChannels',[29,3,44]); % takes lfp in base 0
+            SleepScoreMaster(basepath,'noPrompts',true); % takes lfp in base 0
             thetaEpochs(basepath); 
         end
     catch
