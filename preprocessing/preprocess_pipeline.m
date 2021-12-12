@@ -48,16 +48,21 @@ disp ('Manually copy the kilosort folder from the ssd_path to the main data fold
 %% Extract spike times and waveforms for sorted clusters
 session = sessionTemplate(basepath,'showGUI',true);
 
+%% Calcuate estimated emg 
+EMGFromLFP = getEMGFromLFP(basepath,'overwrite',overwrite,...
+                           'rejectChannels',rejectChannels,'noPrompts',noPrompts,...
+                           'saveMat',savebool,'chInfo',chInfo,'specialChannels',EMGxLFPChannels);
+
+%% find ripples
+ripples = DetectSWR([8,5],'basepath',basepath);
+
+
 %% Compute basic cell metrics
 cell_metrics = ProcessCellMetrics('session',session,'manualAdjustMonoSyn',false);
 
 % GUI to manually curate cell classification. This is not neccesary at this point.
 % It is more useful when you have multiple sessions
 cell_metrics = CellExplorer('metrics',cell_metrics);
-
-
-%% find ripple channels 
-rippleChannels = DetectSWR('basepath',basepath);
 
 
 %% To load multiple sessions into CellExplorer
@@ -74,6 +79,8 @@ data_path = pwd;
 % look for all the cell_metrics.cellinfo.mat files
 files = dir([data_path,'\**\*.cell_metrics.cellinfo.mat']);
 
+basepath = [];
+basename = [];
 % pull out basepaths and basenames
 for i = 1:length(files)
     basepath{i} = files(i).folder;
