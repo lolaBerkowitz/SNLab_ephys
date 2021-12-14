@@ -117,9 +117,9 @@ end
 
 % Calcuate estimated emg 
 if getEMG
-EMGFromLFP = getEMGFromLFP(basepath,'overwrite',overwrite,...
-                           'rejectChannels',rejectChannels,'noPrompts',noPrompts,...
-                           'saveMat',savebool,'chInfo',chInfo,'specialChannels',specialChannels);
+    chInfo = hackInfo('basepath',basepath);
+    EMGFromLFP = getEMGFromLFP(basepath,'overwrite',false,'noPrompts',true,...
+                           'saveMat',true,'chInfo',chInfo,'specialChannels',specialChannels);
 end
 
 % Get brain states
