@@ -20,19 +20,20 @@
 
 % LBerkowitz 2021
 
+%% Single Session Preprocess
 basepath = uigetdir;
 
 %% Check xml/channel mapping: verify channel map, skip bad channels, and save 
-
 make_xml(basepath)
 
 %% Preprocess (create lfp, get digital signals, behavior tracking, kilosort)
-
 preprocess_session(basepath)
 
+%% Batch preprocess (must make sure xml is made/accurate before running)
 
+data_folder = uigetdir; % subject main folder (i.e. ~\data\hpc01)
 
-
+preprocess_batch(data_folder)
 
 %% Clean up kilo results in Phy
 disp ('Curate the kilosort results in Phy ')
@@ -47,11 +48,6 @@ disp ('Manually copy the kilosort folder from the ssd_path to the main data fold
 
 %% Extract spike times and waveforms for sorted clusters
 session = sessionTemplate(basepath,'showGUI',true);
-
-%% Calcuate estimated emg 
-EMGFromLFP = getEMGFromLFP(basepath,'overwrite',overwrite,...
-                           'rejectChannels',rejectChannels,'noPrompts',noPrompts,...
-                           'saveMat',savebool,'chInfo',chInfo,'specialChannels',EMGxLFPChannels);
 
 %% find ripples
 ripples = DetectSWR([8,5],'basepath',basepath);
@@ -133,6 +129,27 @@ else
     disp('XML found. Check channel mapping/bad channels in Neuroscope then go preprocess this session.')
 end
 rmpath(genpath(fullfile('external_packages','buzcode')))
+
+end
+
+function preprocess_batch(data_folder)
+% checks for evidence of preprocessing in data_folder subfolds and runs
+% preprocess_session.m for unprocessed sessions
+
+folders = dir([data_folder]);
+folders = folders(~ismember({folders.name},{'.','..'}),:);
+
+% loop through folders and process those that don't have evidence of
+% processing (in this case chanMap.mat)
+for i = 1:length(folders)
+    basepath = [data_folder,filesep,folders{i}.name];
+    
+    if isempty(dir([basepath,filesep,'chanMap.mat']))
+        preprocess_session(basepath)
+    else
+        continue
+    end
+end
 
 end
 
