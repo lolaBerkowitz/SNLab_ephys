@@ -1,10 +1,9 @@
-function filter_raw_dat_from_dat(dat_path,varargin)
+function filter_raw_dat_from_dat(basepath,varargin)
 % filter_raw_dat: high pass filters raw neuralynx CSC files and writes them
 % to 'filtered.dat'
 %
 % Ryan Harvey 2019
 % Modified for probes Laura Berkowitz 2020
-% Modified for
 % addpath(genpath('D:\Users\BClarkLab\ephys_tools\external_packages\analysis-tools'))
 
 % parse input
@@ -18,14 +17,12 @@ p.addParameter('nChannels',64);
 p.parse(varargin{:});
 
 output_file = ['temp_',p.Results.output_file];
-dat_path = p.Results.dat_path;
 hi_pass = p.Results.hi_pass;
 fs = p.Results.fs;
 verbose = p.Results.verbose;
 nChannels = p.Results.nChannels;
 
-session_path = dat_path;
-[~,basename] = fileparts(session_path);
+[~,basename] = fileparts(basepath);
 
 if verbose
     tic;
@@ -33,10 +30,10 @@ if verbose
 end
 
 % Load .dat
-if ~exsist(fullfile(session_path,[basename,'.dat'])) 
-    fileName = fullfile(session_path,'amplifier.dat');
+if ~exist(fullfile(basepath,[basename,'.dat'])) 
+    fileName = fullfile(basepath,'amplifier.dat');
 else
-    fileName = fullfile(session_path,[basename,'.dat']);
+    fileName = fullfile(basepath,[basename,'.dat']);
 end
 
 % use dir to get size of dat file in bytes

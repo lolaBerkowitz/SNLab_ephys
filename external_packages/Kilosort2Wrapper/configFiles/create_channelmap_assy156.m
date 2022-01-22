@@ -1,5 +1,5 @@
 
-function create_channelmap(basepath,varargin)
+function create_channelmap_assy156(basepath,varargin)
 %  create a channel map file based on the .xml file. Original script from
 %  kilosort 1 wrapper. Modified to not use channels that user set as 'skip'
 %  in the .xml file. Modified further to accomodate probe geometry. 

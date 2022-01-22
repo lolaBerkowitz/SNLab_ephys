@@ -50,7 +50,7 @@ disp ('Manually copy the kilosort folder from the ssd_path to the main data fold
 session = sessionTemplate(basepath,'showGUI',true);
 
 %% find ripples
-ripples = DetectSWR([8,5],'basepath',basepath);
+ripples = DetectSWR([8,60],'basepath',basepath,'thresSDrip',[0.5 2.0],'thresSDswD',[0.5 2.0]);
 
 
 %% Compute basic cell metrics
