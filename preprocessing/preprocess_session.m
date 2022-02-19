@@ -32,7 +32,7 @@ addParameter(p,'DLC',false,@islogical);
 addParameter(p,'removeNoise',false,@islogical);
 addParameter(p,'ssd_path','C:\kilo_temp',@ischar);    % Path to SSD disk.
 addParameter(p,'lfp_fs',1250,@isnumeric);
-addParameter(p,'specialChannels',[29,3,44],@isnumeric) % default for ASYpoly2A64
+addParameter(p,'specialChannels',[30,59,17],@isnumeric) % default for ASYpoly2A64
 parse(p,varargin{:});
 
 analogInputs = p.Results.analogInputs;
@@ -99,6 +99,19 @@ if digitalInputs
         digitalInp = getDigitalIn('all','filename',"digitalin.dat",'fs',session.extracellular.sr);
     end
 end
+
+% Epochs derived from digital inputs
+if exist(fullfile(basepath,[session.general.name,'digitalin.events.mat']),'file')
+    load(fullfile(basepath,[session.general.name,'digitalin.events.mat']),'digitalIn')
+    for i = 1:2:size(digitalIn.timestampsOn{1, 2},1) % by default 2nd column is events
+        session.epochs{i}.name =  str(i);
+        session.epochs{i}.startTime =  digitalIn.timestampsOn{1, 2}(i);
+        session.epochs{i}.stopTime =  digitalIn.timestampsOn{1, 2}(i+1);
+    end
+end
+
+% Force annotate session 
+gui_session
 
 % Auxilary input
 if getAcceleration
