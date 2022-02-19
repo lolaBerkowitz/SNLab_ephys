@@ -19,18 +19,24 @@
 
 
 % LBerkowitz 2021
+%% Multi-animal recording session 
+% For sessions that record from multiple headstages from separate animals.
+% For SNLab, assumes one animal per active port (64 channel electrodes) as
+% of 2/22
 
+file_name = 'test02_220208_165400';
+folder_order = {'test00','test01','test02','test03'};
+split_dat(file_name, folder_order)
 %% Single Session Preprocess
 basepath = uigetdir;
 
-%% Check xml/channel mapping: verify channel map, skip bad channels, and save 
+% Check xml/channel mapping: verify channel map, skip bad channels, and save 
 make_xml(basepath)
 
-%% Preprocess (create lfp, get digital signals, behavior tracking, kilosort)
+% Preprocess (create lfp, get digital signals, behavior tracking, kilosort)
 preprocess_session(basepath)
 
 %% Batch preprocess (must make sure xml is made/accurate before running)
-
 data_folder = uigetdir; % subject main folder (i.e. ~\data\hpc01)
 
 preprocess_batch(data_folder)
@@ -50,7 +56,7 @@ disp ('Manually copy the kilosort folder from the ssd_path to the main data fold
 session = sessionTemplate(basepath,'showGUI',true);
 
 %% find ripples
-ripples = DetectSWR([8,60],'basepath',basepath,'thresSDrip',[0.5 2.0],'thresSDswD',[0.5 2.0]);
+ripples = DetectSWR([27,64],'basepath',basepath,'thresSDrip',[0.5 2.0],'thresSDswD',[0.5 2.0]);
 
 
 %% Compute basic cell metrics
@@ -95,6 +101,7 @@ cell_metrics = CellExplorer('metrics',cell_metrics);
 % %%                      Local Function Below
 
 function make_xml(basepath,varargin)
+
 p = inputParser;
 addParameter(p,'probe_map','A1x64-Poly2-6mm-23s-160.xlsx');
 addParameter(p,'lfp_fs',1250,@isnumeric);
@@ -107,11 +114,14 @@ addpath(genpath(fullfile('external_packages','buzcode')))
 if isempty(dir([basepath,filesep,'amplifier.xml'])) % Make xml file
     
     % Check basepath for xml
-    d = dir([basepath,filesep,'**\*.rhd']);
-    intanRec = read_Intan_RHD2000_file_snlab([d(1).folder,filesep],d(1).name);
+%     d = dir([basepath,filesep,'**\*.rhd']);
+    
+    [~, ~, ~, ~,...
+    ~, ~, frequency_parameters,~ ]= ...
+    read_Intan_RHD2000_file_snlab(basepath);
     
     % pull recording from rhd file
-    fs = intanRec.frequency_parameters.amplifier_sample_rate;
+    fs = frequency_parameters.amplifier_sample_rate;
     
     % make or update xml file
     write_xml(basepath,probe_map,fs,lfp_fs)
@@ -144,6 +154,9 @@ folders = folders(~ismember({folders.name},{'.','..'}),:);
 for i = 1:length(folders)
     basepath = [data_folder,filesep,folders{i}.name];
     
+    % Check xml/channel mapping: verify channel map, skip bad channels, and save 
+    make_xml(basepath)
+    
     if isempty(dir([basepath,filesep,'chanMap.mat']))
         preprocess_session(basepath)
     else
@@ -169,6 +182,8 @@ defaults.FeaturesPerWave = 4;
 [~,basename] = fileparts(path);
 bz_MakeXMLFromProbeMaps({map},path,basename,1,defaults)
 end
+
+
 
 % %% ##########################################################################
 %
