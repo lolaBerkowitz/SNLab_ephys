@@ -53,8 +53,8 @@ dat_folder = [data_path,filesep,split_folder,filesep,file_name];
     read_Intan_RHD2000_file_snlab(dat_folder);
 
 % splits dat according to folder_order and saves to dat_folder
-% process_aux(dat_folder,aux_input_channels,frequency_parameters,folder_order);
-% process_amp(dat_folder,amplifier_channels,frequency_parameters,folder_order)
+process_aux(dat_folder,aux_input_channels,frequency_parameters,folder_order);
+process_amp(dat_folder,amplifier_channels,frequency_parameters,folder_order)
 
 % load digitalin channels for session start end times (first and last event per channel)
 digitalIn = process_digitalin(dat_folder,'digitalin.dat',frequency_parameters.board_dig_in_sample_rate);
