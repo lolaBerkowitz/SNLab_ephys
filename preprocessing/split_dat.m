@@ -13,7 +13,7 @@ function split_dat(file_name, folder_order,varargin)
 % variable arguments:
 %   split_folder: string indicating folder where session files for headstage
 %           recordings are kept. Should be within the main Data folder
-
+%   data_path: path to where your individual animal folders are located
 %           where folder locations are destined i.e. data_path\to_split.
 %   digitalin_order: numeric vector that signifies the digitalin channel
 %           that corresponds to the port_order. Default is [2,3,4,5] so
@@ -35,26 +35,32 @@ function split_dat(file_name, folder_order,varargin)
 
 p = inputParser;
 addParameter(p,'split_folder','to_split',@isstring)
-addParameter(p,'data_path','D:\app_ps1\data',@isstring)
+addParameter(p,'project_data_folder','D:\app_ps1\data',@isfolder)
 addParameter(p,'digitalin_order',[2,3,4,5]',@isnumeric) %snlab rig wiring
 addParameter(p,'port_order',{'A','B','C','D'},@isarray)
 parse(p,varargin{:});
 
 split_folder = p.Results.split_folder;
-data_path = p.Results.data_path;
+project_data_folder = p.Results.project_data_folder;
 digitalin_order = p.Results.digitalin_order;
 port_order = p.Results.port_order;
 
-dat_folder = [data_path,filesep,split_folder,filesep,file_name];
+dat_folder = fullfile(project_data_folder,split_folder,file_name);
 
 % Load info.rhd for port information
 [amplifier_channels, ~, aux_input_channels, ~,...
     ~, ~, frequency_parameters,~ ] = ...
     read_Intan_RHD2000_file_snlab(dat_folder);
 
+
+for i = find(~cellfun(@isempty,folder_order))
+    basepath{i} = fullfile(project_data_folder,folder_order{i},[folder_order{i},'_',file_name]);
+    mkdir(basepath{i})
+end
+
 % splits dat according to folder_order and saves to dat_folder
-process_aux(dat_folder,aux_input_channels,frequency_parameters,folder_order);
-process_amp(dat_folder,amplifier_channels,frequency_parameters,folder_order)
+process_aux(dat_folder,aux_input_channels,folder_order,basepath);
+process_amp(dat_folder,amplifier_channels,frequency_parameters,folder_order,basepath);
 
 % load digitalin channels for session start end times (first and last event per channel)
 digitalIn = process_digitalin(dat_folder,'digitalin.dat',frequency_parameters.board_dig_in_sample_rate);
@@ -63,35 +69,18 @@ digitalIn = process_digitalin(dat_folder,'digitalin.dat',frequency_parameters.bo
 % Order of folders should match port_order and digitalin_order
 for i = find(~cellfun(@isempty,folder_order))
     
-    % make basepath for folders
-    basepath = [data_path,filesep,folder_order{i},filesep,[folder_order{i},'_',file_name]];
-    
-    if ~exist(basepath,'dir')
-        mkdir(basepath)
-    end
-    % move amplifier and aux files to basepath and rename to standard intan
-    % format
-    if isfile([dat_folder,filesep,port_order{i}(end),'_amplifier.dat'])
-        movefile([dat_folder,filesep,port_order{i}(end),'_amplifier.dat'],basepath);
-        system(['rename ',basepath,filesep,port_order{i}(end),'_amplifier.dat',' ','amplifier.dat']);
-    end
-    if isfile([dat_folder,filesep,port_order{i}(end),'_aux.dat'])
-        movefile([dat_folder,filesep,port_order{i}(end),'_aux.dat'],basepath);
-        system(['rename ',basepath,filesep,port_order{i}(end),'_aux.dat',' ','auxillary.dat']);
-    end
     % if video file with subid is present, move that to basepath
     if isfile([dat_folder,filesep,'*_',folder_order{i},'.avi'])
-        movefile([dat_folder,filesep,'*_',folder_order{i},'.avi'],basepath)
+        movefile([dat_folder,filesep,'*_',folder_order{i},'.avi'],basepath{i})
     end
     
     % make copy of rhd, setting, and time to basepath
-    copyfile([dat_folder,filesep,'time.dat'],basepath);
-    copyfile([dat_folder,filesep,'settings.xml'],basepath);
-    copyfile([dat_folder,filesep,'info.rhd'],basepath);
+    copyfile([dat_folder,filesep,'time.dat'],basepath{i});
+    copyfile([dat_folder,filesep,'settings.xml'],basepath{i});
+    copyfile([dat_folder,filesep,'info.rhd'],basepath{i});
     
     % create digitalIn event structure and save to basepath
-    parse_digitalIn(digitalIn,digitalin_order(i),basepath)
-    
+    parse_digitalIn(digitalIn,digitalin_order(i),basepath{i})
 end
 
 
@@ -100,7 +89,7 @@ end
 % function main(basepath,amp,aux,time)
 
 
-function process_aux(dat_path,aux_input_channels,frequency_parameters,ports)
+function process_aux(dat_path,aux_input_channels,ports,basepath)
 % processes intan auxillary file and splits into separate files indicated
 % by ports.
 % input:
@@ -115,17 +104,9 @@ function process_aux(dat_path,aux_input_channels,frequency_parameters,ports)
 
 % Check to see if files have been created 
 % find ports to write
-write_port = unique([{aux_input_channels.port_name}]);
-write_port = write_port(find(~cellfun(@isempty,ports))); % write ports based on inputs
-
-% check if files have been created and if so update list
-for port = write_port
-    if isfile([dat_path,filesep,port{1}(end),'_aux.dat'])
-        disp([port{1}(end),'_aux.dat ','already created'])
-        % remove from list
-        write_port(find(ismember(write_port,port))) = [];
-    end
-end
+write_port = unique({aux_input_channels.port_name});
+basepath = basepath(~cellfun(@isempty,ports));
+write_port = write_port(~cellfun(@isempty,ports)); % write ports based on inputs
 
 % if all files have been written, exit the function
 if isempty(write_port)
@@ -138,44 +119,33 @@ contFile = fullfile(dat_path,'auxiliary.dat');
 file = dir(contFile);
 samples = file.bytes/(n_channels * 2); %int16 = 2 bytes
 aux = memmapfile(contFile,'Format',{'uint16' [n_channels samples] 'mapped'});
-x = aux.Data.mapped;
-
-% create batches
-batch = ceil(linspace(0,samples,ceil(samples/frequency_parameters.aux_input_sample_rate/4)));
 
 % loop through ports
-for port = write_port
-    
+tic
+parfor port = 1:length(write_port)
+    process_aux_(aux,write_port{port},aux_input_channels,basepath{port})
+end
+toc
+clear aux 
+end
+
+function process_aux_(aux,port,aux_input_channels,basepath)
     % skip if file is already created
-    if isfile([dat_path,filesep,port{1}(end),'_aux.dat'])
-        disp([port{1}(end),'_aux.dat ','already created'])
-        continue
+    if isfile([basepath,filesep,'auxiliary.dat'])
+        disp([basepath,'auxiliary.dat ','already created'])
+        return
     end
     
     % initiate file
-    aux_file = fopen(fullfile(dat_path,[port{1}(end),'_aux' ,'.dat']),'w');
-    idx = contains({aux_input_channels.port_name},port{1});
-    
-    % loop though batches save port channels to file
-    for i = 1:length(batch)-1
-        disp(['batch ',num2str(batch(i)+1),' to ',num2str(batch(i+1)),...
-            '   ',num2str(i),' of ',num2str(length(batch)-1)])
-        
-        % pull out batch of data
-        datr = x(idx,batch(i)+1:batch(i+1)) * 0.0000374; % 0.0000374 = conver to volts
-        
-        % gather data and convert to int16 & transpose
-        datcpu = gather_try(int16(datr));
-        
-        % write to disk
-        fwrite(aux_file, datcpu, 'int16');
-    end
+    aux_file = fopen([basepath,filesep,'auxiliary.dat'],'w');
+    idx = contains({aux_input_channels.port_name},port);
+   
+    % write to disk
+    fwrite(aux_file, aux.Data.mapped(idx,:), 'uint16');
     fclose(aux_file);
 end
-clear x aux 
-end
 
-function process_amp(dat_path,amplifier_channels,frequency_parameters,ports)
+function process_amp(dat_path,amplifier_channels,frequency_parameters,ports,basepath)
 % processes intan amplifier file and splits into separate files indicated
 % by ports.
 % input:
@@ -190,16 +160,22 @@ function process_amp(dat_path,amplifier_channels,frequency_parameters,ports)
 
 % Check to see if files have been created 
 % loop through ports
-write_port = unique([{amplifier_channels.port_name}]);
-write_port = write_port(find(~cellfun(@isempty,ports))); % write ports based on inputs
+write_port = unique({amplifier_channels.port_name});
+basepath = basepath(~cellfun(@isempty,ports));
+write_port = write_port(~cellfun(@isempty,ports)); % write ports based on inputs
 
 % loop through ports
-for port = write_port
-    if isfile([dat_path,filesep,port{1}(end),'_amplifier.dat'])
-        disp([port{1}(end),'_amplifier.dat ','already created'])
+remove_port_idx = [];
+for port = 1:length(write_port)
+    if isfile([basepath{port},filesep,'amplifier.dat'])
+        disp([basepath{port},' amplifier.dat ','already created'])
         % remove from list
-        write_port(find(ismember(write_port,port))) = [];
+        remove_port_idx = [remove_port_idx;find(ismember(write_port,write_port{port}))];
     end
+end
+if ~isempty(remove_port_idx)
+    basepath(remove_port_idx) = [];
+    write_port(remove_port_idx) = [];
 end
 
 % if all files have been written, exit the function
@@ -211,39 +187,32 @@ n_channels = size(amplifier_channels,2);
 contFile = fullfile(dat_path,'amplifier.dat');
 file = dir(contFile);
 samples = file.bytes/(n_channels * 2); %int16 = 2 bytes
-amp = memmapfile(contFile,'Format',{'int16' [n_channels samples] 'mapped'});
-% amp.Data = amp.Data.Data.mapped * 0.195; % covert to microvolts
-
-x = amp.Data.mapped;
-% aux.Data = aux.Data * 0.0000374; % covert to volts
+amp = memmapfile(contFile,'Format',{'int16' [n_channels, samples] 'mapped'});
 
 % create batches
 batch = ceil(linspace(0,samples,ceil(samples/frequency_parameters.amplifier_sample_rate/4)));
 
 % loop through ports
-for port = write_port
-    
-    amp_file = fopen(fullfile(dat_path,[port{1}(end),'_amplifier' ,'.dat']),'w');
-    idx = contains({amplifier_channels.port_name},port{1});
-    
-    % loop though batches
-    for i = 1:length(batch)-1
-        disp(['batch ',num2str(batch(i)+1),' to ',num2str(batch(i+1)),...
-            '   ',num2str(i),' of ',num2str(length(batch)-1)])
-        
-        % pull out batch of data
-        datr = x(idx,batch(i)+1:batch(i+1))* 0.195; % 0.195 = convert to uV
-        
-        % gather data and convert to int16 & transpose
-        datcpu = gather_try(int16(datr));
-        
-        % write to disk
-        fwrite(amp_file, datcpu, 'int16');
-    end
-    
-    fclose(amp_file);
+for port = 1:length(write_port)
+    amp_file{port} = fopen(fullfile(basepath{port},'amplifier.dat'),'w');
+    idx{port} = contains({amplifier_channels.port_name},write_port{port});
 end
-clear x amp 
+tic
+% loop though batches
+for i = 1:length(batch)-1
+    disp(['batch ',num2str(batch(i)+1),' to ',num2str(batch(i+1)),...
+        '   ',num2str(i),' of ',num2str(length(batch)-1)])
+    % write to disk
+    for port = 1:length(write_port)
+        fwrite(amp_file{port},amp.Data.mapped(idx{port},batch(i)+1:batch(i+1)) * 0.195, 'int16');
+    end
+end
+
+for port = 1:length(write_port)
+    fclose(amp_file{port});
+end
+toc
+clear amp 
 end
 
 function digitalIn = process_digitalin(data_path,dat_name,fs)
