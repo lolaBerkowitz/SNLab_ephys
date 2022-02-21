@@ -24,9 +24,18 @@
 % For SNLab, assumes one animal per active port (64 channel electrodes) as
 % of 2/22
 
-file_name = 'test02_220208_165400';
-folder_order = {'test00','test01','test02','test03'};
-split_dat(file_name, folder_order)
+% file to process
+file_name = 'day06_220217_085558';
+
+% corresponds to port A, B, C, D unless input port_order is used as input
+% in split_dat below
+folder_order = {[],[],[],'hpc04'};
+
+split_dat(file_name,folder_order)
+
+% loop through folders and process unprocessed data files 
+
+
 %% Single Session Preprocess
 basepath = uigetdir;
 
