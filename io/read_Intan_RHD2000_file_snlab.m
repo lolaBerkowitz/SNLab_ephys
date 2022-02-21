@@ -21,8 +21,8 @@ function [amplifier_channels, notes, aux_input_channels, spike_triggers,...
 
 % [file, path, filterindex] = ...
 %      uigetfile('*.rhd', 'Select an RHD2000 Data File', 'MultiSelect', 'off');
-path = [data_path,filesep];
-file = [ls([path,'*.rhd'])];
+path_ = [data_path,filesep];
+file = [ls([path_,'*.rhd'])];
 
 if (file == 0)
     return;
@@ -34,7 +34,7 @@ end
 % file = d(end).name;
 
 tic;
-filename = [path,file];
+filename = [path_,file];
 fid = fopen(filename, 'r');
 
 s = dir(filename);
