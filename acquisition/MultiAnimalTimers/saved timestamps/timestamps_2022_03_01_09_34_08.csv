@@ -1,0 +1,14 @@
+mouse1,,,,mouse2,,,,mouse3,,,,mouse4,,
+PC time,run time,note,,PC time,run time,note,,PC time,run time,note,,PC time,run time,note
+09:34:08,00:00:00,program start,,09:34:08,00:00:00,program start,,09:34:08,00:00:00,program start,,09:34:08,00:00:00,program start
+09:34:32,00:00:24,test1,,09:36:23,00:02:15,"hpc04-port-C, hpc05-port-D,hpc06-port-A",,09:36:23,00:02:15,"hpc04-port-C, hpc05-port-D,hpc06-port-A",,09:36:23,00:02:15,"hpc04-port-C, hpc05-port-D,hpc06-port-A"
+09:34:34,00:00:26,120 minute countdown started,,,,,,,,,,,,
+09:34:43,00:00:35,120 minute countdown started,,,,,,,,,,,,
+09:35:01,00:00:53,120 minute countdown started,,,,,,,,,,,,
+09:35:02,00:00:54,120 minute countdown started,,,,,,,,,,,,
+09:35:05,00:00:57,120 minute countdown started,,,,,,,,,,,,
+09:35:07,00:00:59,120 minute countdown started,,,,,,,,,,,,
+09:36:23,00:02:15,"hpc04-port-C, hpc05-port-D,hpc06-port-A",,,,,,,,,,,,
+09:36:35,00:02:27,subject on port C,,,,,,,,,,,,
+09:36:44,00:02:36,120 minute countdown started,,,,,,,,,,,,
+09:36:53,00:02:45,Port C,,,,,,,,,,,,
