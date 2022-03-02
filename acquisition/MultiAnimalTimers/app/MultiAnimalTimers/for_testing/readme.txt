@@ -1,7 +1,3 @@
-Written by Matthew Isaacson (mdi22@cornell.edu) with the Matlab appdesigner. Updated 3/1/22
-
-
-
 MultiAnimalTimers Executable
 
 1. Prerequisites for Deployment 
