@@ -23,15 +23,14 @@
 % For sessions that record from multiple headstages from separate animals.
 % For SNLab, assumes one animal per active port (64 channel electrodes) as
 % of 2/22
-
 % file to process
-file_name = 'day06_220217_085558';
+file_name = 'day17_day0_220303_122516';
 
 % corresponds to port A, B, C, D unless input port_order is used as input
 % in split_dat below
-folder_order = {[],[],[],'hpc04'};
-
-split_dat(file_name,folder_order)
+folder_order = {'hpc06',[],'hpc05','hpc04'};
+project_data_folder = '\\10.253.5.16\sn data server 3\multianimal_ephys';
+split_dat(file_name,folder_order,'project_data_folder',project_data_folder)
 
 % loop through folders and process unprocessed data files 
 
@@ -43,7 +42,7 @@ basepath = uigetdir;
 make_xml(basepath)
 
 % Preprocess (create lfp, get digital signals, behavior tracking, kilosort)
-preprocess_session(basepath)
+preprocess_session(basepath,'digitalInputs',false)
 
 %% Batch preprocess (must make sure xml is made/accurate before running)
 data_folder = uigetdir; % subject main folder (i.e. ~\data\hpc01)
@@ -65,7 +64,14 @@ disp ('Manually copy the kilosort folder from the ssd_path to the main data fold
 session = sessionTemplate(basepath,'showGUI',true);
 
 %% find ripples
-ripples = DetectSWR([27,64],'basepath',basepath,'thresSDrip',[0.5 2.0],'thresSDswD',[0.5 2.0]);
+%hpc04 =[38,33] 
+%hpc01 = [23,29]
+epochs = []
+for i = 1:length(session.epochs)
+    epochs = [epochs;session.epochs{i}.startTime session.epochs{i}.stopTime];
+end
+
+ripples = DetectSWR([23,29],'basepath',basepath);
 
 
 %% Compute basic cell metrics
