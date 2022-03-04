@@ -28,6 +28,8 @@ function split_dat(file_name, folder_order,varargin)
 %    for drives over 64 channels.
 % - Add availablity to scan data_path\split_folder and automatically process folders that
 %    have not yet been processed
+% - Simplify (or make more intuitive) inputs to dat_path and save_path in place of
+%   project_data_folder and 'split_folder'
 
 
 % output:
@@ -37,7 +39,7 @@ p = inputParser;
 addParameter(p,'split_folder','to_split',@isstring)
 addParameter(p,'project_data_folder','D:\app_ps1\data',@isfolder)
 addParameter(p,'digitalin_order',[2,3,4,5]',@isnumeric) %snlab rig wiring
-addParameter(p,'port_order',{'A','B','C','D'},@isarray)
+addParameter(p,'port_order',{'A','B','C','D'},@iscell)
 parse(p,varargin{:});
 
 split_folder = p.Results.split_folder;
@@ -45,6 +47,7 @@ project_data_folder = p.Results.project_data_folder;
 digitalin_order = p.Results.digitalin_order;
 port_order = p.Results.port_order;
 
+% locate folder 
 dat_folder = fullfile(project_data_folder,split_folder,file_name);
 
 % Load info.rhd for port information
@@ -52,10 +55,13 @@ dat_folder = fullfile(project_data_folder,split_folder,file_name);
     ~, ~, frequency_parameters,~ ] = ...
     read_Intan_RHD2000_file_snlab(dat_folder);
 
-
+% make the basepath if its not already made
 for i = find(~cellfun(@isempty,folder_order))
     basepath{i} = fullfile(project_data_folder,folder_order{i},[folder_order{i},'_',file_name]);
-    mkdir(basepath{i})
+    
+    if ~isfolder(basepath{i})
+        mkdir(basepath{i})
+    end
 end
 
 % splits dat according to folder_order and saves to dat_folder
@@ -298,7 +304,8 @@ parsed_digitalIn.ints{1,2} = digitalIn.ints{1, channel_index};
 parsed_digitalIn.dur{1,2} = digitalIn.dur{1, channel_index};
 parsed_digitalIn.intsPeriods{1,2} = digitalIn.intsPeriods{1, channel_index};
 
-save([basepath,filesep,'digitalIn.events.mat'],'parsed_digitalIn');
+save([basepath,filesep,'digitalIn.events.mat'],'digitalIn');
 
 end
+
 
