@@ -1,89 +1,79 @@
-function split_dat(file_name, folder_order,varargin)
+function split_dat(data_path,save_path, subject_order,varargin)
 % split_dat for recordings of multiple animals from Intan RHX USB
 % acquisition system. Assumes intan one data per data type format. Will
 % split amplifer and aux by input ports by default.
 
 
 % input:
-%   file_location: name of file location with data
-%   folder_order: cell array with folder location (i.e. {'HPC01','HPC02'...}
+%   data_path: path to file location with intan data to be split
+%   save_path: path to general directory where subject data folders are
+%              located. 
+%   subject_order: cell array with subject name (i.e. {'HPC01','HPC02'...}
 %            will give data_path\HPC01, data_path\HPC02, ...). Order must
-%            match port_order (default is ABCD)
+%            match order: Port A, Port B, Port C, Port D i.e. HPC01 was recording on 
+%            Port A, HPC02 on Port B etc.
 %
 % variable arguments:
-%   split_folder: string indicating folder where session files for headstage
-%           recordings are kept. Should be within the main Data folder
-%   data_path: path to where your individual animal folders are located
-%           where folder locations are destined i.e. data_path\to_split.
 %   digitalin_order: numeric vector that signifies the digitalin channel
 %           that corresponds to the port_order. Default is [2,3,4,5] so
 %           events for port A would be on channel 1, port B channel 2, etc.
 %
-%   port_order: cell array containing order of ports consistent with folder order, so {'A','B',...}
-%            would result with folder HPC01 having channels saved to dat from Port A, HPC02
-%            having channels saved to dat from Port B, etc.
 
 % TO-DO:
 %  - Make dynamic input so multiple ports can be assiged to the same animal
 %    for drives over 64 channels.
 % - Add availablity to scan data_path\split_folder and automatically process folders that
 %    have not yet been processed
-% - Simplify (or make more intuitive) inputs to dat_path and save_path in place of
-%   project_data_folder and 'split_folder'
+
 
 
 % output:
 %   saves the dat file split by occupied ports into folders.
-
+%
+% L Berkowitz 03/2022
 p = inputParser;
-addParameter(p,'split_folder','to_split',@isstring)
-addParameter(p,'project_data_folder','D:\app_ps1\data',@isfolder)
 addParameter(p,'digitalin_order',[2,3,4,5]',@isnumeric) %snlab rig wiring
-addParameter(p,'port_order',{'A','B','C','D'},@iscell)
 parse(p,varargin{:});
 
-split_folder = p.Results.split_folder;
-project_data_folder = p.Results.project_data_folder;
 digitalin_order = p.Results.digitalin_order;
-port_order = p.Results.port_order;
 
 % locate folder 
-dat_folder = fullfile(project_data_folder,split_folder,file_name);
+file_name = basenameFromBasepath(data_path);
 
 % Load info.rhd for port information
 [amplifier_channels, ~, aux_input_channels, ~,...
     ~, ~, frequency_parameters,~ ] = ...
-    read_Intan_RHD2000_file_snlab(dat_folder);
+    read_Intan_RHD2000_file_snlab(data_path);
 
 % make the basepath if its not already made
-for i = find(~cellfun(@isempty,folder_order))
-    basepath{i} = fullfile(project_data_folder,folder_order{i},[folder_order{i},'_',file_name]);
+for i = find(~cellfun(@isempty,subject_order))
+    basepath{i} = fullfile(save_path,filesep,subject_order{i},[subject_order{i},'_',file_name]);
     
     if ~isfolder(basepath{i})
         mkdir(basepath{i})
     end
 end
 
-% splits dat according to folder_order and saves to dat_folder
-process_aux(dat_folder,aux_input_channels,folder_order,basepath);
-process_amp(dat_folder,amplifier_channels,frequency_parameters,folder_order,basepath);
+% splits dat according to subject_order and saves to dat_folder
+process_aux(data_path,aux_input_channels,subject_order,basepath);
+process_amp(data_path,amplifier_channels,frequency_parameters,subject_order,basepath);
 
 % load digitalin channels for session start end times (first and last event per channel)
-digitalIn = process_digitalin(dat_folder,'digitalin.dat',frequency_parameters.board_dig_in_sample_rate);
+digitalIn = process_digitalin(data_path,'digitalin.dat',frequency_parameters.board_dig_in_sample_rate);
 
 %% Loop through folders.
 % Order of folders should match port_order and digitalin_order
-for i = find(~cellfun(@isempty,folder_order))
+for i = find(~cellfun(@isempty,subject_order))
     
     % if video file with subid is present, move that to basepath
-    if isfile([dat_folder,filesep,'*_',folder_order{i},'.avi'])
-        movefile([dat_folder,filesep,'*_',folder_order{i},'.avi'],basepath{i})
+    if isfile([dat_folder,filesep,'*_',subject_order{i},'.avi'])
+        movefile([dat_folder,filesep,'*_',subject_order{i},'.avi'],basepath{i})
     end
     
     % make copy of rhd, setting, and time to basepath
-    copyfile([dat_folder,filesep,'time.dat'],basepath{i});
-    copyfile([dat_folder,filesep,'settings.xml'],basepath{i});
-    copyfile([dat_folder,filesep,'info.rhd'],basepath{i});
+    copyfile([data_path,filesep,'time.dat'],basepath{i});
+    copyfile([data_path,filesep,'settings.xml'],basepath{i});
+    copyfile([data_path,filesep,'info.rhd'],basepath{i});
     
     % create digitalIn event structure and save to basepath
     parse_digitalIn(digitalIn,digitalin_order(i),basepath{i})
@@ -95,7 +85,7 @@ end
 % function main(basepath,amp,aux,time)
 
 
-function process_aux(dat_path,aux_input_channels,ports,basepath)
+function process_aux(dat_path,aux_input_channels,folders,basepath)
 % processes intan auxillary file and splits into separate files indicated
 % by ports.
 % input:
@@ -107,12 +97,13 @@ function process_aux(dat_path,aux_input_channels,ports,basepath)
 % - ports: cell array containing
 % output:
 % - saves port_aux.dat to dat_path
+% LB 03/22
 
 % Check to see if files have been created 
 % find ports to write
 write_port = unique({aux_input_channels.port_name});
-basepath = basepath(~cellfun(@isempty,ports));
-write_port = write_port(~cellfun(@isempty,ports)); % write ports based on inputs
+basepath = basepath(~cellfun(@isempty,folders));
+write_port = write_port(~cellfun(@isempty,folders)); % write ports based on inputs
 
 % if all files have been written, exit the function
 if isempty(write_port)
@@ -136,6 +127,7 @@ clear aux
 end
 
 function process_aux_(aux,port,aux_input_channels,basepath)
+% LB 03/22
     % skip if file is already created
     if isfile([basepath,filesep,'auxiliary.dat'])
         disp([basepath,'auxiliary.dat ','already created'])
@@ -151,7 +143,7 @@ function process_aux_(aux,port,aux_input_channels,basepath)
     fclose(aux_file);
 end
 
-function process_amp(dat_path,amplifier_channels,frequency_parameters,ports,basepath)
+function process_amp(dat_path,amplifier_channels,frequency_parameters,subject_order,basepath)
 % processes intan amplifier file and splits into separate files indicated
 % by ports.
 % input:
@@ -163,12 +155,12 @@ function process_amp(dat_path,amplifier_channels,frequency_parameters,ports,base
 % - ports: cell array containing
 % output:
 % - saves port_amplifier.dat to dat_path
-
+% LB 03/22
 % Check to see if files have been created 
 % loop through ports
 write_port = unique({amplifier_channels.port_name});
-basepath = basepath(~cellfun(@isempty,ports));
-write_port = write_port(~cellfun(@isempty,ports)); % write ports based on inputs
+basepath = basepath(~cellfun(@isempty,subject_order));
+write_port = write_port(~cellfun(@isempty,subject_order)); % write ports based on inputs
 
 % loop through ports
 remove_port_idx = [];
@@ -179,6 +171,7 @@ for port = 1:length(write_port)
         remove_port_idx = [remove_port_idx;find(ismember(write_port,write_port{port}))];
     end
 end
+
 if ~isempty(remove_port_idx)
     basepath(remove_port_idx) = [];
     write_port(remove_port_idx) = [];
@@ -289,7 +282,8 @@ function parsed_digitalIn = parse_digitalIn(digitalIn,channel_index,basepath,var
 % input:
 %  - digitalIn: structure produced by process_digitalIn containing events
 %     from intan digitalIn.dat file
-%  - channel_index: channels to be saved. Assum
+%  - channel_index: channels to be saved. 
+% LB 03/22
 p = inputParser;
 addParameter(p,'video_idx',1,@isnumeric)
 parse(p,varargin{:});
