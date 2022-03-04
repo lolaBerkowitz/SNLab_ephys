@@ -23,14 +23,13 @@
 % For sessions that record from multiple headstages from separate animals.
 % For SNLab, assumes one animal per active port (64 channel electrodes) as
 % of 2/22
-% file to process
-file_name = 'day17_day0_220303_122516';
 
 % corresponds to port A, B, C, D unless input port_order is used as input
 % in split_dat below
-folder_order = {'hpc06',[],'hpc05','hpc04'};
-project_data_folder = '\\10.253.5.16\sn data server 3\multianimal_ephys';
-split_dat(file_name,folder_order,'project_data_folder',project_data_folder)
+subject_order = {[],[],[],'hpc04'};
+data_path = '\\10.253.5.16\sn data server 3\laura_berkowitz\app_ps1_ephys\data\to_split\day03_220214_115829';
+save_path = '\\10.253.5.16\sn data server 3\laura_berkowitz\app_ps1_ephys\data';
+split_dat(data_path,save_path, subject_order)
 
 % loop through folders and process unprocessed data files 
 
