@@ -21,7 +21,7 @@ function preprocess_session(basepath,varargin)
 p = inputParser;
 addParameter(p,'analogInputs',false,@islogical);
 addParameter(p,'analogChannels',[],@isnumeric);
-addParameter(p,'digitalInputs',true,@islogical);
+addParameter(p,'digitalInputs',false,@islogical);
 addParameter(p,'digitalChannels',[],@isnumeric);
 addParameter(p,'getAcceleration',true,@islogical);
 % addParameter(p,'cleanArtifacts',false,@islogical);
@@ -33,6 +33,10 @@ addParameter(p,'removeNoise',false,@islogical);
 addParameter(p,'ssd_path','C:\kilo_temp',@ischar);    % Path to SSD disk.
 addParameter(p,'lfp_fs',1250,@isnumeric);
 addParameter(p,'specialChannels',[30,59,17],@isnumeric) % default for ASYpoly2A64
+addParameter(p,'acquisition_event_flag',false,@islogical) % if you have start and stop recording 
+% events else default uses first and last event as indicies for start and stop of recording
+addParameter(p,'event_bounce_fix',false,@islogical) % fixes bouncy events
+
 parse(p,varargin{:});
 
 analogInputs = p.Results.analogInputs;
@@ -50,11 +54,12 @@ removeNoise = p.Results.removeNoise;
 ssd_path = p.Results.ssd_path;
 lfp_fs = p.Results.lfp_fs;
 specialChannels = p.Results.specialChannels;
+acquisition_event_flag = p.Results.acquisition_event_flag;
 
 % Prepare dat files and prepare metadata
 
 % Set basename from folder
-[~,basename] = fileparts(basepath);
+basename = basenameFromBasepath(basepath);
 
 % rename amplifier.dat to basename.dat
 if ~isempty(dir([basepath,filesep,'amplifier.dat']))
@@ -71,9 +76,10 @@ if ~isempty(dir([basepath,filesep,'amplifier.xml']))
     command = ['rename ',basepath,filesep,'amplifier.xml',' ',basename,'.xml'];
     system(command); % run through system command prompt
 end
+    
 
 % Create SessionInfo
-session = sessionTemplate(basepath,'showGUI',true);
+session = sessionTemplate(basepath,'showGUI',false);
 
 % Process additional inputs 
 
@@ -100,18 +106,42 @@ if digitalInputs
     end
 end
 
-% Epochs derived from digital inputs
-if exist(fullfile(basepath,[session.general.name,'digitalin.events.mat']),'file')
-    load(fullfile(basepath,[session.general.name,'digitalin.events.mat']),'digitalIn')
-    for i = 1:2:size(digitalIn.timestampsOn{1, 2},1) % by default 2nd column is events
-        session.epochs{i}.name =  str(i);
-        session.epochs{i}.startTime =  digitalIn.timestampsOn{1, 2}(i);
-        session.epochs{i}.stopTime =  digitalIn.timestampsOn{1, 2}(i+1);
+% Epochs derived from digital inputs for multianimal recordings
+if exist(fullfile(basepath,['digitalIn.events.mat']),'file')
+    load(fullfile(basepath,['digitalIn.events.mat']))
+    
+    if exist('digitalIn','var')
+        parsed_digitalIn = digitalIn;
+        clear digitalIn
     end
+    
+    if acquisition_event_flag
+        start_idx = 2;
+        % first and last time stamp are always acquisition
+        session.epochs{1}.name =  'acquisition';
+        session.epochs{1}.startTime =  parsed_digitalIn.timestampsOn{1, 2}(1);
+        session.epochs{1}.stopTime = parsed_digitalIn.timestampsOn{1, 2}(end);
+        
+    else
+        start_idx = 1;
+    end
+    
+    % loop through the other epochs
+    ii = start_idx;
+    for i = start_idx:2:size(parsed_digitalIn.timestampsOn{1, 2},1)-1 % by default 2nd column is events
+        session.epochs{ii}.name =  char(i);
+        session.epochs{ii}.startTime =  parsed_digitalIn.timestampsOn{1, 2}(i);
+        session.epochs{ii}.stopTime =  parsed_digitalIn.timestampsOff{1, 2}(i+1);
+        ii = ii+1;
+    end
+else
+    disp('No digitalIn.events.mat found in basepath.')
 end
+save(fullfile(basepath,[basename, '.session.mat']),'session');
 
-% Force annotate session 
+% Force annotate session epochs 
 gui_session
+
 
 % Auxilary input
 if getAcceleration
@@ -178,7 +208,8 @@ run_ks1(basepath,ssd_folder)
 
 % Get tracking positions - TO FIX
 if DLC
-    getSessionTracking('optitrack',false);
+    disp('DLC loader is in development LB 03/22')
+%     getSessionTracking('optitrack',false);
 end
 
 end
