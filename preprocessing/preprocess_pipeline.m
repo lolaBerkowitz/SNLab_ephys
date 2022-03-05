@@ -19,23 +19,29 @@
 
 
 % LBerkowitz 2021
+
 %% Multi-animal recording session 
 % For sessions that record from multiple headstages from separate animals.
 % For SNLab, assumes one animal per active port (64 channel electrodes) as
 % of 2/22
 
-% corresponds to port A, B, C, D unless input port_order is used as input
-% in split_dat below
+% subject folder corresponds to port A, B, C, D, respectively
 subject_order = {[],[],[],'hpc04'};
-data_path = '\\10.253.5.16\sn data server 3\laura_berkowitz\app_ps1_ephys\data\to_split\day03_220214_115829';
-save_path = '\\10.253.5.16\sn data server 3\laura_berkowitz\app_ps1_ephys\data';
-split_dat(data_path,save_path, subject_order)
 
-% loop through folders and process unprocessed data files 
+% folder where dat files reside that need to be split
+data_path = '\\10.253.5.16\sn data server 3\laura_berkowitz\app_ps1_ephys\data\to_split\day03_220214_115829';
+
+% project folder where subjects data should be saved
+save_path = '\\10.253.5.16\sn data server 3\laura_berkowitz\app_ps1_ephys\data';
+
+% split dat files 
+split_dat(data_path,save_path, subject_order)
 
 
 %% Single Session Preprocess
-basepath = uigetdir;
+
+basepath = '\\10.253.5.16\sn data server 3\laura_berkowitz\app_ps1_ephys\data\hpc04\hpc04_day17_220303_122516';
+
 
 % Check xml/channel mapping: verify channel map, skip bad channels, and save 
 make_xml(basepath)
@@ -44,9 +50,9 @@ make_xml(basepath)
 preprocess_session(basepath,'digitalInputs',false)
 
 %% Batch preprocess (must make sure xml is made/accurate before running)
-data_folder = uigetdir; % subject main folder (i.e. ~\data\hpc01)
+subject_folder = '\\10.253.5.16\sn data server 3\laura_berkowitz\app_ps1_ephys\data\hpc04' subject main folder (i.e. ~\data\hpc01)
 
-preprocess_batch(data_folder)
+preprocess_batch(subject_folder)
 
 %% Clean up kilo results in Phy
 disp ('Curate the kilosort results in Phy ')
