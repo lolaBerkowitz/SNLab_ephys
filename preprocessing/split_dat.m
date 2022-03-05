@@ -54,7 +54,7 @@ for i = find(~cellfun(@isempty,subject_order))
     end
 end
 
-% splits dat according to subject_order and saves to dat_folder
+% splits dat according to subject_order and saves to data_path
 process_aux(data_path,aux_input_channels,subject_order,basepath);
 process_amp(data_path,amplifier_channels,frequency_parameters,subject_order,basepath);
 
@@ -66,8 +66,8 @@ digitalIn = process_digitalin(data_path,'digitalin.dat',frequency_parameters.boa
 for i = find(~cellfun(@isempty,subject_order))
     
     % if video file with subid is present, move that to basepath
-    if isfile([dat_folder,filesep,'*_',subject_order{i},'.avi'])
-        movefile([dat_folder,filesep,'*_',subject_order{i},'.avi'],basepath{i})
+    if isfile([data_path,filesep,'*_',subject_order{i},'.avi'])
+        movefile([data_path,filesep,'*_',subject_order{i},'.avi'],basepath{i})
     end
     
     % make copy of rhd, setting, and time to basepath
