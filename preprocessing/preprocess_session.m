@@ -65,7 +65,7 @@ basename = basenameFromBasepath(basepath);
 if ~isempty(dir([basepath,filesep,'amplifier.dat']))
     disp(['renaming amplifer.dat to ',basename,'.dat'])
     % create command
-    command = ['rename ',basepath,filesep,'amplifier.dat',' ',basename,'.dat'];
+    command = ['rename "',basepath,filesep,'amplifier.dat"',' ',basename,'.dat'];
     system(command); % run through system command prompt
 end
 
@@ -73,7 +73,7 @@ end
 if ~isempty(dir([basepath,filesep,'amplifier.xml']))
     disp(['renaming amplifer.xml to ',basename,'.xml'])
     % create command
-    command = ['rename ',basepath,filesep,'amplifier.xml',' ',basename,'.xml'];
+    command = ['rename "',basepath,filesep,'amplifier.xml"',' ',basename,'.xml'];
     system(command); % run through system command prompt
 end
     
