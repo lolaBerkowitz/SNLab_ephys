@@ -23,11 +23,11 @@ metadata = readtable(metadata_csv_path);
 
 run_idx = find(~contains(metadata.split,'done')); % run files that have not been run
 
-for file = run_idx
+for file = run_idx'
     data_path = metadata.data_path{file};
     save_path = metadata.save_path{file};
-    subject_order = {metadata.A{file},metadata.B{file}...
-                    ,metadata.C{file},metadata.D{file}};
+    subject_order = {metadata.Port_A{file},metadata.Port_B{file}...
+                    ,metadata.Port_C{file},metadata.Port_D{file}};
     
     disp(['Running split dat on data folder :', data_path])
     split_dat(data_path,save_path, subject_order)
