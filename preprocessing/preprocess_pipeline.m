@@ -29,7 +29,7 @@
 subject_order = {[],[],[],'hpc04'};
 
 % folder where dat files reside that need to be split
-data_path = '\\10.253.5.16\sn data server 3\laura_berkowitz\app_ps1_ephys\data\to_split\day03_220214_115829';
+data_path = '\\10.253.5.16\sn data server 3\laura_berkowitz\app_ps1_ephys\data\to_split\day08_220219_124637';
 
 % project folder where subjects data should be saved
 save_path = '\\10.253.5.16\sn data server 3\laura_berkowitz\app_ps1_ephys\data';
@@ -39,9 +39,7 @@ split_dat(data_path,save_path, subject_order)
 
 
 %% Single Session Preprocess
-
-basepath = '\\10.253.5.16\sn data server 3\laura_berkowitz\app_ps1_ephys\data\hpc04\hpc04_day17_220303_122516';
-
+basepath = '\\10.253.5.16\sn data server 3\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day00_220303_122516';
 
 % Check xml/channel mapping: verify channel map, skip bad channels, and save 
 make_xml(basepath)
@@ -50,7 +48,7 @@ make_xml(basepath)
 preprocess_session(basepath,'digitalInputs',false)
 
 %% Batch preprocess (must make sure xml is made/accurate before running)
-subject_folder = '\\10.253.5.16\sn data server 3\laura_berkowitz\app_ps1_ephys\data\hpc04' subject main folder (i.e. ~\data\hpc01)
+subject_folder = '\\10.253.5.16\sn data server 3\laura_berkowitz\app_ps1_ephys\data\hpc05'; %subject main folder (i.e. ~\data\hpc01)
 
 preprocess_batch(subject_folder)
 
@@ -172,13 +170,15 @@ folders = folders(~ismember({folders.name},{'.','..'}),:);
 % loop through folders and process those that don't have evidence of
 % processing (in this case chanMap.mat)
 for i = 1:length(folders)
-    basepath = [data_folder,filesep,folders{i}.name];
+    basepath = [data_folder,filesep,folders(i).name];
     
     % Check xml/channel mapping: verify channel map, skip bad channels, and save 
-    make_xml(basepath)
+    if ~exist([basepath,filesep,'amplifier.xml'],'file')
+        make_xml(basepath)
+    end
     
     if isempty(dir([basepath,filesep,'chanMap.mat']))
-        preprocess_session(basepath)
+        preprocess_session(basepath,'digitalInputs',false)
     else
         continue
     end
