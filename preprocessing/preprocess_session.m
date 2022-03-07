@@ -35,7 +35,7 @@ addParameter(p,'lfp_fs',1250,@isnumeric);
 addParameter(p,'specialChannels',[30,59,17],@isnumeric) % default for ASYpoly2A64
 addParameter(p,'acquisition_event_flag',false,@islogical) % if you have start and stop recording 
 % events else default uses first and last event as indicies for start and stop of recording
-addParameter(p,'event_bounce_fix',false,@islogical) % fixes bouncy events
+addParameter(p,'check_epochs',true,@islogical) % fixes bouncy events
 
 parse(p,varargin{:});
 
@@ -55,7 +55,7 @@ ssd_path = p.Results.ssd_path;
 lfp_fs = p.Results.lfp_fs;
 specialChannels = p.Results.specialChannels;
 acquisition_event_flag = p.Results.acquisition_event_flag;
-
+check_epochs = p.Results.check_epochs;
 % Prepare dat files and prepare metadata
 
 % Set basename from folder
@@ -139,8 +139,10 @@ else
 end
 save(fullfile(basepath,[basename, '.session.mat']),'session');
 
-% Force annotate session epochs 
-gui_session
+%  annotate session epochs 
+if check_epochs
+    gui_session
+end
 
 
 % Auxilary input
@@ -192,15 +194,15 @@ mkdir(ssd_folder);
 disp('Copying basename.dat, basename.xml, and channelmap to ssd')
 
 disp('Saving dat file to ssd')
-command = ['robocopy ',basepath,' ',ssd_folder,' ',basename,'.dat'];
+command = ['robocopy "',basepath,'" ',ssd_folder,' ',basename,'.dat'];
 system(command);
 
 disp('Saving xml to ssd')
-command = ['robocopy ',basepath,' ',ssd_folder,' ',basename,'.xml'];
+command = ['robocopy "',basepath,'" ',ssd_folder,' ',basename,'.xml'];
 system(command);
 
 disp('Saving channel_map to ssd')
-command = ['robocopy ',basepath,' ',ssd_folder,' chanMap.mat'];
+command = ['robocopy "',basepath,'" ',ssd_folder,' chanMap.mat'];
 system(command);
 
 % Spike sort using kilosort 1 (data on ssd)
