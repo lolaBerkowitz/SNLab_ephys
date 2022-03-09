@@ -133,6 +133,7 @@ aux = memmapfile(contFile,'Format',{'uint16' [n_channels samples] 'mapped'});
 % loop through ports
 tic
 parfor port = 1:length(write_port)
+    write_aux(aux,write_port{port},aux_input_channels,basepath{port},trim_dat_epoch(port,:))
 end
 toc
 clear aux 
