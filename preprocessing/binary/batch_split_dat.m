@@ -1,4 +1,4 @@
-function batch_split_dat(metadata_csv_path)
+function batch_split_dat(metadata_path)
 % pulls path and port info from metata csv and runs split_dat.m 
 %
 % input: 
@@ -20,7 +20,7 @@ function batch_split_dat(metadata_csv_path)
 %   LBerkowitz 03/2022
 
 % load csv as table
-metadata = readtable(metadata_csv_path);
+metadata = readtable(metadata_path);
 
 % loop through paths 
 
