@@ -24,7 +24,7 @@ addParameter(p,'analogChannels',[],@isnumeric);
 addParameter(p,'digitalInputs',false,@islogical);
 addParameter(p,'digitalChannels',[],@isnumeric);
 addParameter(p,'getAcceleration',true,@islogical);
-% addParameter(p,'cleanArtifacts',false,@islogical);
+addParameter(p,'concatenateDat',false,@islogical);
 addParameter(p,'getLFP',true,@islogical);
 addParameter(p,'getEMG',true,@islogical);
 addParameter(p,'stateScore',true,@islogical);
@@ -46,6 +46,7 @@ digitalChannels = p.Results.digitalChannels;
 getAcceleration = p.Results.getAcceleration;
 getLFP = p.Results.getLFP;
 getEMG = p.Results.getEMG;
+concatenateDat = p.Results.concatenateDat;
 
 % cleanArtifacts = p.Results.cleanArtifacts;
 stateScore = p.Results.stateScore;
@@ -60,6 +61,15 @@ check_epochs = p.Results.check_epochs;
 
 % Set basename from folder
 basename = basenameFromBasepath(basepath);
+
+% Create SessionInfo
+session = sessionTemplate(basepath,'showGUI',true);
+
+% If non-contiguous recordings were taken, merge the dat files into one
+% session. Default is false. 
+if concatenateDat
+    concatenateDats(basepath,0,1);
+end
 
 % rename amplifier.dat to basename.dat
 if ~isempty(dir([basepath,filesep,'amplifier.dat']))
@@ -76,10 +86,7 @@ if ~isempty(dir([basepath,filesep,'amplifier.xml']))
     command = ['rename "',basepath,filesep,'amplifier.xml"',' ',basename,'.xml'];
     system(command); % run through system command prompt
 end
-    
-
-% Create SessionInfo
-session = sessionTemplate(basepath,'showGUI',false);
+   
 
 % Process additional inputs 
 
