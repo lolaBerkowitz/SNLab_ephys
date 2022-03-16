@@ -17,8 +17,11 @@
 %  3.  Manual Curation in Phy 
 %  4.  Compile and save in CellExplorer data structure
 
-
 % LBerkowitz 2021
+
+%% paths for individual research projects 
+laura = '\\10.253.5.16\sn data server 3\laura_berkowitz\app_ps1_ephys\data';
+austin = '\\10.253.5.16\sn data server 3\austin_bunce\Ephys\data';
 
 %% Multi-animal recording session 
 % For sessions that record from multiple headstages from separate animals.
@@ -26,20 +29,20 @@
 % of 2/22
 
 % subject folder corresponds to port A, B, C, D, respectively
-subject_order = {[],[],[],'hpc04'};
+subject_order = {'hpc06','hpc05',[],[]};
 
 % folder where dat files reside that need to be split
-data_path = '\\10.253.5.16\sn data server 3\laura_berkowitz\app_ps1_ephys\data\to_split\day08_220219_124637';
+data_path = '\\10.253.5.16\sn data server 3\laura_berkowitz\app_ps1_ephys\data\to_split\day05_220310_113927';
 
 % project folder where subjects data should be saved
-save_path = '\\10.253.5.16\sn data server 3\laura_berkowitz\app_ps1_ephys\data';
-
+save_path = {laura, laura, [], []};
+    
 % split dat files 
-split_dat(data_path,save_path, subject_order)
+split_dat(data_path,save_path, subject_order,'trim_dat',true)
 
 
 %% Single Session Preprocess
-basepath = '\\10.253.5.16\sn data server 3\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day00_220303_122516';
+basepath = '\\10.253.5.16\sn data server 3\austin_bunce\EPhys\data\hpc04\hpc04_day05';
 
 % Check xml/channel mapping: verify channel map, skip bad channels, and save 
 make_xml(basepath)
@@ -48,7 +51,7 @@ make_xml(basepath)
 preprocess_session(basepath,'digitalInputs',false)
 
 %% Batch preprocess (must make sure xml is made/accurate before running)
-subject_folder = '\\10.253.5.16\sn data server 3\laura_berkowitz\app_ps1_ephys\data\hpc05'; %subject main folder (i.e. ~\data\hpc01)
+subject_folder = '\\10.253.5.16\sn data server 3\austin_bunce\EPhys\data\hpc04\hpc04_day05'; %subject main folder (i.e. ~\data\hpc01)
 
 preprocess_batch(subject_folder)
 
@@ -69,12 +72,12 @@ session = sessionTemplate(basepath,'showGUI',true);
 %% find ripples
 %hpc04 =[38,33] 
 %hpc01 = [23,29]
-epochs = []
+epochs = [];
 for i = 1:length(session.epochs)
     epochs = [epochs;session.epochs{i}.startTime session.epochs{i}.stopTime];
 end
 
-ripples = DetectSWR([23,29],'basepath',basepath);
+ripples = DetectSWR([38,33],'basepath',basepath);
 
 
 %% Compute basic cell metrics
@@ -178,7 +181,7 @@ for i = 1:length(folders)
     end
     
     if isempty(dir([basepath,filesep,'chanMap.mat']))
-        preprocess_session(basepath,'digitalInputs',false)
+        preprocess_session(basepath,'digitalInputs',false,'check_epochs',false)
     else
         continue
     end
