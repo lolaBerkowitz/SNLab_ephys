@@ -80,7 +80,7 @@ for channel =  digitalin_order(subject_idx)
     session_duration = (digitalIn.timestampsOff{1,channel}(end)...
         - digitalIn.timestampsOn{1, channel}(1))/60;
     
-    disp(['port ',input_name{port},' recording was ',...
+    disp(['port ',input_name{channel},' recording was ',...
         num2str(session_duration),' minutes'])
     port = port+1;
 end
@@ -115,7 +115,7 @@ if trim_dat
     % create digitalIn event structure and save to basepath, and reset
     % relative to recording start and end
     parse_digitalIn(digitalIn,digitalin_order(port),basepath{port},'trim_dat_epoch',...
-        trim_dat_epoch{port,:}*frequency_parameters.board_dig_in_sample_rate)
+        trim_dat_epoch(port,:)/frequency_parameters.board_dig_in_sample_rate)
 else
     % create digitalIn event structure and save to basepath
     parse_digitalIn(digitalIn,digitalin_order(port),basepath{port})
@@ -247,8 +247,9 @@ end
 for port = 1:length(write_port)
     if ~isempty(trim_dat_epoch)
         temp_samples = trim_dat_epoch(port,2) - trim_dat_epoch(port,1);
-        batch{port} = ceil(linspace(trim_dat_epoch(port,1),temp_samples,...
-            ceil(trim_dat_epoch(port,2)/frequency_parameters.amplifier_sample_rate/4)));
+        batch{port} = round(linspace(trim_dat_epoch(port,1),trim_dat_epoch(port,2),10000));
+%         batch{port} = ceil(linspace(trim_dat_epoch(port,1),temp_samples,...
+%             ceil(trim_dat_epoch(port,2)/frequency_parameters.amplifier_sample_rate/4)));
     end
     idx{port} = contains({amplifier_channels.port_name},write_port{port});
 end
@@ -256,11 +257,11 @@ end
 
 % loop though ports and write dats
 if ~isempty(trim_dat_epoch)
-    for port = 1:length(write_port)
+    parfor port = 1:length(write_port)
         write_amp(amp,basepath{port},batch{port},idx{port})
     end
 else
-    for port = 1:length(write_port)
+    parfor port = 1:length(write_port)
         write_amp(amp,basepath{port},batch,idx{port})
     end
 end
