@@ -268,6 +268,19 @@ end
 
 % close amp_files
 fclose('all');
+
+% check size of amp compared to calcuated bytes 
+for port = 1:length(basepath)
+    t = dir([basepath{port},filesep,'amplifier.dat']);
+    samples = t.bytes/(sum(idx{port}) * 2); %int16 = 2 bytes
+    calc_samples = trim_dat_epoch(port,2) - trim_dat_epoch(port,1);
+    if samples == calc_samples
+        disp([basepath{port},filesep,'amplifier.dat ','size verified'])
+    else
+        disp([basepath{port},filesep,'amplifier.dat ','has different size than epoch'])
+    end
+end
+
 clear amp 
 end
 
@@ -362,4 +375,6 @@ save([basepath,filesep,'digitalIn.events.mat'],'digitalIn');
 
 end
 
+function check_sizes(basepath,dat,size)
 
+end
