@@ -10,7 +10,7 @@ function split_dat(data_path,save_path, subject_order,varargin)
 %              located (one path per port)
 %   subject_order: cell array with subject name (i.e. {'HPC01','HPC02'...}
 %            will give data_path\HPC01, data_path\HPC02, ...). Order must
-%            match order: Port A, Port B, Port C, Port D i.e. HPC01 was recording on 
+%            match order: Port A, Port B, Port C, Port D i.e. HPC01 was recording on
 %            Port A, HPC02 on Port B etc.
 %
 % variable arguments:
@@ -35,14 +35,14 @@ function split_dat(data_path,save_path, subject_order,varargin)
 
 p = inputParser;
 addParameter(p,'digitalin_order',[2,3,4,5],@isnumeric) %snlab rig wiring for events
-addParameter(p,'input_name',{'video','A','B','C','D'},@isnumeric) %snlab rig wiring 
-addParameter(p,'trim_dat',false,@islogical) %snlab rig wiring 
+addParameter(p,'input_name',{'video','A','B','C','D'},@isnumeric) %snlab rig wiring
+addParameter(p,'trim_dat',false,@islogical) %snlab rig wiring
 
 parse(p,varargin{:});
 
 digitalin_order = p.Results.digitalin_order;
 input_name = p.Results.input_name;
-trim_dat = p.Results.trim_dat; 
+trim_dat = p.Results.trim_dat;
 
 
 % identify inputs that require processing -- order of inputs is associated
@@ -95,7 +95,7 @@ else
     process_aux(data_path,aux_input_channels,subject_order,basepath);
     process_amp(data_path,amplifier_channels,frequency_parameters,...
         subject_order,basepath);
-
+    
 end
 
 % Loop through folders.
@@ -110,16 +110,16 @@ for port = find(~cellfun(@isempty,subject_order))
     % make copy of rhd, and setting to basepath
     copyfile([data_path,filesep,'settings.xml'],basepath{port});
     copyfile([data_path,filesep,'info.rhd'],basepath{port});
-
-if trim_dat
-    % create digitalIn event structure and save to basepath, and reset
-    % relative to recording start and end
-    parse_digitalIn(digitalIn,digitalin_order(port),basepath{port},'trim_dat_epoch',...
-        trim_dat_epoch(port,:)/frequency_parameters.board_dig_in_sample_rate)
-else
-    % create digitalIn event structure and save to basepath
-    parse_digitalIn(digitalIn,digitalin_order(port),basepath{port})
-end
+    
+    if trim_dat
+        % create digitalIn event structure and save to basepath, and reset
+        % relative to recording start and end
+        parse_digitalIn(digitalIn,digitalin_order(port),basepath{port},'trim_dat_epoch',...
+            trim_dat_epoch(port,:)/frequency_parameters.board_dig_in_sample_rate)
+    else
+        % create digitalIn event structure and save to basepath
+        parse_digitalIn(digitalIn,digitalin_order(port),basepath{port})
+    end
 end
 
 
@@ -149,7 +149,7 @@ parse(p,varargin{:});
 trim_dat_epoch = p.Results.trim_dat_epoch;
 
 
-% Check to see if files have been created 
+% Check to see if files have been created
 % find ports to write
 write_port = unique({aux_input_channels.port_name});
 basepath = basepath(~cellfun(@isempty,folders));
@@ -167,19 +167,42 @@ file = dir(contFile);
 samples = file.bytes/(n_channels * 2); %int16 = 2 bytes
 aux = memmapfile(contFile,'Format',{'uint16' [n_channels samples] 'mapped'});
 
+% create batches
+if isempty(trim_dat_epoch)
+    batch = ceil(linspace(0,samples,ceil(samples/frequency_parameters.aux_input_sample_rate/4)));
+end
+% initialize new dat, channel index, and batch
+for port = 1:length(write_port)
+    if ~isempty(trim_dat_epoch)
+        batch{port} = round(linspace(trim_dat_epoch(port,1),trim_dat_epoch(port,2),100));
+    end
+    idx{port} = contains({aux_input_channels.port_name},write_port{port});
+end
+
 % loop through ports
 if ~isempty(trim_dat_epoch) % trims dat based on digitalin events
-    for port = 1:length(write_port)
-        write_aux(aux,write_port{port},aux_input_channels,basepath{port},...
-            'trim_dat_epoch',trim_dat_epoch(port,:))
+    parfor port = 1:length(write_port)
+        write_aux(aux,basepath{port},batch{port},idx{port})
     end
 else
-    for port = 1:length(write_port) % keeps entire dat
-        write_aux(aux,write_port{port},aux_input_channels,basepath{port})
+    parfor port = 1:length(write_port) % keeps entire dat
+        write_aux(aux,basepath{port},batch,idx{port})
     end
 end
 
-clear aux 
+% check size of amp compared to calcuated bytes
+for port = 1:length(basepath)
+    t = dir([basepath{port},filesep,'auxiliary.dat']);
+    samples = t.bytes/(3 * 2); %int16 = 2 bytes
+    calc_samples = trim_dat_epoch(port,2) - trim_dat_epoch(port,1);
+    if samples == calc_samples
+        disp([basepath{port},filesep,'auxiliary.dat ','size verified'])
+    else
+        disp([basepath{port},filesep,'auxiliary.dat ','has different size than epoch'])
+    end
+end
+
+clear aux
 end
 
 function process_amp(dat_path,amplifier_channels,frequency_parameters,subject_order,basepath,varargin)
@@ -194,12 +217,12 @@ function process_amp(dat_path,amplifier_channels,frequency_parameters,subject_or
 % - subject order: cell array containing subject names 'hpc01'
 % - basepath: cell array of each basepath per subject
 %
-%optional: 
+%optional:
 % trim_dat_epoch: matrix of start and end time in samples to cut dat file.
 % output:
 % - saves port_amplifier.dat to dat_path
 % LB 03/22
-% Check to see if files have been created 
+% Check to see if files have been created
 
 p = inputParser;
 addParameter(p,'trim_dat_epoch',[],@isnumeric) %snlab rig wiring for events
@@ -248,8 +271,8 @@ for port = 1:length(write_port)
     if ~isempty(trim_dat_epoch)
         temp_samples = trim_dat_epoch(port,2) - trim_dat_epoch(port,1);
         batch{port} = round(linspace(trim_dat_epoch(port,1),trim_dat_epoch(port,2),10000));
-%         batch{port} = ceil(linspace(trim_dat_epoch(port,1),temp_samples,...
-%             ceil(trim_dat_epoch(port,2)/frequency_parameters.amplifier_sample_rate/4)));
+        %         batch{port} = ceil(linspace(trim_dat_epoch(port,1),temp_samples,...
+        %             ceil(trim_dat_epoch(port,2)/frequency_parameters.amplifier_sample_rate/4)));
     end
     idx{port} = contains({amplifier_channels.port_name},write_port{port});
 end
@@ -269,7 +292,7 @@ end
 % close amp_files
 fclose('all');
 
-% check size of amp compared to calcuated bytes 
+% check size of amp compared to calcuated bytes
 for port = 1:length(basepath)
     t = dir([basepath{port},filesep,'amplifier.dat']);
     samples = t.bytes/(sum(idx{port}) * 2); %int16 = 2 bytes
@@ -281,7 +304,7 @@ for port = 1:length(basepath)
     end
 end
 
-clear amp 
+clear amp
 end
 
 function write_amp(amp,basepath,batch,idx)
@@ -297,35 +320,26 @@ end
 
 end
 
-function write_aux(aux,port,aux_input_channels,basepath,varargin)
+function write_aux(aux,basepath,batch,idx)
 % LB 03/22
 
-p = inputParser;
-addParameter(p,'trim_dat_epoch',[],@isnumeric) %snlab rig wiring for events
+% skip if file is already created
+if isfile([basepath,filesep,'auxiliary.dat'])
+    disp([basepath,filesep,'auxiliary.dat ','already created'])
+    return
+end
 
-parse(p,varargin{:});
+% initiate file
+aux_file = fopen([basepath,filesep,'auxiliary.dat'],'w');
 
-trim_dat_epoch = p.Results.trim_dat_epoch;
-
-    % skip if file is already created
-    if isfile([basepath,filesep,'auxiliary.dat'])
-        disp([basepath,filesep,'auxiliary.dat ','already created'])
-        return
-    end
-    
-    % initiate file
-    aux_file = fopen([basepath,filesep,'auxiliary.dat'],'w');
-    idx = contains({aux_input_channels.port_name},port);
-   
-    if ~isempty(trim_dat_epoch)
-        % write to disk
-        fwrite(aux_file, aux.Data.mapped(idx,trim_dat_epoch(1):trim_dat_epoch(2)), 'uint16');
-        fclose(aux_file);
-    else
-        % write to disk
-        fwrite(aux_file, aux.Data.mapped(idx,:), 'uint16');
-        fclose(aux_file);
-    end
+% loop though batches
+for ii = 1:length(batch)-1
+    disp(['batch ',num2str(batch(ii)+1),' to ',num2str(batch(ii+1)),...
+        '   ',num2str(ii),' of ',num2str(length(batch)-1)])
+    % write to disk
+    fwrite(aux_file,aux.Data.mapped(idx,batch(ii)+1:batch(ii+1)), 'uint16');
+end
+fclose(aux_file);
 end
 
 function digitalIn = parse_digitalIn(old_digitalIn,channel_index,basepath,varargin)
@@ -335,12 +349,12 @@ function digitalIn = parse_digitalIn(old_digitalIn,channel_index,basepath,vararg
 % input:
 %  - digitalIn: structure produced by process_digitalIn containing events
 %     from intan digitalIn.dat file
-%  - channel_index: channels to be saved. 
+%  - channel_index: channels to be saved.
 %  - basepath: location to save digitalin.events.mat
-% optional: 
+% optional:
 %  - video_idx: digitalin channel that contains timestamps from video
 %  source. Default is 1 (intan channel 0);
-%  - trim_dat_epoch: start and end of recording in seconds 
+%  - trim_dat_epoch: start and end of recording in seconds
 %
 % LB 03/22
 p = inputParser;
@@ -361,7 +375,7 @@ if ~isempty(trim_dat_epoch)
     digitalIn.dur{1,2} = old_digitalIn.dur{1, channel_index};
     digitalIn.intsPeriods{1,2} = old_digitalIn.intsPeriods{1, channel_index} - trim_dat_epoch(1,1);
 else
-
+    
     digitalIn.timestampsOn{1,video_idx} = old_digitalIn.timestampsOn{1, video_idx};
     digitalIn.timestampsOff{1,video_idx} = old_digitalIn.timestampsOff{1, video_idx};
     digitalIn.timestampsOn{1,2} = old_digitalIn.timestampsOn{1, channel_index};
@@ -369,12 +383,9 @@ else
     digitalIn.ints{1,2} = old_digitalIn.ints{1, channel_index};
     digitalIn.dur{1,2} = old_digitalIn.dur{1, channel_index};
     digitalIn.intsPeriods{1,2} = old_digitalIn.intsPeriods{1, channel_index};
-
+    
 end
 save([basepath,filesep,'digitalIn.events.mat'],'digitalIn');
 
 end
 
-function check_sizes(basepath,dat,size)
-
-end
