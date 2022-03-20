@@ -1,10 +1,8 @@
-function amp = load_amplifier(basepath,amplifier_channels)
+function amp = load_amplifier(basepath,n_channels)
 % load intan amplifier file mapped 
 basename = basenameFromBasepath(basepath);
 
 % Load the file
-n_channels = size(amplifier_channels,2);
-
 if exist([basepath,filesep,'amplifier.dat'],'file')
     contFile = fullfile(basepath,'amplifier.dat');
 elseif exist([basepath,filesep,basename,'.dat'],'file')
