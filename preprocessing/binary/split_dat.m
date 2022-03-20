@@ -35,7 +35,7 @@ function split_dat(data_path,save_path, subject_order,varargin)
 
 p = inputParser;
 addParameter(p,'digitalin_order',[2,3,4,5],@isnumeric) %snlab rig wiring for events
-addParameter(p,'input_name',{'video','A','B','C','D'},@isnumeric) %snlab rig wiring
+addParameter(p,'input_name',{'video','A','B','C','D'},@ischar) %snlab rig wiring
 addParameter(p,'trim_dat',false,@islogical) %snlab rig wiring
 
 parse(p,varargin{:});
@@ -359,30 +359,57 @@ function digitalIn = parse_digitalIn(old_digitalIn,channel_index,basepath,vararg
 % LB 03/22
 p = inputParser;
 addParameter(p,'video_idx',1,@isnumeric)
+addParameter(p,'event_idx',2,@isnumeric)
 addParameter(p,'trim_dat_epoch',[],@isnumeric)
 parse(p,varargin{:});
 
 video_idx = p.Results.video_idx;
 trim_dat_epoch = p.Results.trim_dat_epoch;
+event_idx = p.Results.event_idx;
 
 if ~isempty(trim_dat_epoch)
+    % adjust digitalin so time starts at zero
+    start_idx = (trim_dat_epoch(1)/frequency_parameters.board_dig_in_sample_rate);
     
-    digitalIn.timestampsOn{1,video_idx} = old_digitalIn.timestampsOn{1, video_idx} - trim_dat_epoch(1,1);
-    digitalIn.timestampsOff{1,video_idx} = old_digitalIn.timestampsOff{1, video_idx} - trim_dat_epoch(1,1);
-    digitalIn.timestampsOn{1,2} = old_digitalIn.timestampsOn{1, channel_index} - trim_dat_epoch(1,1);
-    digitalIn.timestampsOff{1,2} = old_digitalIn.timestampsOff{1, channel_index} - trim_dat_epoch(1,1);
-    digitalIn.ints{1,2} = old_digitalIn.ints{1, channel_index} - trim_dat_epoch(1,1);
-    digitalIn.dur{1,2} = old_digitalIn.dur{1, channel_index};
-    digitalIn.intsPeriods{1,2} = old_digitalIn.intsPeriods{1, channel_index} - trim_dat_epoch(1,1);
+    digitalIn.timestampsOn{video_idx} = old_digitalIn.timestampsOn{1, video_idx} - start_idx;
+    digitalIn.timestampsOff{video_idx} = old_digitalIn.timestampsOff{1, video_idx} - start_idx;
+    
+    digitalIn.timestampsOn{event_idx} = old_digitalIn.timestampsOn{1, channel_index} - start_idx;
+    digitalIn.timestampsOff{event_idx} = old_digitalIn.timestampsOff{1, channel_index} - start_idx;
+    
+    % and recalculate other variables
+    for ii = 1:size(digitalIn.timestampsOn,2)
+        % intervals
+        d = zeros(2,max([size(digitalIn.timestampsOn{ii},1) size(digitalIn.timestampsOff{ii},1)]));
+        d(1,1:size(digitalIn.timestampsOn{ii},1)) = digitalIn.timestampsOn{ii};
+        d(2,1:size(digitalIn.timestampsOff{ii},1)) = digitalIn.timestampsOff{ii};
+        if d(1,1) > d(2,1)
+            d = flip(d,1);
+        end
+        if d(2,end) == 0; d(2,end) = nan; end
+        digitalIn.ints{ii} = d;
+        digitalIn.dur{ii} = digitalIn.ints{ii}(2,:) - digitalIn.ints{ii}(1,:); % durantion
+        
+        clear intsPeriods
+        intsPeriods(1,1) = d(1,1); % find stimulation intervals
+        intPeaks =find(diff(d(1,:))>lag);
+        for jj = 1:length(intPeaks)
+            intsPeriods(jj,2) = d(2,intPeaks(jj));
+            intsPeriods(jj+1,1) = d(1,intPeaks(jj)+1);
+        end
+        intsPeriods(end,2) = d(2,end);
+        digitalIn.intsPeriods{ii} = intsPeriods;
+    end
+    
 else
     
-    digitalIn.timestampsOn{1,video_idx} = old_digitalIn.timestampsOn{1, video_idx};
-    digitalIn.timestampsOff{1,video_idx} = old_digitalIn.timestampsOff{1, video_idx};
-    digitalIn.timestampsOn{1,2} = old_digitalIn.timestampsOn{1, channel_index};
-    digitalIn.timestampsOff{1,2} = old_digitalIn.timestampsOff{1, channel_index};
-    digitalIn.ints{1,2} = old_digitalIn.ints{1, channel_index};
-    digitalIn.dur{1,2} = old_digitalIn.dur{1, channel_index};
-    digitalIn.intsPeriods{1,2} = old_digitalIn.intsPeriods{1, channel_index};
+    digitalIn.timestampsOn{video_idx} = old_digitalIn.timestampsOn{1, video_idx};
+    digitalIn.timestampsOff{video_idx} = old_digitalIn.timestampsOff{1, video_idx};
+    digitalIn.timestampsOn{event_idx} = old_digitalIn.timestampsOn{1, channel_index};
+    digitalIn.timestampsOff{event_idx} = old_digitalIn.timestampsOff{1, channel_index};
+    digitalIn.ints{event_idx} = old_digitalIn.ints{1, channel_index};
+    digitalIn.dur{event_idx} = old_digitalIn.dur{1, channel_index};
+    digitalIn.intsPeriods{event_idx} = old_digitalIn.intsPeriods{1, channel_index};
     
 end
 save([basepath,filesep,'digitalIn.events.mat'],'digitalIn');
