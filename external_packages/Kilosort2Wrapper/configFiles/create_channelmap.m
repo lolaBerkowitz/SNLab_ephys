@@ -50,7 +50,7 @@ aux_skip      = cell2mat({par.AnatGrps.Skip});
 aux_ch        = cell2mat({par.AnatGrps.Channels});
 disconnect_ch = aux_ch(logical(aux_skip))+1;
 
-chanMap   = 1:Nchannels;
+chanMap   = aux_ch + 1;
 chanMap0ind = chanMap - 1;
 
 connected(disconnect_ch) = false;
