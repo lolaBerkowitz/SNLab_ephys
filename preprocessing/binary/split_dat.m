@@ -87,24 +87,29 @@ end
 
 % splits dat according to subject_order and saves to data_path
 if trim_dat
-    process_aux(data_path,aux_input_channels,subject_order,basepath,...
+    process_aux(data_path,aux_input_channels,frequency_parameters,subject_order,basepath,...
         'trim_dat_epoch',trim_dat_epoch);
     process_amp(data_path,amplifier_channels,frequency_parameters,...
         subject_order,basepath,'trim_dat_epoch',trim_dat_epoch);
 else
-    process_aux(data_path,aux_input_channels,subject_order,basepath);
+    process_aux(data_path,aux_input_channels,frequency_parameters,subject_order,basepath);
     process_amp(data_path,amplifier_channels,frequency_parameters,...
         subject_order,basepath);
     
 end
 
 % Loop through folders.
+% check for videos 
+vid_files = dir([data_path,filesep,'*.avi']);
+vids = {vid_files.name};
 % Order of folders should match port_order and digitalin_order
+digidx = 1;
 for port = find(~cellfun(@isempty,subject_order))
     
     % if video file with subid is present, move that to basepath
-    if isfile([data_path,filesep,'*_',subject_order{port},'.avi'])
-        movefile([data_path,filesep,'*_',subject_order{port},'.avi'],basepath{port})
+    if ~isempty(vids(contains({vid_files.name},subject_order{port})))
+        file = vids(contains({vid_files.name},subject_order{port}));
+        movefile([data_path,filesep,file{1}],basepath{port})
     end
     
     % make copy of rhd, and setting to basepath
@@ -115,19 +120,19 @@ for port = find(~cellfun(@isempty,subject_order))
         % create digitalIn event structure and save to basepath, and reset
         % relative to recording start and end
         parse_digitalIn(digitalIn,digitalin_order(port),basepath{port},'trim_dat_epoch',...
-            trim_dat_epoch(port,:)/frequency_parameters.board_dig_in_sample_rate)
+            trim_dat_epoch(digidx,:)/frequency_parameters.board_dig_in_sample_rate) % input trim_dat in seconds
     else
         % create digitalIn event structure and save to basepath
         parse_digitalIn(digitalIn,digitalin_order(port),basepath{port})
     end
+    digidx = digidx + 1;
 end
 
 
 end
-
 
 % Local functions
-function process_aux(dat_path,aux_input_channels,folders,basepath,varargin)
+function process_aux(dat_path,aux_input_channels,frequency_parameters,subject_order,basepath,varargin)
 % processes intan auxillary file and splits into separate files indicated
 % by ports.
 % input:
@@ -142,7 +147,7 @@ function process_aux(dat_path,aux_input_channels,folders,basepath,varargin)
 % LB 03/22
 
 p = inputParser;
-addParameter(p,'trim_dat_epoch',[],@isnumeric) %snlab rig wiring for events
+addParameter(p,'trim_dat_epoch',[],@isnumeric) % in samples 
 
 parse(p,varargin{:});
 
@@ -152,8 +157,8 @@ trim_dat_epoch = p.Results.trim_dat_epoch;
 % Check to see if files have been created
 % find ports to write
 write_port = unique({aux_input_channels.port_name});
-basepath = basepath(~cellfun(@isempty,folders));
-write_port = write_port(~cellfun(@isempty,folders)); % write ports based on inputs
+basepath = basepath(~cellfun(@isempty,subject_order));
+write_port = write_port(~cellfun(@isempty,subject_order)); % write ports based on inputs
 
 % if all files have been written, exit the function
 if isempty(write_port)
@@ -193,8 +198,8 @@ end
 % check size of amp compared to calcuated bytes
 for port = 1:length(basepath)
     t = dir([basepath{port},filesep,'auxiliary.dat']);
-    samples = t.bytes/(3 * 2); %int16 = 2 bytes
-    calc_samples = trim_dat_epoch(port,2) - trim_dat_epoch(port,1);
+    samples = t.bytes/(3 * 2); %int16 = 2 bytes, default
+    calc_samples = round(trim_dat_epoch(port,2) - trim_dat_epoch(port,1));
     if samples == calc_samples
         disp([basepath{port},filesep,'auxiliary.dat ','size verified'])
     else
@@ -296,7 +301,7 @@ fclose('all');
 for port = 1:length(basepath)
     t = dir([basepath{port},filesep,'amplifier.dat']);
     samples = t.bytes/(sum(idx{port}) * 2); %int16 = 2 bytes
-    calc_samples = trim_dat_epoch(port,2) - trim_dat_epoch(port,1);
+    calc_samples = round(trim_dat_epoch(port,2) - trim_dat_epoch(port,1));
     if samples == calc_samples
         disp([basepath{port},filesep,'amplifier.dat ','size verified'])
     else
@@ -367,9 +372,10 @@ video_idx = p.Results.video_idx;
 trim_dat_epoch = p.Results.trim_dat_epoch;
 event_idx = p.Results.event_idx;
 
+lag = 100;
 if ~isempty(trim_dat_epoch)
     % adjust digitalin so time starts at zero
-    start_idx = (trim_dat_epoch(1)/frequency_parameters.board_dig_in_sample_rate);
+    start_idx = (trim_dat_epoch(1));
     
     digitalIn.timestampsOn{video_idx} = old_digitalIn.timestampsOn{1, video_idx} - start_idx;
     digitalIn.timestampsOff{video_idx} = old_digitalIn.timestampsOff{1, video_idx} - start_idx;
