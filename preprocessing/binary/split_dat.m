@@ -20,6 +20,8 @@ function split_dat(data_path,save_path, subject_order,varargin)
 %
 
 % TO-DO:
+%  - trim/split digitalin.dat and remake digitalin.events.mat 
+%  - trim/split time.dat  
 %  - Make dynamic input so multiple ports can be assiged to the same animal
 %    for drives over 64 channels.
 % - Add availablity to scan data_path\split_folder and automatically process folders that
