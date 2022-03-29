@@ -1,13 +1,13 @@
 function trim_dat(basepath,varargin)
-% trim_dat removes parts of the dat file that does not contain neural data, 
+% trim_dat removes parts of the dat file that does not contain neural data,
 % either from unplugs.
 
 % Dependenies: one signal per channel dat files from intan RHD recording
-% system. 
+% system.
 %
-% inputs: 
-%   basepath: path to SNLab data directory for a given session. 
-% 
+% inputs:
+%   basepath: path to SNLab data directory for a given session.
+%
 % optional:
 %   video_idx: digitalin channel with video timestamps (default: 1 or intan
 %   0)
@@ -16,29 +16,29 @@ function trim_dat(basepath,varargin)
 %   is channel 2 or intan channel 1).
 %   amp_n_channels: number of channels in amplifier.dat (default 64)
 %   aux_n_channels: number of channels in auxiliary.dat (default 3)
-%   noise_epoch: matrix of start/end epochs for denoising (NOT CURRENTLY
-%   WORKING LB 3/22). 
-% output: 
-%   - creates amplifier.dat and auxiliary.dat based on first and last timestamp in digtigalin.events.mat 
+%   trim_epoch: 1x2 vector of [start, end] timestamps in seconds (default
+%   empty)
+% output:
+%   - creates amplifier.dat and auxiliary.dat based on first and last timestamp in digtigalin.events.mat
 %     saves back to basepath.
 %   - updates digitalin.events.mat to reflect trimmed amplifier/auxiliary
 %     files
 %   - renames digitalin, amplifier, and auxiliary dat files with '_old' to
 
-% To-DO: 
-% Add utility to replace epochs of dat with zeros (unplugs, etc). 
-% Add option to trim based on epoch input. 
-% Trim digitalin.dat, and time.dat. 
+% To-DO:
+% Add utility to replace epochs of dat with zeros (unplugs, etc).
+% Add option to trim based on epoch input.
+% Trim digitalin.dat, and time.dat.
 
-% LBerkowitz 03/22 
+% LBerkowitz 03/22
 %
 p = inputParser;
 addParameter(p,'video_idx',1,@isnumeric) % default for processed data
 addParameter(p,'event_idx',2,@isnumeric) % default for processed data
 addParameter(p,'channel',2,@isnumeric) % default for processed data
-addParameter(p,'amp_n_channels',64,@isnumeric) 
-addParameter(p,'aux_n_channels',3,@isnumeric) 
-addParameter(p,'noise_epochs',[],@isnumeric) 
+addParameter(p,'amp_n_channels',64,@isnumeric)
+addParameter(p,'aux_n_channels',3,@isnumeric)
+addParameter(p,'trim_epoch',[],@isnumeric)
 
 parse(p,varargin{:});
 video_idx = p.Results.video_idx;
@@ -46,10 +46,10 @@ event_idx = p.Results.event_idx;
 channel = p.Results.channel;
 amp_n_channels = p.Results.amp_n_channels;
 aux_n_channels = p.Results.aux_n_channels;
-noise_epochs = p.Results.noise_epochs; 
+trim_epoch = p.Results.trim_epoch;
 
 
-% load rhd to obtain recording parameters 
+% load rhd to obtain recording parameters
 [~, ~, ~, ~,...
     ~, ~, frequency_parameters,~ ] = ...
     read_Intan_RHD2000_file_snlab(basepath);
@@ -59,20 +59,37 @@ amp = load_amplifier(basepath,amp_n_channels);
 aux = load_auxiliary(basepath,aux_n_channels);
 digitalIn = process_digitalin(basepath,frequency_parameters.board_dig_in_sample_rate);
 
-% Pull start and end from digitalin channels that correspond to dat
-%timestamp multiplied by sample rate
-trim_dat_epoch(1) = digitalIn.timestampsOn{1, channel}(1)*...
-    (frequency_parameters.board_dig_in_sample_rate);
+if isempty(trim_epoch)
+    % Pull start and end from digitalin channels that correspond to dat
+    %timestamp multiplied by sample rate
+    trim_dat_epoch(1) = digitalIn.timestampsOn{1, channel}(1)*...
+        (frequency_parameters.board_dig_in_sample_rate);
+    
+    trim_dat_epoch(2) = digitalIn.timestampsOff{1,channel}(end)*...
+        (frequency_parameters.board_dig_in_sample_rate);
+    
+    session_duration = (digitalIn.timestampsOff{1,channel}(end)...
+        - digitalIn.timestampsOn{1, channel}(1))/60;
+    
+    disp(['recording was ',num2str(session_duration),' minutes'])
+elseif ~isempty(trim_epoch) && length(trim_epoch) == 2
+    
+    trim_dat_epoch(1) = trim_epoch(1)*...
+        (frequency_parameters.board_dig_in_sample_rate);
+    
+    trim_dat_epoch(2) = trim_epoch(2)*...
+        (frequency_parameters.board_dig_in_sample_rate);
+    
+    session_duration = (digitalIn.timestampsOff{1,channel}(end)...
+        - digitalIn.timestampsOn{1, channel}(1))/60;
+    
+    disp(['recording was ',num2str(session_duration),' minutes'])
+else
+    error('you have more epochs than expected. trim_epoch should be [start time, end time] in seconds')
+    
+end
 
-trim_dat_epoch(2) = digitalIn.timestampsOff{1,channel}(end)*...
-    (frequency_parameters.board_dig_in_sample_rate);
-
-session_duration = (digitalIn.timestampsOff{1,channel}(end)...
-    - digitalIn.timestampsOn{1, channel}(1))/60;
-
-disp(['recording was ',num2str(session_duration),' minutes'])
-
-% create batches 
+% create batches
 calc_samples = trim_dat_epoch(2) - trim_dat_epoch(1);
 batch = round(linspace(trim_dat_epoch(1),trim_dat_epoch(2),1000));
 
@@ -139,7 +156,7 @@ system("rename " + basepath + filesep + "amplifier.dat" + " " + "amplifier_old.d
 system("rename " + basepath + filesep +  "digitalin.dat" + " " + "digitalin_old.dat")
 system("rename " + basepath + filesep +  "auxiliary.dat" + " " + "auxiliary_old.dat")
 
-% rename trimmed files 
+% rename trimmed files
 system("rename " + basepath + filesep + "amplifier_.dat" + " " + "amplifier.dat")
 system("rename " + basepath + filesep +  "auxiliary_.dat" + " " + "auxiliary.dat")
 
