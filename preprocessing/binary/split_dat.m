@@ -389,6 +389,13 @@ if ~isempty(trim_dat_epoch)
     for ii = 1:size(digitalIn.timestampsOn,2)
         % intervals
         d = zeros(2,max([size(digitalIn.timestampsOn{ii},1) size(digitalIn.timestampsOff{ii},1)]));
+        
+        if isempty(d)
+            digitalIn.ints{ii} = [];
+            digitalIn.dur{ii} = [];
+            digitalIn.intsPeriods{ii} = [];
+            continue
+        end
         d(1,1:size(digitalIn.timestampsOn{ii},1)) = digitalIn.timestampsOn{ii};
         d(2,1:size(digitalIn.timestampsOff{ii},1)) = digitalIn.timestampsOff{ii};
         if d(1,1) > d(2,1)
