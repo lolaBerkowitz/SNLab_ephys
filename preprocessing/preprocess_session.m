@@ -62,15 +62,6 @@ check_epochs = p.Results.check_epochs;
 % Set basename from folder
 basename = basenameFromBasepath(basepath);
 
-% Create SessionInfo
-session = sessionTemplate(basepath,'showGUI',true);
-
-% If non-contiguous recordings were taken, merge the dat files into one
-% session. Default is false. 
-if concatenateDat
-    concatenateDats(basepath,0,1);
-end
-
 % rename amplifier.dat to basename.dat
 if ~isempty(dir([basepath,filesep,'amplifier.dat']))
     disp(['renaming amplifer.dat to ',basename,'.dat'])
@@ -86,7 +77,15 @@ if ~isempty(dir([basepath,filesep,'amplifier.xml']))
     command = ['rename "',basepath,filesep,'amplifier.xml"',' ',basename,'.xml'];
     system(command); % run through system command prompt
 end
-   
+
+% Create SessionInfo
+session = sessionTemplate(basepath,'showGUI',true);
+
+% If non-contiguous recordings were taken, merge the dat files into one
+% session. Default is false. 
+if concatenateDat
+    concatenateDats(basepath,0,1);
+end
 
 % Process additional inputs 
 
@@ -186,7 +185,7 @@ if stateScore
             thetaEpochs(basepath); 
         end
     catch
-        disp('Problem with SleepScore skyping...');
+        disp('Problem with SleepScore skiping...');
     end
 end
 
