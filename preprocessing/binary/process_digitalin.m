@@ -70,6 +70,10 @@ for ii = 1:size(digital_on,2)
     end
     
 end
-
+if ~exist('digitalIn','var')
+    disp('no events detected, saving empty struct')
+    digitalIn.timestampsOn =  digital_on;
+    digitalIn.timestampsOff = digital_off;
+end
 save([basepath,filesep,'digitalIn.events.mat'],'digitalIn');
 end
