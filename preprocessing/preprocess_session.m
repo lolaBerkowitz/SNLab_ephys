@@ -37,6 +37,8 @@ addParameter(p,'specialChannels',[30,59,17],@isnumeric) % default for ASYpoly2A6
 addParameter(p,'acquisition_event_flag',false,@islogical) % if you have start and stop recording
 % events else default uses first and last event as indicies for start and stop of recording
 addParameter(p,'check_epochs',false,@islogical) % fixes bouncy events
+addParameter(p,'maze_size',30,@isnumeric); % in cm
+
 
 parse(p,varargin{:});
 
@@ -59,6 +61,7 @@ lfp_fs = p.Results.lfp_fs;
 specialChannels = p.Results.specialChannels;
 acquisition_event_flag = p.Results.acquisition_event_flag;
 check_epochs = p.Results.check_epochs;
+maze_size = p.Results.maze_size;
 % Prepare dat files and prepare metadata
 
 % Set basename from folder
@@ -88,7 +91,7 @@ if ~isempty(dir([basepath,filesep,'amplifier.xml']))
 end
 
 % Create SessionInfo
-session = sessionTemplate(basepath,'showGUI',false);
+session = sessionTemplate(basepath,'showGUI',true);
 % Process additional inputs
 
 % Analog inputs
@@ -178,16 +181,12 @@ end
 % Get brain states
 % an automatic way of flaging bad channels is needed
 if stateScore
-    try
-        if exist('pulses','var')
-            SleepScoreMaster(basepath,'noPrompts',true,'ignoretime',pulses.intsPeriods); % try to sleep score
-            thetaEpochs(basepath);
-        else
-            SleepScoreMaster(basepath,'noPrompts',true); % takes lfp in base 0
-            thetaEpochs(basepath);
-        end
-    catch
-        disp('Problem with SleepScore skiping...');
+    if exist('pulses','var')
+        SleepScoreMaster(basepath,'noPrompts',true,'ignoretime',pulses.intsPeriods); % try to sleep score
+        thetaEpochs(basepath);
+    else
+        SleepScoreMaster(basepath,'noPrompts',true); % takes lfp in base 0
+        thetaEpochs(basepath);
     end
 end
 
@@ -217,12 +216,55 @@ if kilosort
     % Spike sort using kilosort 1 (data on ssd)
     run_ks1(basepath,ssd_folder)
 end
-% Get tracking positions - TO FIX
-if DLC
-    disp('DLC loader is in development LB 03/22')
-    %     getSessionTracking('optitrack',false);
-end
+% Get tracking positions
+% check for DLC csv
+dlc_files = dir([basepath,filesep,'*DLC*.csv']);
 
+if ~isempty(dlc_files)
+    general_behavior_file_SNlab('basepath',basepath)
+    
+    load(fullfile(basepath,[basename,'.animal.behavior.mat']))
+    
+    if ~isempty(behavior.position.x)
+        start = [];
+        stop = [];
+        maze_size = [];
+        for ep = 1:length(session.epochs)
+            if contains(session.epochs{ep}.environment,{'open_field','linear_track'})
+                start = [start,session.epochs{ep}.startTime];
+                stop = [stop,session.epochs{ep}.stopTime];
+                
+                if ismember(session.epochs{ep}.environment,'open_field')
+                    maze_size = [maze_size; 30];
+                elseif ismember(session.epochs{ep}.environment,'linear_track')
+                    maze_size = [maze_size; 120];
+                end
+            end
+        end
+        
+        good_idx = manual_trackerjumps(behavior.timestamps,...
+            behavior.position.x,...
+            behavior.position.y,...
+            start,...
+            stop,...
+            basepath,'darkmode',false);
+        
+        behavior.position.x(~good_idx) = NaN;
+        behavior.position.y(~good_idx) = NaN;
+        
+        % rescale coordinates 
+        scale_factor = (max(behavior.position.x) - min(behavior.position.x))/maze_size; %pixels/cm
+        
+        coord_names = fieldnames(behavior.position); 
+       for i = find(contains(coord_names,{'x','y'}))'
+           behavior.position.(coord_names{i}) = behavior.position.(coord_names{i})/scale_factor;
+       end
+       
+        behavior.position.units = 'cm';
+       
+        save(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
+    end
+    
 end
 
 

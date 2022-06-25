@@ -97,7 +97,7 @@ if ~isempty(dlc_files)
     end
 end
 
-% find session epochs that contain behavior
+%% find session epochs that contain behavior
 behav = 1;
 for epoch = 1:length(session.epochs)
     % grab the timestamps for the behavior epoch from the video channel
@@ -108,8 +108,10 @@ for epoch = 1:length(session.epochs)
             video_ttl{behav} = digitalIn.timestampsOn{1, video_channel_ttl}(idx);
             behav = behav + 1;
             disp(['Epoch ', num2str(epoch), ' contains behavior tag. Grabbing video channel ttls for this epoch.'])
+       end
     end
 end
+
 %% Process dlc files below
 for ii = 1:length({dlc_files.name})
     
@@ -152,10 +154,11 @@ for ii = 1:length({dlc_files.name})
 end
 
 % Concatenating tracking fields...
-x = []; y = []; folder = []; samplingRate = []; description = [];
+x = []; y = []; timestamps = []; folder = []; samplingRate = []; description = [];
 for ii = 1:size(tempTracking,2)
     x = [x; tempTracking{ii}.position.x];
     y = [y; tempTracking{ii}.position.y];
+    timestamps = [timestamps; tempTracking{ii}.timestamps];
     folder{ii} = tempTracking{ii}.folder;
     samplingRate = [samplingRate; tempTracking{ii}.samplingRate];
     description{ii} = tempTracking{ii}.description;
@@ -165,7 +168,7 @@ tracking.position.x = x;
 tracking.position.y = y;
 tracking.folders = folder;
 tracking.samplingRate = samplingRate;
-tracking.timestamps = ts;
+tracking.timestamps = timestamps;
 end
 
 function [tracking] = sync_ttl(basepath,video_ttl,x,y,ts,fs,pulses_delta_range)
