@@ -20,3 +20,17 @@ def load_data(data_dir, pattern = 'ol_scoring.csv',var_names = ['file','frame','
         df = pd.concat([df ,pd.read_csv(file,usecols = var_names)], ignore_index=True)
     return df
 
+def add_metadata(df, df_meta):
+    """
+    Add metadata to dataframe
+    """
+    vars = df_meta.keys()
+
+    for video in df_meta.vidname.unique():
+        temp_df = df_meta[df_meta.vidname == video].copy()
+
+        idx = df["file"].str.contains(temp_df.vidname.values[0])
+        for var in vars:
+            df.loc[idx, var] = temp_df[var].values[0]
+
+    return df
