@@ -76,7 +76,7 @@ digitalIn = process_digitalin(data_path,frequency_parameters.board_dig_in_sample
 port = 1;
 for channel =  digitalin_order(subject_idx)
     
-    if isempty([digitalIn.timestampsOn{:}])
+    if isempty(vertcat(digitalIn.timestampsOn{:}))
         continue
     end
     %timestamp multiplied by sample rate
@@ -94,7 +94,7 @@ for channel =  digitalin_order(subject_idx)
     port = port+1;
 end
 
-% splits dat according to subject_order and saves to data_path
+%% splits dat according to subject_order and saves to data_path
 if trim_dat
     process_aux(data_path,aux_input_channels,port_id,subject_order,basepath,...
         'trim_dat_epoch',trim_dat_epoch);
