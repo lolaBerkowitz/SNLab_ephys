@@ -1,4 +1,4 @@
-data_folder = 'Y:\laura_berkowitz\app_ps1_ephys\data\hpc05';
+data_folder = 'E:\data\hpc04';
 folders = dir(data_folder);
 folders = folders(~ismember({folders.name},{'.','..'}),:);
 
@@ -8,16 +8,27 @@ for i = 1:length(folders)
     basepath = [data_folder,filesep,folders(i).name];
     basename = basenameFromBasepath(basepath);
     cd(basepath)
+%     check = dir([basename,'.ripples.events.mat']);
+%     
+%     if ~isempty(check)
+%         disp('ripples already created')
+%         continue
+%     end
+        
     if ~isempty(dir(fullfile(basepath,[folders(i).name,'.lfp']))) && ...
             ~isempty(dir(fullfile(basepath,'anatomical_map.csv')))
         
         % updates basename.session with channel map
-        channel_mapping('basepath',basepath)
+        channel_mapping('basepath',basepath,'fig',false)
         session = loadSession(basepath,basename);
         
         try
-            ripple_channel = session.brainRegions.CA1sp.channels(end);
-            ripples = FindRipples('basepath',basepath,'channel',ripple_channel,'thresholds',[0.25 1]);
+            ripple_channel = session.brainRegions.CA1sp.channels(end)+1;
+            ripples = FindRipples('basepath',basepath,...
+                'channel',ripple_channel,...
+                'thresholds',[0.25 1],...
+                'durations',[20 100],...
+                'minDuration',20);
             save([basename '.ripples.events.mat'],'ripples')
         catch
             disp('CA1sp not found, skipping session')
