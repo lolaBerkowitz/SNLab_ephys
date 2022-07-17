@@ -74,6 +74,9 @@ if ~exist('digitalIn','var')
     disp('no events detected, saving empty struct')
     digitalIn.timestampsOn =  digital_on;
     digitalIn.timestampsOff = digital_off;
+    digitalIn.ints =  digital_on;
+    digitalIn.dur = digital_on;
+    digitalIn.intsPeriods =  digital_on;
 end
 save([basepath,filesep,'digitalIn.events.mat'],'digitalIn');
 end
