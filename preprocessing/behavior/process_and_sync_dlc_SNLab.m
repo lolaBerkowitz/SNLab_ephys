@@ -90,9 +90,13 @@ if ~isempty(dlc_files)
         disp('video files for dlc output found.')
     elseif sum(contains(vidnames,{vid_files.name}) )> 0
         disp('some files found, but not as many as dlc output. Check folder and add video for each dlc output')
+        tracking = nan;
+        field_names = nan;
         return
     else
         disp('No videos found. Check folder and add video for each dlc output')
+        tracking = nan;
+        field_names = nan;
         return
     end
 end
@@ -109,6 +113,10 @@ for epoch = 1:length(session.epochs)
             behav = behav + 1;
             disp(['Epoch ', num2str(epoch), ' contains behavior tag. Grabbing video channel ttls for this epoch.'])
        end
+    else
+        disp(['No behavior flag found in basename.session.epoch.evironment.',...
+            'Enironment must contain flag indicated in the input enviornment_name'])
+        return  
     end
 end
 
