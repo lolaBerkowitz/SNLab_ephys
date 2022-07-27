@@ -61,7 +61,6 @@ end
 if ephys % saves csv and appends coordinates to general behavior file
     % load config file 
     config = readtable(fullfile(config_path,'ephys_config.csv'));
-    
     % grab coordinates
     main(basepath,vid_files,config,vid_type,vid_time)
     
