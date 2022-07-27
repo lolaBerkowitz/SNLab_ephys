@@ -14,23 +14,27 @@ function getXY(varargin)
 %       vid_type: file extension of video (default '.avi')
 %       vid_time: time in seconds to load video.
 %       ephys: boolean indicating ephys session. Assumes CellExplorer
-%       processing has been done. 
+%       processing has been done.
 %       multi_chamber: boolean indicating if multiple behavior chambers are
 %       in frame.
 %   OUTPUT:
 %       xycoords --> table containing max min values for each video file.
 %
-% examples: 
-% 
-% Behavior file with multi_chamber videos: 
+% examples:
+%
+% Behavior file with multi_chamber videos:
 %   getXY('basepath',basepath,'multi_chamber',true)
-
-% LB May 2019 updated for SNLab LB 2022
+%
+% To-do:
+%  add functionality to add data to CellExplorer mat files
+%  add ability to scroll through frames for start/end trials
+%
+% LB 2022
 
 % input parser
 p = inputParser;
 p.addParameter('basepath',pwd,@isfolder);
-p.addParameter('vid_type','avi',@ischar);
+p.addParameter('vid_type','.avi',@ischar);
 p.addParameter('vid_time',300,@isnumeric); % time of video to load in seconds
 p.addParameter('ephys',true,@islogical); % time of video to load in seconds
 p.addParameter('multi_chamber',false,@islogical); % time of video to load in seconds
@@ -42,19 +46,29 @@ basepath = p.Results.basepath; % not used currently
 vid_type = p.Results.vid_type; % not used currently
 vid_time = p.Results.vid_time; % not used currently
 ephys = p.Results.ephys; % not used currently
-multi_chamber = p.Results.multi_chamber; 
-config_path = p.Results.config_path; 
-
-basename = basenameFromBasepath(basepath);
+multi_chamber = p.Results.multi_chamber;
+config_path = p.Results.config_path;
 
 % find video files
-vid_files = dir(fullfile(basepath,['*.',vid_type]));
+vid_files = dir(fullfile(basepath,['*',vid_type]));
 
 if isempty(vid_files)
     error('No videos found. Check video type and path')
 end
 
+
+
 if ephys % saves csv and appends coordinates to general behavior file
+    % load config file 
+    config = readtable(fullfile(config_path,'ephys_config.csv'));
+    
+    % grab coordinates
+    main(basepath,vid_files,config,vid_type,vid_time)
+    
+    % load csv
+    
+    % add csv data to basename.behavior file
+    
     % load session file
     session = loadSession(basepath,basename);
     
@@ -68,61 +82,54 @@ if ephys % saves csv and appends coordinates to general behavior file
         general_behavior_file_SNlab(basepath)
     end
     
-    for file = 1:length(vid_files) %loop through folders containing subject videos
-        
-        vid_path = fullfile(basepath,vid_files(file).name);
-        %Pull up video
-        videoObj = VideoReader(vid_path,'CurrentTime',vid_time); % load video starting at vid_time
-        
-        
-        coords_table = main(videoObj,vid_files(file).name);
-        
-        save_file = fullfile(basepath,[basename,'_',extractBefore(vid_files(file).name,'.avi'),'object_maze_coords.csv']);
-        writetable(coords_table,save_file);
-        
-        
-    end
-    
 elseif ~ephys % time of video to load in seconds
-% save csv only for behavior 
+    % load config
+    config = readtable(fullfile(config_path,'ephys_config.csv'));
     
-    for file = 1:length(vid_files) %loop through folders containing subject videos
-        
-        vid_path = fullfile(basepath,vid_files(file).name);
-        
-        %Pull up video
-        videoObj = VideoReader(vid_path,'CurrentTime',vid_time); % load video starting at vid_time
-        
-        % load config 
-        config = readtable(fullfile(config_path,'ephys_config.csv'));
-
-        coords_table = main(videoObj,vid_files(file).name,config);
-        
-        save_file = fullfile(basepath,[basename,'_',extractBefore(vid_files(file).name,'.avi'),'object_maze_coords.csv']);
-        writetable(coords_table,save_file);
-        
-    end
+    main(basepath,vid_files,config,vid_type,vid_time)
     
 elseif ~ephys && multi_chamber
     
-        config = readtable(fullfile(config_path,'multi_chamber_config.csv'));
+    config = readtable(fullfile(config_path,'multi_chamber_config.csv'));
+    
+    main(basepath,vid_files,config,vid_type,vid_time)
+end
 
-        coords_table = main(videoObj,vid_files(file).name,config);
-                
-        save_file = fullfile(basepath,[basename,'_',extractBefore(vid_files(file).name,'.avi'),'object_maze_coords.csv']);
-        writetable(coords_table,save_file);
+end
+
+function main(basepath,vid_files,config,vid_type,vid_time)
+% runs main process of looping through videos in basepath and pulling up
+% image via grab_coords for user to collect coordinate data.
+
+basename = basenameFromBasepath(basepath);
+
+% loop through video
+for file = 1:length(vid_files) %loop through folders containing subject videos
+    
+    vid_path = fullfile(basepath,vid_files(file).name);
+    
+    %Pull up video
+    videoObj = VideoReader(vid_path,'CurrentTime',vid_time); % load video starting at vid_time
+    
+    % pulls up video frame and grabs coords
+    coords_table = grab_coords(videoObj,vid_files(file).name,config);
+    
+    % save data
+    save_file = fullfile(basepath,[basename,'_',extractBefore(vid_files(file).name,vid_type),'object_maze_coords.csv']);
+    writetable(coords_table,save_file);
+    
 end
 
 end
 
 function prompt = create_prompt(config)
-%creates prompt so users can know which coordinate to collect 
+%creates prompt so users can know which coordinate to collect
 
 % use variables indicated inc config table
 varnames = config.Properties.VariableNames;
 prompt = []; % initialize prompt
 
-% loop through and concatenate vaarname with column values 
+% loop through and concatenate vaarname with column values
 for i = 1:length(varnames)
     prompt = [prompt repmat(varnames(i),size(config,1),1) config.(varnames{i})];
 end
@@ -132,7 +139,7 @@ prompt = join(prompt);
 
 end
 
-function config = main(videoObj,vidname,config)
+function config = grab_coords(videoObj,vidname,config)
 
 % go to folder containing video & image
 imshow(readFrame(videoObj)) % display the first frame
@@ -142,7 +149,7 @@ i=1;
 
 prompt = create_prompt(config);
 % let the user click around the coordinates
-while true        
+while true
     title(prompt{i})
     xlabel('Press U key to redo coordinate')
     [X,Y] = ginput(1);
