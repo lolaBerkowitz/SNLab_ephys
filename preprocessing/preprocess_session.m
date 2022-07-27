@@ -118,43 +118,7 @@ if digitalInputs
 end
 
 % Epochs derived from digital inputs for multianimal recordings
-if exist(fullfile(basepath,['digitalIn.events.mat']),'file')
-    load(fullfile(basepath,['digitalIn.events.mat']))
-    
-    if exist('digitalIn','var')
-        parsed_digitalIn = digitalIn;
-        clear digitalIn
-    end
-    
-    if acquisition_event_flag
-        start_idx = 2;
-        % first and last time stamp are always acquisition
-        session.epochs{1}.name =  'acquisition';
-        session.epochs{1}.startTime =  parsed_digitalIn.timestampsOn{1, 2}(1);
-        session.epochs{1}.stopTime = parsed_digitalIn.timestampsOn{1, 2}(end);
-        
-    else
-        start_idx = 1;
-    end
-    
-    % loop through the other epochs
-    ii = start_idx;
-    for i = start_idx:2:size(parsed_digitalIn.timestampsOn{1, 2},1)-1 % by default 2nd column is events
-        session.epochs{ii}.name =  char(i);
-        session.epochs{ii}.startTime =  parsed_digitalIn.timestampsOn{1, 2}(i);
-        session.epochs{ii}.stopTime =  parsed_digitalIn.timestampsOff{1, 2}(i+1);
-        ii = ii+1;
-    end
-else
-    disp('No digitalIn.events.mat found in basepath.')
-end
-save(fullfile(basepath,[basename, '.session.mat']),'session');
-
-%  annotate session epochs
-if check_epochs
-    gui_session
-end
-
+update_epochs('basepath',basepath,'annotate',check_epochs,'overwite',true)
 
 % Auxilary input
 if getAcceleration
@@ -249,11 +213,12 @@ if ~isempty(dlc_files)
             stop,...
             basepath,'darkmode',false);
         
+        
         behavior.position.x(~good_idx) = NaN;
         behavior.position.y(~good_idx) = NaN;
         
         % rescale coordinates 
-        scale_factor = (max(behavior.position.x) - min(behavior.position.x))/maze_size; %pixels/cm
+        scale_factor = (max(behavior.position.x) - min(behavior.position.x))/(maze_size(1)+3); %pixels/cm
         
         coord_names = fieldnames(behavior.position); 
        for i = find(contains(coord_names,{'x','y'}))'
@@ -264,6 +229,8 @@ if ~isempty(dlc_files)
        
         save(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
     end
+    
+end
     
 end
 
