@@ -1,37 +1,28 @@
 function [tracking,field_names] = process_and_sync_dlc_SNLab(varargin)
-% Unpacks DLC
+% Unpacks DLC and syncs with digitalin.events.mat timestamps
 %
 % Run this after you have exported deeplabcut csv results, have
 % basename.session.epochs labeled, and have digitalin.events.mat.
-% 
-% optional inputs: 
+%
+% optional inputs:
 % basepath: location of SNLab session data (contains basename.session file,
-%  digitalin.events.mat, and DLC output saved as CSV). 
-% video_channel_ttl: digitalin channel that contains video ttl pulses (default channel 1). 
+%  digitalin.events.mat, and DLC output saved as CSV).
+% video_channel_ttl: digitalin channel that contains video ttl pulses (default channel 1).
 % primary_coords: cordinates of interest (default first dlc bodypart)
-% 
 %
 %
-% assumptions: 
-% * Assumes video name has Spinview generated timestamps, and the dlc output
-%   contains the video name (DLC default). This impacts the order of the video 
-%   in the folder i.e. earlier videos first. Thus, the order of the DLC
-%   output in the directory should correspond to the order of the ttl pulse
-%   epoch (denoted by enviornment_name). 
-%
-%
-
-
 % L Berkowitz 03/2022 adapted some code by R Harvey
 
+% to-do: 
+% add functionality to choose primary coordinates 
+
+% parse inputs
 p = inputParser;
 p.addParameter('basepath',pwd,@isfolder);
-p.addParameter('video_channel_ttl',1,@isnumeric);
+p.addParameter('video_channel_ttl',1,@isnumeric); % digitalin channel that contains video ttl
 p.addParameter('primary_coords',1,@isnumeric); % which tracker point do you want
 p.addParameter('likelihood',.95,@isnumeric); % tracking quality thres [0-1]
 p.addParameter('pulses_delta_range',0.01,@isnumeric); % range for ttls
-p.addParameter('event_channel',2,@isnumeric); % default events epochs for SNlab is 2 for single session
-p.addParameter('environment_name',{'linear_track','open_field','w_maze','y_maze','figure_8_maze'},@ischar);
 
 p.parse(varargin{:});
 primary_coords = p.Results.primary_coords; % not used currently
@@ -39,108 +30,70 @@ basepath = p.Results.basepath;
 video_channel_ttl = p.Results.video_channel_ttl;
 likelihood = p.Results.likelihood;
 pulses_delta_range = p.Results.pulses_delta_range;
-event_channel = p.Results.event_channel;
-environment_name = p.Results.environment_name;
+basename = basenameFromBasepath(basepath);
 
-% load session
-session = loadSession(basepath);
-
-% check for events
+% check for events, cannot process without them 
 if exist(fullfile(basepath,'digitalin.events.mat'),'file') % only load if timestamps have been processed
-    load(fullfile(basepath,'digitalin.events.mat'));
-    
-    % for the sessions that had this saved incorrectly
-    if exist('parsed_digitalIn','var')
-        digitalIn = parsed_digitalIn;
-        clear parsed_digitalIn
-    end
-    
-else
+    load(fullfile(basepath,'digitalin.events.mat'),'digitalIn');
+else % if none, make them and update basename.session
     disp('processing events, one moment')
     % make digitalin.events.mat
     process_digitalin(basepath,session.extracellular.sr)
-    
     % update epochs
-    ii = 1;
-    for i = 1:2:size(digitalin.timestampsOn{1, event_channel},1)-1 % by default 2nd column is events
-        session.epochs{ii}.name =  char(i); % set label as empty
-        session.epochs{ii}.startTime =  digitalin.timestampsOn{1, event_channel}(i);
-        session.epochs{ii}.stopTime =  digitalin.timestampsOff{1, event_channel}(i+1);
-        ii = ii+1;
-    end
-    disp('update session epochs with proper labels')
-    gui_session(session)
+    update_epochs('basepath',basepath,'annotate',true)
+    % update behavioralTracking
+    update_behavioralTracking('basepath',basepath)
 end
 
-% check for DLC csv
-dlc_files = dir([basepath,filesep,'*DLC*.csv']);
+% check for behavioralTracking field from session file and if present, grab
+% tracking info (tracking file name, epoch index, and frame
+% rate
 
-if ~isempty(dlc_files)
-    n_files = length(dlc_files);
-    disp([num2str(n_files),' dlc files found.'])
+% first load session file
+session = loadSession(basepath,basename);
+
+if isfield(session,'behavioralTracking')
     
-    % grab video names from dlc file name
-    vidnames = strcat(extractBefore({dlc_files.name},'DLC'),'.avi');
+    [dlc_files,~,ep_idx,frame_rate] =  get_tracking_info_from_session(session);
     
-    disp('checking folder for videos')
+else % create it and reload session and pull dlc,video, and epoch info
+    % update session with dlc/video info
+    update_behavioralTracking('basepath',basepath)
+    session = loadSession(basepath,basename); % reload updated session file
+    % pull tracking info
+    [dlc_files,~,ep_idx,frame_rate] =  get_tracking_info_from_session(session);
     
-    % find number of videos to check for dlc output
-    vid_files = dir([basepath,filesep,'*.avi']);
-    if sum(contains(vidnames,{vid_files.name})) == n_files
-        disp('video files for dlc output found.')
-    elseif sum(contains(vidnames,{vid_files.name}) )> 0
-        disp('some files found, but not as many as dlc output. Check folder and add video for each dlc output')
-        tracking = nan;
-        field_names = nan;
-        return
-    else
-        disp('No videos found. Check folder and add video for each dlc output')
-        tracking = nan;
-        field_names = nan;
-        return
-    end
 end
 
-%% find session epochs that contain behavior
-behav = 1;
-for epoch = 1:length(session.epochs)
-    % grab the timestamps for the behavior epoch from the video channel
-    if any(contains(fieldnames(session.epochs{1, epoch}),'environment'))
-       if ismember(session.epochs{1, epoch}.environment,environment_name)
-            idx = digitalIn.timestampsOn{1, video_channel_ttl} >= session.epochs{1, epoch}.startTime  & ...
-                digitalIn.timestampsOn{1, video_channel_ttl} <= session.epochs{1, epoch}.stopTime;
-            video_ttl{behav} = digitalIn.timestampsOn{1, video_channel_ttl}(idx);
-            behav = behav + 1;
-            disp(['Epoch ', num2str(epoch), ' contains behavior tag. Grabbing video channel ttls for this epoch.'])
-       end
-    else
-        disp(['No behavior flag found in basename.session.epoch.evironment.',...
-            'Enironment must contain flag indicated in the input enviornment_name'])
-        return  
-    end
+% grab video ttls
+for epoch = ep_idx
+    % grab the video ttl timestamps within the epoch boundaries
+    idx = digitalIn.timestampsOn{1, video_channel_ttl} >= session.epochs{1, epoch}.startTime  & ...
+        digitalIn.timestampsOn{1, video_channel_ttl} <= session.epochs{1, epoch}.stopTime;
+    video_ttl{behav} = digitalIn.timestampsOn{1, video_channel_ttl}(idx);
+    disp(['Epoch ', num2str(epoch), ' contains behavior tag. Grabbing video channel ttls for this epoch.'])
 end
 
-%% Process dlc files below
-for ii = 1:length({dlc_files.name})
+%% Sync video ttl with trackin file 
+for ii = 1:length({dlc_files})
+    disp(['processing file ',num2str(ii), ' of ',num2str(length(dlc_files))])
     
-    % load file
-    file = dlc_files(ii).name;
-    
-    % load corresponding video
-    video_file = vidnames(ismember(vidnames,strcat(extractBefore(file,'DLC'),'.avi')));
-    obj = VideoReader(fullfile(basepath,video_file{1}));
-    fs = obj.FrameRate;
+    % get frame rate of video
+    fs = frame_rate(ii);
     
     % load csv with proper header
-    opts = detectImportOptions(fullfile(basepath,file),'NumHeaderLines',2);
-    df = readtable(fullfile(basepath,file),opts);
+    opts = detectImportOptions(fullfile(basepath,dlc_files{ii}),'NumHeaderLines',2);
+    df = readtable(fullfile(basepath,dlc_files{ii}),opts);
+    
     % get names of fields, these will be as long as tracker points
     % used times 3 because [x,y,likelihood]
     field_names = fields(df);
+    
     % locate columns with [x,y,likelihood]
     x_col = find(contains(field_names,'x'));
     y_col = find(contains(field_names,'y'));
     likelihood_col = find(contains(field_names,'likelihood'));
+    
     % filter out bad tracker points by likelihood thres
     for i = 1:length(x_col)
         idx = df{:,likelihood_col(i)} < likelihood;
@@ -148,15 +101,10 @@ for ii = 1:length({dlc_files.name})
         df{idx,y_col(i)} = NaN;
     end
     ts = df{:,1}/fs;
-    %             x = df{:,x_col(primary_coords)};
-    %             y = df{:,y_col(primary_coords)};
-    
     x = df{:,x_col};
     y = df{:,y_col};
     
-    % find order of video in session (assumes trailing timestamps) 
-    vid_files(ii)
-    
+    % store tracking for each video file
     tempTracking{ii} = sync_ttl(basepath,video_ttl{ii},x,y,ts,fs,pulses_delta_range);
     trackFolder(ii) = ii;
 end
@@ -172,21 +120,26 @@ for ii = 1:size(tempTracking,2)
     description{ii} = tempTracking{ii}.description;
 end
 
+% save data to ouput structure
 tracking.position.x = x;
 tracking.position.y = y;
 tracking.folders = folder;
 tracking.samplingRate = samplingRate;
 tracking.timestamps = timestamps;
+tracking.description = description;
+tracking.vidnames = vidnames;
+
 end
 
+% Local functions 
 function [tracking] = sync_ttl(basepath,video_ttl,x,y,ts,fs,pulses_delta_range)
 
 % if ~exist(fullfile(folder,'digitalIn.events.mat'),'file')
 %     digitalIn = getDigitalIn('all','folder',folder);
 % end
-% 
+%
 % load(fullfile(folder,'digitalIn.events.mat'))
-% 
+%
 % Len = cellfun(@length, digitalIn.timestampsOn, 'UniformOutput', false);
 % [~,idx] = max(cell2mat(Len));
 % bazlerTtl = digitalIn.timestampsOn{idx};
@@ -241,6 +194,19 @@ else
 end
 end
 
+function [tracking_files,vid_names,ep_idx,frame_rate] =  get_tracking_info_from_session(session,basename)
+% extracts tracking information (tracking filename, video name, and epoch index
+% basename.session.behavioralTracking
 
+disp(['Checking for DLC files in ', basename, '.session.behavioralTracking'])
+
+for i = 1:length(session.behavioralTracking)
+    tracking_files{i} = session.behavioralTracking{1,i}.filenames;
+    vid_names{i} = session.behavioralTracking{1,i}.notes;
+    ep_idx(i) =  session.behavioralTracking{1,i}.epoch;
+    frame_rate(i) = session.behavioralTracking{1,i}.framerate;
+end
+
+end
 
 
