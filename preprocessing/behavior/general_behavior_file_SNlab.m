@@ -30,8 +30,13 @@ if exist([basepath,filesep,[basename,'.animal.behavior.mat']],'file') &&...
     return
 end
 
+% run update_behavioralTracking to make sure dlc files and associated
+% epochs are indicated in basename.session.behavioralTracking 
+update_behavioralTracking('basepath',basepath)
+
+
 % call extract_tracking which contains many extraction methods
-[t,x,y,v,a,units,source,fs,notes,extra_points] = ...
+[t,x,y,v,a,units,source,fs,notes,extra_points,vidnames] = ...
     extract_tracking(basepath,primary_coords_dlc,likelihood_dlc,smooth_factor);
 
 % load session file 
@@ -53,6 +58,7 @@ behavior.stateNames = [];
 behavior.notes = notes;
 behavior.epochs = session.epochs;
 behavior.processinginfo.date = date;
+behavior.processinginfo.vidnames = vidnames;
 behavior.processinginfo.function = 'general_behavioral_file_SNlab.mat';
 behavior.processinginfo.source = source;
 
@@ -69,7 +75,7 @@ if save_mat
 end
 end
 
-function [t,x,y,v,a,units,source,fs,notes,extra_points] = ...
+function [t,x,y,v,a,units,source,fs,notes,extra_points,vidnames] = ...
     extract_tracking(basepath,primary_coords_dlc,likelihood_dlc,smooth_factor)
 
 % initalize variables to pull
@@ -82,6 +88,7 @@ units = [];
 source = [];
 notes = [];
 extra_points = [];
+vidnames = [];
 
 % below are many methods on locating tracking data from many formats
 [tracking,field_names] = process_and_sync_dlc_SNLab('basepath',basepath,...
@@ -90,6 +97,7 @@ extra_points = [];
 
 t = tracking.timestamps;
 fs = 1/mode(diff(t));
+vidnames = tracking.vidnames;
 
 x = tracking.position.x(:,primary_coords_dlc);
 y = tracking.position.y(:,primary_coords_dlc);
