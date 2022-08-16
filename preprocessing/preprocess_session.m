@@ -28,7 +28,7 @@ addParameter(p,'concatenateDat',false,@islogical);
 addParameter(p,'getLFP',true,@islogical);
 addParameter(p,'getEMG',true,@islogical);
 addParameter(p,'stateScore',true,@islogical);
-addParameter(p,'DLC',false,@islogical);
+addParameter(p,'tracking',true,@islogical);
 addParameter(p,'kilosort',false,@islogical);
 addParameter(p,'removeNoise',false,@islogical);
 addParameter(p,'ssd_path','C:\kilo_temp',@ischar);    % Path to SSD disk.
@@ -54,7 +54,7 @@ kilosort = p.Results.kilosort;
 
 % cleanArtifacts = p.Results.cleanArtifacts;
 stateScore = p.Results.stateScore;
-DLC = p.Results.DLC;
+tracking = p.Results.tracking;
 removeNoise = p.Results.removeNoise;
 ssd_path = p.Results.ssd_path;
 lfp_fs = p.Results.lfp_fs;
@@ -91,7 +91,7 @@ if ~isempty(dir([basepath,filesep,'amplifier.xml']))
 end
 
 % Create SessionInfo
-session = sessionTemplate(basepath,'showGUI',true);
+session = sessionTemplate(basepath,'showGUI',false);
 % Process additional inputs
 
 % Analog inputs
@@ -118,7 +118,7 @@ if digitalInputs
 end
 
 % Epochs derived from digital inputs for multianimal recordings
-update_epochs('basepath',basepath,'annotate',check_epochs,'overwite',true)
+update_epochs('basepath',basepath,'annotate',check_epochs,'overwrite',true)
 
 % Auxilary input
 if getAcceleration
@@ -132,14 +132,13 @@ end
 
 if getLFP
     % create downsampled lfp low-pass filtered lfp file
-    LFPfromDat(basepath,'outFs',lfp_fs,'useGPU',true);
+    ce_LFPfromDat(session,'outFs',lfp_fs);
 end
 
 % Calcuate estimated emg
 if getEMG
-    chInfo = hackInfo('basepath',basepath);
-    EMGFromLFP = getEMGFromLFP(basepath,'overwrite',false,'noPrompts',true,...
-        'saveMat',true,'chInfo',chInfo,'specialChannels',specialChannels);
+    EMGFromLFP = ce_EMGFromLFP(session,'overwrite',false,'noPrompts',true,...
+        'specialChannels',specialChannels);
 end
 
 % Get brain states
@@ -181,10 +180,8 @@ if kilosort
     run_ks1(basepath,ssd_folder)
 end
 % Get tracking positions
-% check for DLC csv
-dlc_files = dir([basepath,filesep,'*DLC*.csv']);
 
-if ~isempty(dlc_files)
+if tracking
     general_behavior_file_SNlab('basepath',basepath)
     
     load(fullfile(basepath,[basename,'.animal.behavior.mat']))
