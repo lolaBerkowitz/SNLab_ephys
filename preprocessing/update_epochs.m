@@ -21,7 +21,7 @@ addParameter(p,'basepath',pwd); % single or many basepaths in cell array or uses
 addParameter(p,'acquisition_event_flag',false); % overwrite previously saved data (will remove custom fields)
 addParameter(p,'epoch_events',2); % index for where epoch events are saved in digitalIn.events.mat file
 addParameter(p,'overwrite',true); % by default update epochs
-addParameter(p,'annotate',false); % save animal.behavior.mat
+addParameter(p,'annotate',true); % save animal.behavior.mat
 
 % addParameter(p,'maze_size',30); % maze size in cm
 
@@ -36,7 +36,10 @@ basename = basenameFromBasepath(basepath);
 if exist(fullfile(basepath,'digitalIn.events.mat'),'file')
     
     % load digitalin file
-    load(fullfile(basepath,'digitalIn.events.mat'),'digitalIn')
+    load(fullfile(basepath,'digitalIn.events.mat'))
+    if exist('parsed_digitalIn','var')
+        digitalIn = parsed_digitalIn;
+    end
     % load session file
     load(fullfile(basepath,[basename, '.session.mat']),'session')
     
@@ -55,8 +58,8 @@ if exist(fullfile(basepath,'digitalIn.events.mat'),'file')
             start_idx = 2;
             % first and last time stamp are always acquisition
             session.epochs{1}.name =  'acquisition';
-            session.epochs{1}.startTime =  parsed_digitalIn.timestampsOn{1, 2}(1);
-            session.epochs{1}.stopTime = parsed_digitalIn.timestampsOn{1, 2}(end);
+            session.epochs{1}.startTime =  digitalIn.timestampsOn{1, 2}(1);
+            session.epochs{1}.stopTime = digitalIn.timestampsOn{1, 2}(end);
             
         else
             start_idx = 1;
@@ -64,10 +67,10 @@ if exist(fullfile(basepath,'digitalIn.events.mat'),'file')
         
         % loop through the other epochs
         ii = start_idx;
-        for i = start_idx:2:size(parsed_digitalIn.timestampsOn{1, 2},1)-1 % by default 2nd column is events
+        for i = start_idx:2:size(digitalIn.timestampsOn{1, 2},1)-1 % by default 2nd column is events
             session.epochs{ii}.name =  char(i);
-            session.epochs{ii}.startTime =  parsed_digitalIn.timestampsOn{1, 2}(i);
-            session.epochs{ii}.stopTime =  parsed_digitalIn.timestampsOff{1, 2}(i+1);
+            session.epochs{ii}.startTime =  digitalIn.timestampsOn{1, 2}(i);
+            session.epochs{ii}.stopTime =  digitalIn.timestampsOff{1, 2}(i+1);
             ii = ii+1;
         end
     end
