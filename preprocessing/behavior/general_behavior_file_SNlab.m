@@ -34,9 +34,8 @@ end
 % epochs are indicated in basename.session.behavioralTracking 
 update_behavioralTracking('basepath',basepath)
 
-
 % call extract_tracking which contains many extraction methods
-[t,x,y,v,a,units,source,fs,notes,extra_points,vidnames] = ...
+[t,x,y,v,a,angle,units,source,fs,notes,extra_points,vidnames] = ...
     extract_tracking(basepath,primary_coords_dlc,likelihood_dlc,smooth_factor);
 
 % load session file 
@@ -52,7 +51,9 @@ behavior.position.linearized = [];
 behavior.position.units = units;
 behavior.speed = v';
 behavior.acceleration = a';
+behavior.angle = angle';
 behavior.trials = [];
+behavior.trialsID = [];
 behavior.states = [];
 behavior.stateNames = [];
 behavior.notes = notes;
@@ -75,7 +76,7 @@ if save_mat
 end
 end
 
-function [t,x,y,v,a,units,source,fs,notes,extra_points,vidnames] = ...
+function [t,x,y,v,a,angle,units,source,fs,notes,extra_points,vidnames] = ...
     extract_tracking(basepath,primary_coords_dlc,likelihood_dlc,smooth_factor)
 
 % initalize variables to pull
@@ -84,6 +85,7 @@ x = [];
 y = [];
 v = [];
 a = [];
+angle = [];
 units = [];
 source = [];
 notes = [];
@@ -103,6 +105,7 @@ x = tracking.position.x(:,primary_coords_dlc);
 y = tracking.position.y(:,primary_coords_dlc);
 
 if length(primary_coords_dlc) > 1
+    angle = xy_angle(x,y);
     % compute average point between two coords 
     x = median(x,2);
     y = median(y,2);
