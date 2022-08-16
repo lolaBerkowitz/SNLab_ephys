@@ -79,7 +79,11 @@ if ephys % saves csv and appends coordinates to general behavior file
     % load session file
     session = loadSession(basepath,basename);
     
-    % load csv
+    % get coords 
+    main(basepath,vid_files,config,vid_type,vid_time)
+
+    % load coord csv 
+%     coords = dir(fullfile(basepath,'*object_maze_coords.csv'));
     
 elseif ~ephys % time of video to load in seconds
     % load config
