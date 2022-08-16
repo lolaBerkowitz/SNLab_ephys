@@ -54,28 +54,30 @@ session = loadSession(basepath,basename);
 
 if isfield(session,'behavioralTracking')
     
-    [dlc_files,~,ep_idx,frame_rate] =  get_tracking_info_from_session(session);
+    [dlc_files,vidnames,ep_idx,frame_rate] =  get_tracking_info_from_session(session,basename);
     
 else % create it and reload session and pull dlc,video, and epoch info
     % update session with dlc/video info
     update_behavioralTracking('basepath',basepath)
     session = loadSession(basepath,basename); % reload updated session file
     % pull tracking info
-    [dlc_files,~,ep_idx,frame_rate] =  get_tracking_info_from_session(session);
+    [dlc_files,vidnames,ep_idx,frame_rate] =  get_tracking_info_from_session(session,basename);
     
 end
 
 % grab video ttls
+behav = 1;
 for epoch = ep_idx
     % grab the video ttl timestamps within the epoch boundaries
     idx = digitalIn.timestampsOn{1, video_channel_ttl} >= session.epochs{1, epoch}.startTime  & ...
         digitalIn.timestampsOn{1, video_channel_ttl} <= session.epochs{1, epoch}.stopTime;
     video_ttl{behav} = digitalIn.timestampsOn{1, video_channel_ttl}(idx);
+    behav = behav + 1;
     disp(['Epoch ', num2str(epoch), ' contains behavior tag. Grabbing video channel ttls for this epoch.'])
 end
 
 %% Sync video ttl with trackin file 
-for ii = 1:length({dlc_files})
+for ii = 1:length(dlc_files)
     disp(['processing file ',num2str(ii), ' of ',num2str(length(dlc_files))])
     
     % get frame rate of video
