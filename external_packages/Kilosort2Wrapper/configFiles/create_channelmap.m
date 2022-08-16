@@ -15,7 +15,7 @@ function create_channelmap(basepath,varargin)
 
 p = inputParser; 
 p.addParameter('xcoords',[6,19,repmat([0,30],1,31)]');
-p.addParameter('ycoords', [linspace(0,1449.0,64)]');
+p.addParameter('ycoords', [linspace(-1449.0,0,64)]');
 p.parse(varargin{:});
 
 % unpack coordinates for channels 
