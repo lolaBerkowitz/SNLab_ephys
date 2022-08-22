@@ -20,7 +20,7 @@ function [tracking,field_names] = process_and_sync_dlc_SNLab(varargin)
 p = inputParser;
 p.addParameter('basepath',pwd,@isfolder);
 p.addParameter('video_channel_ttl',1,@isnumeric); % digitalin channel that contains video ttl
-p.addParameter('primary_coords',1,@isnumeric); % which tracker point do you want
+p.addParameter('primary_coords',1:2,@isnumeric); % which tracker point do you want
 p.addParameter('likelihood',.95,@isnumeric); % tracking quality thres [0-1]
 p.addParameter('pulses_delta_range',0.01,@isnumeric); % range for ttls
 
