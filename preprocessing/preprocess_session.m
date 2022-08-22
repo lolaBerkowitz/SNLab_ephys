@@ -90,8 +90,9 @@ if ~isempty(dir([basepath,filesep,'amplifier.xml']))
     system(command); % run through system command prompt
 end
 
-% Create SessionInfo
+% Create SessionInfo (only run this once!)
 session = sessionTemplate(basepath,'showGUI',false);
+
 % Process additional inputs
 
 % Analog inputs
@@ -177,55 +178,14 @@ if kilosort
     system(command);
     
     % Spike sort using kilosort 1 (data on ssd)
-    run_ks1(basepath,ssd_folder)
+    run_ks1(basepath)
 end
 % Get tracking positions
 
 if tracking
-    general_behavior_file_SNlab('basepath',basepath)
-    
-    load(fullfile(basepath,[basename,'.animal.behavior.mat']))
-    
-    if ~isempty(behavior.position.x)
-        start = [];
-        stop = [];
-        maze_size = [];
-        for ep = 1:length(session.epochs)
-            if contains(session.epochs{ep}.environment,{'open_field','linear_track'})
-                start = [start,session.epochs{ep}.startTime];
-                stop = [stop,session.epochs{ep}.stopTime];
-                
-                if ismember(session.epochs{ep}.environment,'open_field')
-                    maze_size = [maze_size; 30];
-                elseif ismember(session.epochs{ep}.environment,'linear_track')
-                    maze_size = [maze_size; 120];
-                end
-            end
-        end
-        
-        good_idx = manual_trackerjumps(behavior.timestamps,...
-            behavior.position.x,...
-            behavior.position.y,...
-            start,...
-            stop,...
-            basepath,'darkmode',false);
-        
-        
-        behavior.position.x(~good_idx) = NaN;
-        behavior.position.y(~good_idx) = NaN;
-        
-        % rescale coordinates 
-        scale_factor = (max(behavior.position.x) - min(behavior.position.x))/(maze_size(1)+3); %pixels/cm
-        
-        coord_names = fieldnames(behavior.position); 
-       for i = find(contains(coord_names,{'x','y'}))'
-           behavior.position.(coord_names{i}) = behavior.position.(coord_names{i})/scale_factor;
-       end
-       
-        behavior.position.units = 'cm';
-       
-        save(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
-    end
+    % saves general behavior file, restrictxy, maze_coords, and updates
+    % session.behavioralTracking. Requires dlc output in basepath
+    process_tracking(basepath)
     
 end
     
