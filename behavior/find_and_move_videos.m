@@ -19,7 +19,7 @@ function find_and_move_videos(basepath,local_drive_path)
 % 
 % Ryan H 2022
 
-disp(pyversion)
+disp(pyenv)
 pathToCode = fileparts(which('find_and_move_avi.py'));
 if count(py.sys.path,pathToCode)==0
     % adds the code path to the python path
