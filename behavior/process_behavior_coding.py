@@ -19,7 +19,10 @@ def load_data(data_dir, pattern = 'ol_scoring.csv',var_names = ['file','frame','
     df = pd.DataFrame()
     for file in files:
         # print("Loading file: " + file)
-        df = pd.concat([df ,pd.read_csv(file,usecols = var_names)], ignore_index=True)
+        new_df = pd.read_csv(file,usecols = var_names)
+        new_df["basepath"] = os.path.dirname(file)
+        new_df["basename"] = os.path.basename(os.path.dirname(file))
+        df = pd.concat([df ,new_df], ignore_index=True)
     return df
 
 def add_metadata(df, df_meta):
@@ -126,6 +129,8 @@ def compute_explore_time(df, epoch_name = 'all_baseline_5min_test'):
              # append data
             d.append({
                 'file': file,
+                'basepath': temp_df.basepath.iloc[0],
+                'basename': temp_df.basename.iloc[0],
                 'subid': temp_df.subid.iloc[0],
                 'session_date': temp_df.session_date.iloc[0],
                 'age': temp_df.age.iloc[0],
@@ -155,6 +160,8 @@ def compute_explore_time(df, epoch_name = 'all_baseline_5min_test'):
         # append data
         d.append({
             'file': file,
+            'basepath': temp_df.basepath.iloc[0],
+            'basename': temp_df.basename.iloc[0],
             'subid': temp_df.subid.iloc[0],
             'session_date': temp_df.session_date.iloc[0],
             'age': temp_df.age.iloc[0],
@@ -175,3 +182,66 @@ def compute_explore_time(df, epoch_name = 'all_baseline_5min_test'):
     df_out.reset_index(drop = True,inplace=True)
     
     return df_out
+
+def reorganize_df(df):
+    '''
+    Reorganize dataframe to have columns for each action, and checks start and stop are balanced times for each action
+    '''
+
+    # make two new columns, one for object and one for action made
+    df[['object','action']] = df.action.str.split('_', expand=True)
+    df['object'] = df.object.str.replace('object','')
+
+    # create dataframe where each row is a visit to object 1 or object 2
+    df_visit = pd.DataFrame(columns = ['file','start','stop','object'])
+    for file in df.file.unique():
+        temp_df = df[df.file == file].copy()
+        object_1_idx = temp_df.object == '1'
+        object_2_idx = temp_df.object == '2'
+
+        if np.sum(object_1_idx) % 2 == 1:
+            raise Exception('Object 1 has an odd number of starts and stops')
+        if np.sum(object_2_idx) % 2 == 1:
+            raise Exception('Object 2 has an odd number of starts and stops')
+        
+        d = []
+        for idx, i in enumerate(range(0,len(temp_df),2)):
+            d.append(
+                {'file': temp_df.iloc[i].file,
+                'basepath':temp_df.iloc[i].basepath,
+                'basename':temp_df.iloc[i].basename,
+                'start': temp_df.iloc[i].frame,
+                'stop': temp_df.iloc[i+1].frame,
+                'object': temp_df.iloc[i].object
+                }
+            )
+        
+        df_visit = pd.concat([df_visit, pd.DataFrame(d)], ignore_index=True)
+
+    df_visit.reset_index(drop = True,inplace=True)
+    
+    return df_visit
+
+def add_indicators(df):
+    """
+    Adds logical variables for parsing dataframe
+    first_5min = first 5 minutes of visit
+    first_3min = last 5 minutes of visit    
+    """
+
+    df['object_exploration_time'] = df.stop - df.start
+    df['first_5min'] = df.stop.apply(lambda x: x < 300)
+    df['first_3min'] = df.stop.apply(lambda x: x < 180)
+    df['whole_session'] = True
+    df['all_baseline_3min_test'] = True
+    df.loc[df['condition'] == 'test','all_baseline_3min_test'] = df.loc[df['condition'] == 'test','first_3min']
+
+    df['all_baseline_5min_test'] = True
+    df.loc[df['condition'] == 'test','all_baseline_5min_test'] = df.loc[df['condition'] == 'test','first_5min']
+
+    df['trial_n'] = np.zeros(len(df))
+    df.loc[df['stop'] < df['trial_stop_1'],'trial_n'] = 1
+    df.loc[(df['stop'] > df['trial_stop_1']) & (df['stop'] < df['trial_stop_2']),'trial_n'] = 2
+    df.loc[(df['stop'] > df['trial_stop_2']) & (df['stop'] < df['trial_stop_3']),'trial_n'] = 3
+    df["in_trial"] = df.trial_n.apply(lambda x: x > 0)
+    return df
