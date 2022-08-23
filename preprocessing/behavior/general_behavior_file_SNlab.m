@@ -23,8 +23,9 @@ smooth_factor = p.Results.smooth_factor;
 basename = basenameFromBasepath(basepath);
 
 % check if file was already made
-if exist([basepath,filesep,[basename,'.animal.behavior.mat']],'file') &&...
-        ~force_overwrite
+if force_overwrite
+    disp('Overwriting previous runs')
+elseif ~isempty(dir(fullfile(basepath,[basename,'.animal.behavior.mat'])))
     load([basepath,filesep,[basename,'.animal.behavior.mat']],'behavior');
     disp([basepath,filesep,[basename,'.animal.behavior.mat already detected. Loading file...']]);
     return
