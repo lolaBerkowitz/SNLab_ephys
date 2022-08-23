@@ -157,17 +157,17 @@ for ii = 1:length(session.behavioralTracking)
     ts = vid_ts(frames(~isnan(frames)));
     trial_ts = [trial_ts; ts(start_idx)' ts(stop_idx)'];
 %     trial_name{t_n:t_n+length(ts(start_idx)')-1} = repmat(name,length(ts(start_idx)',1));
-    for t = 1:length(ts(start_idx)'
+    for t = 1:length(ts(start_idx))
         trial_id{t_n} = strjoin(name,['_',num2str(t)]);
     end
     % update t_n so trials and trial_id will be same length
-    t_n = t_n + length(ts(start_idx)';
+    t_n = t_n + length(ts(start_idx))';
 
 end
 
 % Add to behavior file
 behavior.trials = trial_ts;
-behavior.trial_id = trial_id;
+behavior.trialID = trial_id;
 % save behavior file
 save(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
 end
