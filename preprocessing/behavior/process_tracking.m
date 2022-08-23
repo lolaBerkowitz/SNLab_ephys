@@ -31,7 +31,6 @@ config_path = p.Results.config_path;
 metadata_path = p.Results.metadata_path;
 
 basename = basenameFromBasepath(basepath);
-session = loadSession(basepath,basename);
 
 % run main function
 general_behavior_file_SNlab('basepath',basepath)
@@ -41,8 +40,7 @@ update_behavior_from_metadata(metadata_path,'basepath',basepath)
 
 % get maze coords
 if maze_coords
-    config = get_behavior_config(session,config_path);
-    get_maze_XY('basepath',basepath,'config_path', fullfile(config_path,config))
+    get_maze_XY('basepath',basepath,'config_path', config_path)
 end
 
 % restrict and transform primary coordinates to maze and convert to cm
