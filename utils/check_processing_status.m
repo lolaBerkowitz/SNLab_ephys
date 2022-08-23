@@ -50,12 +50,18 @@ col_names = {'basepath','lfp','sleep_states','tracking_dlc',...
 session_status = cell2table(cell(0,length(col_names)),'VariableNames', col_names);
 
 % find all sessions in data_folder
-df = compile_sessions(data_folder);
+% handle input as csv of basepaths or directory
+if contains(data_folder,'.csv')
+    df = readtable(data_folder);
+    data_folder = fileparts(data_folder);
+else
+    df = compile_sessions(data_folder);
+end
 
+basepaths = unique(df.basepath);
 % loop through basepaths
-for i = 1:length(df.basepath)
-    basepath = df.basepath{i};
-    basepath = basepath{1};
+for i = 1:length(basepaths)
+    basepath = basepaths{i};
     basename = basenameFromBasepath(basepath);
     
     session_status.basepath{i} = basepath;
