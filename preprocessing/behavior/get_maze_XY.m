@@ -49,6 +49,11 @@ config_path = p.Results.config_path;
 basename = basenameFromBasepath(basepath);
 session = loadSession(basepath,basename);
 
+if length(dir(fullfile(basepath,'*maze_coords.csv'))) == length(session.behavioralTracking)
+    disp('Maze coords found for each behavioralTracking entry')
+    return
+end
+
 if ~isfield(session,'behavioralTracking')
     warning('No tracking items found. No maze coords to return.')
     return
@@ -163,7 +168,7 @@ config_file.vid_name = name;
 config_file.x = coords(:,1);
 config_file.y = coords(:,2);
 
-
+close all
 end
 
 function config_name = get_behavior_config(session,epoch,config_path)
