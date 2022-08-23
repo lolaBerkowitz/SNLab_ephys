@@ -34,7 +34,11 @@ basename = basenameFromBasepath(basepath);
 
 % check for events, cannot process without them 
 if exist(fullfile(basepath,'digitalin.events.mat'),'file') % only load if timestamps have been processed
-    load(fullfile(basepath,'digitalin.events.mat'),'digitalIn');
+    load(fullfile(basepath,'digitalin.events.mat'));
+    
+    if exist('parsed_digitalIn','var')
+        digitalIn = parsed_digitalIn;
+    end
 else % if none, make them and update basename.session
     disp('processing events, one moment')
     % make digitalin.events.mat
