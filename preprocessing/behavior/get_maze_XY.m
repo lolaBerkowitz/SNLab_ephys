@@ -36,7 +36,7 @@ p = inputParser;
 p.addParameter('basepath',pwd,@isfolder);
 p.addParameter('vid_type','.avi',@ischar);
 p.addParameter('vid_time',300,@isnumeric); % time of video to load in seconds
-p.addParameter('config_path','C:\Users\schafferlab\github\SNLab_ephys\behavior\behavior_configs',@islogical); % time of video to load in seconds
+p.addParameter('config_path','C:\Users\schafferlab\github\SNLab_ephys\behavior\behavior_configs',@isfolder); % time of video to load in seconds
 
 
 p.parse(varargin{:})
@@ -96,7 +96,7 @@ for file = 1:length(session.behavioralTracking) %loop through folders containing
     coords_table = grab_coords(videoObj,session.behavioralTracking{1,file}.notes,config);
     
     % save data
-    save_file = fullfile(basepath,[extractBefore(session.behavioralTracking{1,file}.notes,vid_type),'_maze_coords.csv']);
+    save_file = fullfile(basepath,[extractBefore(session.behavioralTracking{1,file}.notes,'.avi'),'_maze_coords.csv']);
     writetable(coords_table,save_file);
     
 end
@@ -176,13 +176,16 @@ configs = {configs.name};
 
 % look through session epochs
 name = session.epochs{1, epoch}.name;
+multi_idx = contains(configs,'multi');
+object_idx = contains(configs,'object');
+open_field_idx = contains(configs,'open_field');
 
 if contains(name,{'multi'})
-    config_name = configs{find(contains(configs,'multi'))};
+    config_name = configs{multi_idx & ~object_idx};
 elseif contains(name,{'object'})
-    config_name = configs{find(contains(configs,'object'))};
+    config_name = configs{~multi_idx & object_idx & ~open_field_idx};
 elseif contains(name,{'context','open_field'})
-    config_name = configs{find(contains(configs,'open_field'))};
+    config_name = configs{~multi_idx & ~object_idx & open_field_idx};
 end
 
 config_name = fullfile(config_path,config_name);

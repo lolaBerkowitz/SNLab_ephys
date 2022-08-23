@@ -18,6 +18,7 @@ function check_processing_status(data_folder,varargin)
 % restricxy file
 % ripples
 % ol_scoring
+warning('off','all')
 
 p = inputParser;
 p.addParameter('check_lfp',true,@islogical)
@@ -48,14 +49,14 @@ col_names = {'basepath','lfp','sleep_states','tracking_dlc',...
     'cell_metrics','ripples','anatomical_map','behavior_scoring'};
 session_status = cell2table(cell(0,length(col_names)),'VariableNames', col_names);
 
-% find all basepaths in data_folder
-sessions = dir(data_folder);
-sessions = sessions(~ismember({sessions.name},{'.','..'}),:); % remove ., ..
-sessions = sessions([sessions.isdir]);
+% find all sessions in data_folder
+df = compile_sessions(data_folder);
+
 % loop through basepaths
-for i = 1:length({sessions.name})
-    basepath = fullfile(data_folder,sessions(i).name);
-    basename = sessions(i).name;
+for i = 1:length(df.basepath)
+    basepath = df.basepath{i};
+    basepath = basepath{1};
+    basename = basenameFromBasepath(basepath);
     
     session_status.basepath{i} = basepath;
     folder_contents = dir(basepath);
@@ -115,7 +116,12 @@ for i = 1:length({sessions.name})
     end
     
     if check_scoring
-        session_status.behavior_scoring(i) = isfile(fullfile(basepath,[basename,'_ol_scoring.csv']));
+        % if they have a video
+        if sum(contains({folder_contents.name},'.avi')) >= 1
+            session_status.behavior_scoring(i) = isfile(fullfile(basepath,[basename,'_ol_scoring.csv']));
+        else
+            session_status.behavior_scoring(i) = nan;
+        end
     end
 end
 
