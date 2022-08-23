@@ -178,7 +178,7 @@ if kilosort
     system(command);
     
     % Spike sort using kilosort 1 (data on ssd)
-    run_ks1(basepath)
+    run_ks1(basepath,'ssd_folder',ssd_folder)
 end
 % Get tracking positions
 
