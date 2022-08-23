@@ -100,7 +100,7 @@ for ii = 1:length(session.behavioralTracking)
     vidname = session.behavioralTracking{1,ii}.notes;
     row_idx = contains(temp_df.vidname,extractBefore(vidname,'.avi'));
         
-    behavior.epochs{1, epoch}.maze_size = temp_df(row_idx,col_idx);
+    behavior.epochs{1, epoch}.maze_size = table2array(temp_df(row_idx,col_idx));
 
 end
 % save behavior file
@@ -126,7 +126,7 @@ col_idx = find(contains(vars,'trial'));
 trial_ts = [];
 trial_id = [];
 
-t_n = [];
+t_n = 1;
 % loop through videos indicated in session.behavioralTracking
 for ii = 1:length(session.behavioralTracking)
     
@@ -158,16 +158,16 @@ for ii = 1:length(session.behavioralTracking)
     trial_ts = [trial_ts; ts(start_idx)' ts(stop_idx)'];
 %     trial_name{t_n:t_n+length(ts(start_idx)')-1} = repmat(name,length(ts(start_idx)',1));
     for t = 1:length(ts(start_idx))
-        trial_id{t_n} = strjoin(name,['_',num2str(t)]);
+        trial_id{t_n} = [name,['_',num2str(t)]];
+        t_n = t_n+1;
     end
     % update t_n so trials and trial_id will be same length
-    t_n = t_n + length(ts(start_idx))';
 
 end
 
 % Add to behavior file
 behavior.trials = trial_ts;
-behavior.trialID = trial_id;
+behavior.trialsID = trial_id';
 % save behavior file
 save(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
 end
