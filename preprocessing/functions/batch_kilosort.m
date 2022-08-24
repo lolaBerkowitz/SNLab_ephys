@@ -1,14 +1,20 @@
 function batch_kilosort(data_folder)
 
 % Find all subfolders 
-folders = dir(data_folder);
-folders = folders(~ismember({folders.name},{'.','..'}),:);
+% handle input as csv of basepaths or directory
+if contains(data_folder,'.csv')
+    df = readtable(data_folder);
+else
+    df = compile_sessions(data_folder);
+end
 
+basepaths = unique(df.basepath);
 % loop through folders and process those that don't have evidence of
 % processing (in this case chanMap.mat)
-for i = 1:length(folders)
-    basepath = [data_folder,filesep,folders(i).name];
+for i = 1:length(basepaths)
+    basepath = basepaths{i};
     basename = basenameFromBasepath(basepath);
+    
     cd(basepath)
     ks_check = dir(fullfile(basepath,'Kilosort_*'));
     xml_check = fullfile(basepath,[basename,'.xml']);
