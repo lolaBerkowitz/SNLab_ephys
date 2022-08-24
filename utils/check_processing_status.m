@@ -80,7 +80,7 @@ for i = 1:length(basepaths)
     if check_tracking
         session_status.tracking_animalBehavior(i) = isfile(fullfile(basepath,[basename,'.animal.behavior.mat']));
         session_status.tracking_restrictxy(i) = isfile(fullfile(basepath,[basename,'.restrictxy.mat']));
-        session_status.tracking_mazeCoords(i) = isfile(fullfile(basepath,'*maze_coords.csv'));
+        session_status.tracking_mazeCoords(i) = sum(isfile(fullfile(basepath,'*maze_coords.csv'))) >= 1;
         if isfile(fullfile(basepath,[basename,'.session.mat']))
             session = loadSession(basepath,basename);
             session_status.tracking_sessionBehavioralTracking(i) = isfield(session,'behavioralTracking');
