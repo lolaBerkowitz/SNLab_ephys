@@ -1,6 +1,7 @@
 function get_maze_XY(varargin)
 % getXY allows user to obtain xy coordinates of maze corners and objects
-% (center/edge) from a video. Saves csv for each folder.
+% (center/edge) from a video. Saves csv for each folder.Uses ffmpeg to
+% generate frame from video (faster than VideoReader). 
 %
 %   ASSUMPTIONS:
 %    Videos must be in format compatible with Video Reader (see matlab
@@ -89,17 +90,23 @@ load(fullfile(basepath,[basename,'.animal.behavior.mat']))
 for file = 1:length(session.behavioralTracking) %loop through folders containing subject videos
     
     vid_path = fullfile(basepath,session.behavioralTracking{1,file}.notes);
-    
+    img_path = fullfile(basepath,'temp_img.png');
+    % create image save to current directory
+    sys_cmd = ['ffmpeg -ss ', num2str(vid_time),' -i ',vid_path,' -vframes 1 ',img_path];
+    system(sys_cmd)
     %Pull up video
-    videoObj = VideoReader(vid_path,'CurrentTime',vid_time); % load video starting at vid_time
+%     videoObj = VideoReader(vid_path,'CurrentTime',vid_time); % load video starting at vid_time
     
     epoch = session.behavioralTracking{1,file}.epoch;
     % choose config based on epoch
     config = get_behavior_config(session,epoch,config_path);
     
     % pulls up video frame and grabs coords
-    coords_table = grab_coords(videoObj,session.behavioralTracking{1,file}.notes,config);
+    coords_table = grab_coords(img_path,session.behavioralTracking{1,file}.notes,config);
     
+    % delete the image you created
+    delete(img_path)
+
     % save data
     save_file = fullfile(basepath,[extractBefore(session.behavioralTracking{1,file}.notes,'.avi'),'_maze_coords.csv']);
     writetable(coords_table,save_file);
@@ -125,13 +132,13 @@ prompt = join(prompt);
 
 end
 
-function config_file = grab_coords(videoObj,vidname,config_path)
+function config_file = grab_coords(img_path,vidname,config_path)
 % Uses config to prompt users to define xy coordinates of an image
 % (videoObj). Outputs xy coordinates in form of a table. 
 
 % go to folder containing video & image
-fig = figure;
-imshow(readFrame(videoObj)) % display the first frame
+figure;
+imshow(imread(img_path)) % display the first frame
 axis('equal')
 set(gcf,'CurrentCharacter','@')
 hold on
@@ -169,6 +176,7 @@ config_file.x = coords(:,1);
 config_file.y = coords(:,2);
 
 close all
+
 end
 
 function config_name = get_behavior_config(session,epoch,config_path)
