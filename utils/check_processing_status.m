@@ -29,7 +29,6 @@ p.addParameter('check_cell_metrics',true,@islogical)
 p.addParameter('check_ripples',true,@islogical)
 p.addParameter('check_anatomical',true,@islogical)
 p.addParameter('check_scoring',true,@islogical)
-p.addParameter('remedy',true,@islogical)
 
 p.parse(varargin{:})
 check_lfp = p.Results.check_lfp;
@@ -40,11 +39,10 @@ check_cell_metrics = p.Results.check_cell_metrics;
 check_ripples = p.Results.check_ripples;
 check_anatomical = p.Results.check_anatomical;
 check_scoring = p.Results.check_scoring;
-remedy = p.Results.remedy;
 
 % initialize session_status.csv as table
 col_names = {'basepath','lfp','sleep_states','tracking_dlc',...
-    'tracking_animalBehavior','tracking_restrictxy','tracking_mazeCoords',...
+    'tracking_animalBehavior','tracking_restrictxy',...
     'sorting_Kilosort','sorting_phyRez','tracking_sessionBehavioralTracking',...
     'cell_metrics','ripples','anatomical_map','behavior_scoring'};
 session_status = cell2table(cell(0,length(col_names)),'VariableNames', col_names);
@@ -80,7 +78,6 @@ for i = 1:length(basepaths)
     if check_tracking
         session_status.tracking_animalBehavior(i) = isfile(fullfile(basepath,[basename,'.animal.behavior.mat']));
         session_status.tracking_restrictxy(i) = isfile(fullfile(basepath,[basename,'.restrictxy.mat']));
-        session_status.tracking_mazeCoords(i) = sum(isfile(fullfile(basepath,'*maze_coords.csv'))) >= 1;
         if isfile(fullfile(basepath,[basename,'.session.mat']))
             session = loadSession(basepath,basename);
             session_status.tracking_sessionBehavioralTracking(i) = isfield(session,'behavioralTracking');
