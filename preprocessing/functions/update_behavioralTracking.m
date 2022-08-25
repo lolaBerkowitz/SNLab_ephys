@@ -30,6 +30,10 @@ basename = basenameFromBasepath(basepath);
 disp('Checking for behavior videos...')
 vid_files = dir(fullfile(basepath,['*.','avi']));
 
+% make sure earlier recorded videos are fist
+[~,idx] = sort([vid_files.datenum]);
+vid_files = vid_files(idx)
+
 % check basepath for dlc tracking
 dlc_files = dir([basepath,filesep,'*DLC*.csv']); % check for dlc output
 
