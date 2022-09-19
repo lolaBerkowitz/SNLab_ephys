@@ -12,7 +12,8 @@
 %
 % Pipeline Overview: 
 %
-%  1.  Check xml/channel mapping 
+%  0.  Split-dat (if multiple animals are recorded in same sesion)
+%  1.  Run DLC from anaconda prompt (env: DLC-GPU)
 %  2.  Preprocess (create lfp, get digital signals, behavior tracking, kilosort)
 %  3.  Manual Curation in Phy 
 %  4.  Compile and save in CellExplorer data structure
@@ -20,38 +21,57 @@
 % LBerkowitz 2021
 
 %% paths for individual research projects 
-laura = '\\10.253.5.16\sn data server 3\laura_berkowitz\app_ps1_ephys\data';
-austin = '\\10.253.5.16\sn data server 3\austin_bunce\Ephys\data';
+laura = 'Y:\laura_berkowitz\app_ps1_ephys\data';
 
 %% Multi-animal recording session 
 % For sessions that record from multiple headstages from separate animals.
 % For SNLab, assumes one animal per active port (64 channel electrodes) as
 % of 2/22
-
 % subject folder corresponds to port A, B, C, D, respectively
-subject_order = {'hpc06','hpc05',[],[]};
+subject_order = {'hpc10','hpc09','hpc07',[]};
 
 % folder where dat files reside that need to be split
-data_path = '\\10.253.5.16\sn data server 3\laura_berkowitz\app_ps1_ephys\data\to_split\day05_220310_113927';
+data_path = 'Y:\laura_berkowitz\app_ps1_ephys\data\to_split\day00_day02_day04_220610_101437';
 
 % project folder where subjects data should be saved
-save_path = {laura, laura, [], []};
+save_path = {laura,laura,laura,[]}; 
     
 % split dat files 
-split_dat(data_path,save_path, subject_order,'trim_dat',true)
+split_dat(data_path,save_path, subject_order,'trim_dat',false)
 
+%% Process tracking (Done first so tracking can be updated in preprocess_session)
+% Open anaconda prompt and open gui
+% enter commands: 
+% activate conda DLC-GPU
+% ipython
+% import deeplabcut
+% deeplabcut.launch_dlc() 
+% Load config for video to analyze (ie.
+% 30cm_open_field-berkowitz-2022-07-14 for 30cm open fields)
+% Once project is loaded, navigate to analyze_video tab and load the videos
+% to be analyzed. Let them run overnight while split dat runs. 
 
 %% Single Session Preprocess
-basepath = '\\10.253.5.16\sn data server 3\austin_bunce\EPhys\data\hpc04\hpc04_day05';
+basepath = 'Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day35_220614_100545';
 
 % Check xml/channel mapping: verify channel map, skip bad channels, and save 
-make_xml(basepath)
+% make_xml(basepath)
 
 % Preprocess (create lfp, get digital signals, behavior tracking, kilosort)
-preprocess_session(basepath,'digitalInputs',false)
+preprocess_session(basepath,'digitalInputs',false,'kilosort',true,'tracking',true)
+
+%% update behavior file from metadatacsv
+
+%object location metadata
+metadata_path = 'Y:\laura_berkowitz\app_ps1_ephys\behavior\object_location\object_location_metadata.csv';
+
+update_behavior_from_metadata(metadata_path,'basepath',basepath)
+
+%% for object location tasks
+get__XY('basepath',basepath,'ephys',false,'vid_time',800)
 
 %% Batch preprocess (must make sure xml is made/accurate before running)
-subject_folder = '\\10.253.5.16\sn data server 3\austin_bunce\EPhys\data\hpc04\hpc04_day05'; %subject main folder (i.e. ~\data\hpc01)
+subject_folder = 'Y:\laura_berkowitz\app_ps1_ephys\data\hpc09'; %subject main folder (i.e. ~\data\hpc01)
 
 preprocess_batch(subject_folder)
 
@@ -67,22 +87,23 @@ disp ('Curate the kilosort results in Phy ')
 disp ('Manually copy the kilosort folder from the ssd_path to the main data folder.')
 
 %% Extract spike times and waveforms for sorted clusters
-session = sessionTemplate(basepath,'showGUI',true);
+cd(basepath)
+basename = basenameFromBasepath(basepath);
+% update 
+session = loadSession(basepath,basename);
+gui_session
+
+% run channel mapping to update session with 
+channel_mapping('basepath',basepath)
+gui_session
 
 %% find ripples
-%hpc04 =[38,33] 
-%hpc01 = [23,29]
-epochs = [];
-for i = 1:length(session.epochs)
-    epochs = [epochs;session.epochs{i}.startTime session.epochs{i}.stopTime];
-end
-
-ripples = DetectSWR([38,33],'basepath',basepath);
+% first input [ripple channel, sharp wave channel] using intan channels. 
+% ripples = DetectSWR([33,1],'basepath',basepath);
 
 
 %% Compute basic cell metrics
 cell_metrics = ProcessCellMetrics('session',session,'manualAdjustMonoSyn',false);
-
 % GUI to manually curate cell classification. This is not neccesary at this point.
 % It is more useful when you have multiple sessions
 cell_metrics = CellExplorer('metrics',cell_metrics);
@@ -100,14 +121,20 @@ cd('..\..')
 data_path = pwd;
 
 % look for all the cell_metrics.cellinfo.mat files
-files = dir([data_path,'\**\*.cell_metrics.cellinfo.mat']);
-
+% files = dir([data_path,'\**\*.cell_metrics.cellinfo.mat']);
 basepath = [];
 basename = [];
 % pull out basepaths and basenames
-for i = 1:length(files)
-    basepath{i} = files(i).folder;
-    basename{i} = basenameFromBasepath(files(i).folder);
+% for i = 1:length(files)
+%     basepath{i} = files(i).folder;
+%     basename{i} = basenameFromBasepath(files(i).folder);
+% end
+
+objectlocationpaths = readtable("Y:\laura_berkowitz\app_ps1_ephys\analysis\object_location_paths.csv");
+
+for i = 1:length(objectlocationpaths.basepath)
+    basepath{i} = objectlocationpaths.basepath{i};
+    basename{i} = basenameFromBasepath(objectlocationpaths.basepath{i});
 end
 
 % load all cell metrics
@@ -117,6 +144,16 @@ cell_metrics = loadCellMetricsBatch('basepaths',basepath,'basenames',basename);
 cell_metrics = CellExplorer('metrics',cell_metrics);
 
 
+%% find ripples
+%hpc04 =[38,33] 
+%hpc01 = [23,29]
+% epochs = [];
+% for i = 1:length(session.epochs)
+%     epochs = [epochs;session.epochs{i}.startTime session.epochs{i}.stopTime];
+% end
+
+% first input [ripple channel, sharp wave channel] using intan channels. 
+ripples = DetectSWR([33,3],'basepath',basepath);
 
 
 % %%                      Local Function Below
@@ -167,28 +204,33 @@ function preprocess_batch(data_folder)
 % checks for evidence of preprocessing in data_folder subfolds and runs
 % preprocess_session.m for unprocessed sessions
 
-folders = dir([data_folder]);
-folders = folders(~ismember({folders.name},{'.','..'}),:);
 
-% loop through folders and process those that don't have evidence of
+df = compile_sessions(data_folder);
+
+% loop through basepaths in df and process those that don't have evidence of
 % processing (in this case chanMap.mat)
-for i = 1:length(folders)
-    basepath = [data_folder,filesep,folders(i).name];
+for i = 1:length({df.basepath})
+    try
+    basepath = df.basepath{i};
     
     % Check xml/channel mapping: verify channel map, skip bad channels, and save 
-    if ~exist([basepath,filesep,'amplifier.xml'],'file')
-        make_xml(basepath)
-    end
-    
-    if isempty(dir([basepath,filesep,'chanMap.mat']))
-        preprocess_session(basepath,'digitalInputs',false,'check_epochs',false)
-    else
-        continue
+%     if ~exist([basepath,filesep,'amplifier.xml'],'file')
+%         make_xml(basepath)
+%     end
+     
+        if isempty(dir(fullfile(basepath,[folders(i).name,'.lfp'])))
+            preprocess_session(basepath,'digitalInputs',false,'check_epochs',false,'kilosort',true)
+            channel_mapping('basepath',basepath)
+        else
+            channel_mapping('basepath',basepath)
+            continue
+        end
+    catch
+        disp([basepath, 'processing failed. Check all components for preprocessing present'])
     end
 end
 
 end
-
 
 function write_xml(path,map,Fold,FNew)
 % Wrapper for buzcode bz_MakeXMLFromProbeMaps with defaults
@@ -226,4 +268,3 @@ end
 %
 % %% 7. Spike sort in Phy (Spike sorting kwik files in phy will update the kwik file)
 %
-
