@@ -25,6 +25,7 @@ folders = folders([folders.isdir],:);
 % create table and save basepaths for each subdirectory
 df = table; 
 df.basepath = cellfun(@(S) fullfile(unique({folders.folder}), S), {folders.name}, 'Uniform', 0)';
+df.basename = {folders.name}';
 
 % save basepaths if save_path is input
 if ~isempty(save_path)
