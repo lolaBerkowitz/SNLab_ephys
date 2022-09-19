@@ -1,8 +1,13 @@
-function restrict_and_transform(basepath)
+function restrict_and_transform(basepath,varargin)
 % restrict_and_transform takes xy coordinates from animal behavior file and
 % transforms them to cm. 
 %
 % Assumes general behavior file and *maze_coords.csv is in basepath. 
+p = inputParser;
+p.addParameter('maze_size',[],@isnumeric)
+
+p.parse(varargin{:});
+maze_size = p.Results.maze_size;
 
 % session basename to load animal behavior file and sessions file 
 basename = basenameFromBasepath(basepath);
@@ -17,7 +22,9 @@ load(fullfile(basepath,[basename,'.session.mat']))
 %% process coordinates in animal behavior file
 start = [];
 stop = [];
-maze_size = [];
+if isempty(maze_size)
+    maze_size = [];
+end
 x_max = [];
 x_min = [];
 y_max = [];
@@ -35,8 +42,11 @@ for ep = 1:length(session.behavioralTracking)
     x_min = [x_min; min(maze_coords_df.x(ismember(maze_coords_df.object,'corner')))];
     y_max = [y_max; max(maze_coords_df.y(ismember(maze_coords_df.object,'corner')))];
     y_min = [y_min; min(maze_coords_df.y(ismember(maze_coords_df.object,'corner')))];
+    
     % gather maze size from behavior.epochs.maze_size 
-    maze_size = [maze_size; behavior.epochs{1, epoch}.maze_size];
+    if ~isempty(behavior.epochs{1, epoch}.maze_size)
+        maze_size = [maze_size; behavior.epochs{1, epoch}.maze_size];
+    end
 
 end
 
