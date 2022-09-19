@@ -23,7 +23,7 @@ function process_tracking(basepath,varargin)
 p = inputParser;
 p.addParameter('maze_coords',true,@islogical)
 p.addParameter('config_path','C:\Users\schafferlab\github\SNLab_ephys\behavior\behavior_configs\')
-p.addParameter('metadata_path','Y:\laura_berkowitz\app_ps1_ephys\behavior\object_location\object_location_metadata.csv')
+p.addParameter('metadata_path','Y:\laura_berkowitz\app_ps1_ephys\behavior\behavior_metadata.csv')
 
 p.parse(varargin{:})
 maze_coords = p.Results.maze_coords;
@@ -33,7 +33,7 @@ metadata_path = p.Results.metadata_path;
 basename = basenameFromBasepath(basepath);
 
 % run main function
-general_behavior_file_SNlab('basepath',basepath)
+general_behavior_file_SNlab('basepath',basepath,'force_overwrite',true)
 
 % update trials from metadata csv
 update_behavior_from_metadata(metadata_path,'basepath',basepath)
