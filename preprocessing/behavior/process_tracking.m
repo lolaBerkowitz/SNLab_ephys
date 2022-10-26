@@ -32,6 +32,19 @@ metadata_path = p.Results.metadata_path;
 
 basename = basenameFromBasepath(basepath);
 
+% skip if no tracking found
+if isempty(dir([basepath,filesep,'*DLC*.csv']))
+    disp('No DLC tracking found. Skipping session')
+    return
+end
+
+% skip if no digitalin events
+try 
+    load(fullfile(basepath,'digitalIn.events.mat'))
+catch
+    disp('no digitalin.events found. Can''t run general behavior file for ephys')
+    return
+end
 % run main function
 general_behavior_file_SNlab('basepath',basepath,'force_overwrite',true)
 
