@@ -92,6 +92,7 @@ end
 
 % Create SessionInfo (only run this once!)
 session = sessionTemplate(basepath,'showGUI',false);
+save(fullfile(basepath,[basename, '.session.mat']),'session');
 
 % Process additional inputs
 
@@ -146,11 +147,9 @@ end
 % an automatic way of flaging bad channels is needed
 if stateScore
     if exist('pulses','var')
-        SleepScoreMaster(basepath,'noPrompts',true,'ignoretime',pulses.intsPeriods); % try to sleep score
-        thetaEpochs(basepath);
+        SleepScoreMaster(basepath,'ignoretime',pulses.intsPeriods); % try to sleep score
     else
-        SleepScoreMaster(basepath,'noPrompts',true); % takes lfp in base 0
-        thetaEpochs(basepath);
+        SleepScoreMaster(basepath); % takes lfp in base 0
     end
 end
 
