@@ -28,10 +28,10 @@ laura = 'Y:\laura_berkowitz\app_ps1_ephys\data';
 % For SNLab, assumes one animal per active port (64 channel electrodes) as
 % of 2/22
 % subject folder corresponds to port A, B, C, D, respectively
-subject_order = {'hpc10','hpc09','hpc07',[]};
+subject_order = {[],[],[],[]};
 
 % folder where dat files reside that need to be split
-data_path = 'Y:\laura_berkowitz\app_ps1_ephys\data\to_split\day00_day02_day04_220610_101437';
+data_path = 'Y:\laura_berkowitz\app_ps1_ephys\data\to_split\hpc07_hpc09_hpc10_220608_095940';
 
 % project folder where subjects data should be saved
 save_path = {laura,laura,laura,[]}; 
@@ -58,17 +58,9 @@ basepath = 'Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day35_220614_10054
 % make_xml(basepath)
 
 % Preprocess (create lfp, get digital signals, behavior tracking, kilosort)
-preprocess_session(basepath,'digitalInputs',false,'kilosort',true,'tracking',true)
+preprocess_session(basepath,'digitalInputs',false,'kilosort',true,'tracking',false)
 
-%% update behavior file from metadatacsv
 
-%object location metadata
-metadata_path = 'Y:\laura_berkowitz\app_ps1_ephys\behavior\object_location\object_location_metadata.csv';
-
-update_behavior_from_metadata(metadata_path,'basepath',basepath)
-
-%% for object location tasks
-get__XY('basepath',basepath,'ephys',false,'vid_time',800)
 
 %% Batch preprocess (must make sure xml is made/accurate before running)
 subject_folder = 'Y:\laura_berkowitz\app_ps1_ephys\data\hpc09'; %subject main folder (i.e. ~\data\hpc01)
@@ -99,8 +91,14 @@ gui_session
 
 %% find ripples
 % first input [ripple channel, sharp wave channel] using intan channels. 
-% ripples = DetectSWR([33,1],'basepath',basepath);
-
+ripples = DetectSWR([session.channelTags.Ripple.channels,...
+    session.channelTags.SharpWave.channels,...
+    session.channelTags.Bad.channels(1)],...
+    'thresSDrip',[.25,.5],...
+    'thresSDswD',[.25,.5],...
+    'saveMat',true,...
+    'check',true,...
+    'forceDetect',true);
 
 %% Compute basic cell metrics
 cell_metrics = ProcessCellMetrics('session',session,'manualAdjustMonoSyn',false);
