@@ -3,8 +3,7 @@ function [velocity, acceleration,distance_vector] = linear_motion(x,y,fr,smooth_
 % inputs: 
 %   x: position vector of x-coordinates of length n
 %   y: position vecotr of y-coordinates of length n
-%   smooth_factor: integer value for which to divide sample rate
-%           (i.e. samplerate/smooth_factor).
+%   smooth_factor: time in seconds to smooth over (e.g .100 for 100ms)  
 % output:
 %   velocity: n-1 vector of velocity
 %   acceleration: second derivative of position data using matlab gradient
@@ -19,7 +18,7 @@ distance_vector = sqrt(sqrXDiff + sqrYDiff);
 velocity = (distance_vector)*fr; %instanteous velocity
 acceleration = gradient(velocity,1/fr); %instanteous acceleration
 
-frames_to_smooth = nearest_odd(fr/smooth_factor);
+frames_to_smooth = nearest_odd(fr*smooth_factor);
 velocity = sgolayfilt(velocity,3,frames_to_smooth);
 
 end
