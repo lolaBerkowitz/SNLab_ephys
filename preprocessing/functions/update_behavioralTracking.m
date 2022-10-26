@@ -18,7 +18,7 @@ function update_behavioralTracking(varargin)
 p=inputParser;
 addParameter(p,'basepath',pwd); % single or many basepaths in cell array or uses pwd
 addParameter(p,'annotate',false); % save animal.behavior.mat
-addParameter(p,'tags',{'base','learning','test','OF','open_field','track','context'}); % save animal.behavior.mat
+addParameter(p,'tags',{'base','learning','test','OF','open_field','morph','track','context'}); % save animal.behavior.mat
 
 parse(p,varargin{:});
 basepath = p.Results.basepath;
@@ -32,7 +32,7 @@ vid_files = dir(fullfile(basepath,['*.','avi']));
 
 % make sure earlier recorded videos are fist
 [~,idx] = sort([vid_files.datenum]);
-vid_files = vid_files(idx)
+vid_files = vid_files(idx);
 
 % check basepath for dlc tracking
 dlc_files = dir([basepath,filesep,'*DLC*.csv']); % check for dlc output
