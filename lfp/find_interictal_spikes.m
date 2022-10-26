@@ -1,52 +1,109 @@
-data_folder = 'Y:\laura_berkowitz\app_ps1_ephys\data\hpc05';
-folders = dir(data_folder);
-folders = folders(~ismember({folders.name},{'.','..'}),:);
-overwrite = true;
+
+% Detection heuristics 
+%  * Cortical or non-hippocampal channel (given IEDs filtered at
+%  physiological ripple frequency (80 - 250Hz) exhibit high power in this
+%  band. Thus non-hippocampal channel are used for first detection. 
+%  * Passband filtered at 60 - 80 Hz (per Gelinas et al 2016) 
+%  * Durations of events from 10 - 60 ms, events within 10ms of each other
+%  are merged
+%  * Events at least greater than 3 SD above normalized squared signal
+
+% data_folder = 'Y:\laura_berkowitz\app_ps1_ephys\data\hpc05';
+% folders = dir(data_folder);
+% folders = folders(~ismember({folders.name},{'.','..'}),:);
+% overwrite = true;
+
+
+function find_interictal_spikes(data_path,varargin)
+
+p = inputParser;
+addParameter(p,'overwrite',true,@islogical)
+addParameter(p,'annotate_only',false,@islogical)
+
+
+parse(p,varargin{:})
+overwrite = p.Results.overwrite;
+annotate_only = p.Results.annotate_only;
+
+
+% Load sessions 
+df = compile_sessions(data_path);
+
+sessions = df.basepath;
 % loop through folders and process those that don't have evidence of
 % processing (in this case chanMap.mat)
-for i = 1:length(folders)
-    basepath = [data_folder,filesep,folders(i).name];
+for i = 1:length(sessions)
+    
+    
+    basepath = sessions{i};
     basename = basenameFromBasepath(basepath);
-    cd(basepath)
+        
+    % see if interictal_spikes events have been processed
     check = dir([basename,'.interictal_spikes.events.mat']);
     
-    if ~isempty(check) & ~overwrite
+    if annotate_only
+        
+        NeuroScope2('basepath',basepath)
+        continue
+    end
+    
+    if ~isempty(check) && ~overwrite
         disp('interictal_spikes already created')
         continue
     end
         
-    if ~isempty(dir(fullfile(basepath,[folders(i).name,'.lfp']))) && ...
+    if ~isempty(dir(fullfile(basepath,[basename,'.lfp']))) && ...
             ~isempty(dir(fullfile(basepath,'anatomical_map.csv')))
         
         % updates basename.session with channel map
          channel_mapping('basepath',basepath,'fig',false)
+         
         session = loadSession(basepath,basename);
         bad_channels = session.channelTags.Bad.channels;
+        
+        channel = [];
+        % will fail if no cortical channels are present
         try
             cortex_channels = session.brainRegions.Cortex.channels;
             cortex_channels(ismember(cortex_channels,bad_channels)) = [];
             channel = cortex_channels(1);
-            interictal_spikes = FindRipples('basepath',basepath,...
-                'channel',channel,...
-                'thresholds',[.25 6],...
-                'durations',[10 50],...
-                'minDuration',10);
-            save([basename '.interictal_spikes.events.mat'],'interictal_spikes')
-        catch
+            
+         catch
             disp('Cortex not found, skipping session')
             continue
         end
         
-%         % refine ripple detection using spiking level
-%         if ~isempty(dir(fullfile(basepath,[folders(i).name,'.spikes.cellinfo.mat'])))
-%             spikes = importSpikes('cellType', "Pyramidal Cell", 'brainRegion', "CA1");
-%             ripplesTemp = eventSpikingTreshold(ripples,'spikes',spikes,'spikingThreshold',0.5);
-%             ripples = ripplesTemp;
-%             if ~exist([basepath '\Ripple_Profile'])
-%                 mkdir('Ripple_Profile');
-%             end
-%             save([basename '.ripples.events.mat'],'ripples');saveas(gcf,['Ripple_Profile\SWRmua.png']);
-%         end
+          % will fail if no cortical channels are present
+        if isempty('channel')
+            disp('No Cortex channel. Using last dentate channel')
+            dentate_channels = session.brainRegions.Dentate.channels;
+            dentate_channels(ismember(dentate_channels,bad_channels)) = [];
+            channel = dentate_channels(end);
+        end
         
+            interictal_spikes = FindRipples('basepath',basepath,...
+                'channel',channel,...
+                'thresholds',[.25 6],...
+                'durations',[10 150],...
+                'minDuration',10,...
+                 'passband',[40 250],...
+                 'saveMat',false,...
+                 'EMGThresh',.90); % Removes events that are above 90% corrrelated across all channels
+             
+            save(fullfile(basepath,[basename '.interictal_spikes_.events.mat']),'interictal_spikes')
+        
+%         % Load ripples, if ripple event overlaps with IED then define as
+%         % IED ( Gelinas et al 2016)
+%         load(fullfile(basepath,[basename,'.ripples.events.mat']))
+%                 
+%         % Find IEDs that were also detected as physiological ripples
+%        [status,interval,~] = InIntervals(interictal_spikes.peaks,ripples.timestamps);
+%         
+%        % Set those phyviological ripples as flagged 
+%        ripples.flagged = interval(status);
+%        
+%        save(fullfile(basepath,[basename '.ripples.events.mat']),'ripples')
+
     end
+end
 end
