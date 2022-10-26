@@ -14,17 +14,27 @@ data_folder = p.Results.data_folder; % for batch in progress
 
 % read in metadata csv
 df = readtable(metadata_path);
+basename = basenameFromBasepath(basepath);
+% skip if behavior file doesn't exist
+try
+    load(fullfile(basepath,[basename,'.animal.behavior.mat']))
+catch
+    return
+end
 
 if batch
     disp('batch processing option a work in progress')
     return
-else
-    % update behavior.trials from trial_start/stop columns
-    update_trials(basepath,df)
     
-    % update maze size
-    update_maze_size(basepath,df)
 end
+
+
+% update behavior.trials from trial_start/stop columns
+update_trials(basepath,df)
+
+% update maze size
+update_maze_size(basepath,df)
+
 
 end
 
@@ -68,6 +78,8 @@ for i = 1:length(basenames)
     
     % update behavior.trials from trial_start/stop columns
     update_trials(basepath,df)
+    % update behavior.epochs.maze_size from maze_size column
+    update_maze_size(basepath,df)
     
     
 end
