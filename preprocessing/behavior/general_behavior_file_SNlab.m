@@ -22,6 +22,13 @@ smooth_factor = p.Results.smooth_factor;
 
 basename = basenameFromBasepath(basepath);
 
+try 
+    load(fullfile(basepath,'digitalIn.events.mat'))
+catch
+    disp('no digitalin.events found. Can''t run general behavior file for ephys')
+    return
+end
+
 % check if file was already made
 if force_overwrite
     disp('Overwriting previous runs')
