@@ -197,7 +197,7 @@ if contains(name,{'multi'})
     config_name = configs{multi_idx & ~object_idx};
 elseif contains(name,{'object'})
     config_name = configs{~multi_idx & object_idx & ~open_field_idx};
-elseif contains(name,{'context','open_field','morph'})
+elseif contains(name,{'context','open_field','morph','circular_track'})
     config_name = configs{~multi_idx & ~object_idx & open_field_idx};
 end
 
