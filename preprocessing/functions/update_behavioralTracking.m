@@ -19,12 +19,23 @@ p=inputParser;
 addParameter(p,'basepath',pwd); % single or many basepaths in cell array or uses pwd
 addParameter(p,'annotate',false); % save animal.behavior.mat
 addParameter(p,'tags',{'base','learning','test','OF','open_field','morph','track','context'}); % save animal.behavior.mat
+addParameter(p,'force',false); % save animal.behavior.mat
 
 parse(p,varargin{:});
 basepath = p.Results.basepath;
 annotate = p.Results.annotate;
 tags = p.Results.tags;
+force = p.Results.force;
+
 basename = basenameFromBasepath(basepath);
+
+% check if session contains behavioralTracking field 
+session = loadSession(basepath,basename);
+
+if isfield(session,'behavioralTracking') && ~force
+    disp('Session already contains field ''behavioralTracking''')
+    return
+end
 
 % check for videos in basepath
 disp('Checking for behavior videos...')
@@ -36,8 +47,6 @@ vid_files = vid_files(idx);
 
 % check basepath for dlc tracking
 dlc_files = dir([basepath,filesep,'*DLC*.csv']); % check for dlc output
-
-session = loadSession(basepath,basename);
 
 if isempty(vid_files)
     warning('No videos found. behavioralTracking field not updated. Exiting function')
