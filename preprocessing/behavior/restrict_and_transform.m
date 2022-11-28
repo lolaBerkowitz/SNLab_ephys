@@ -12,17 +12,14 @@ maze_size = p.Results.maze_size;
 % session basename to load animal behavior file and sessions file 
 basename = basenameFromBasepath(basepath);
 
-% load behavior file
-load(fullfile(basepath,[basename,'.animal.behavior.mat']))
-
 % load sessions file
 load(fullfile(basepath,[basename,'.session.mat']))
 
-% restrict the coordinates
-behavior = restrict(basepath,basename,behavior);
+% restrict the coordinates and save back to behavior file
+restrict(basepath,session);
 
 % now scale the coordinates
-[scale_factor_x,scale_factor_y] = scale_coords(behavior,session,basepath,maze_size);
+[scale_factor_x,scale_factor_y] = scale_coords(session,basepath,maze_size);
 
 % save maze coords as cm back to maze_coords.csv 
 % loop through coords for each video
@@ -36,12 +33,23 @@ for ep = 1:length(session.behavioralTracking)
         [extractBefore(session.behavioralTracking{1,ep}.notes,'.avi'),'_maze_coords.csv']));
 end
 
-% save behavior file
-save(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
 end
 
-function behavior = restrict(basepath,basename,behavior)
+function restrict(basepath,session,behavior)
+
+basename = basenameFromBasepath(basepath); 
+
+% load behavior file
+load(fullfile(basepath,[basename,'.animal.behavior.mat']))
+start = [];
+stop = [];
 % gets index to restrict xy
+for ep = 1:length(session.behavioralTracking)
+    epoch = session.behavioralTracking{1,ep}.epoch;
+    start = [start,session.epochs{epoch}.startTime];
+    stop = [stop,session.epochs{epoch}.stopTime];
+    
+end
 
 if ~isempty(dir(fullfile(basepath,[basename,'.restrictxy.mat'])))
     load(fullfile(basepath,[basename,'.restrictxy.mat']))
@@ -56,8 +64,17 @@ end
 % for primary xy coordinates, restrict to boundaries provided by good_idx
 behavior.position.x(~good_idx) = NaN;
 behavior.position.y(~good_idx) = NaN;
+save(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
+
 end
-function [scale_factor_x,scale_factor_y] = scale_coords(behavior,session,basepath,maze_size)
+
+function [scale_factor_x,scale_factor_y] = scale_coords(session,basepath,maze_size)
+
+
+basename = basenameFromBasepath(basepath); 
+
+% load behavior file
+load(fullfile(basepath,[basename,'.animal.behavior.mat']))
 % Scales xy coordinates in behavior and saves back to behavior structure
 
 if isempty(maze_size)
@@ -70,13 +87,10 @@ x_min = [];
 y_max = [];
 y_min = [];
 
-start = [];
-stop = [];
+
 % loop through epochs to retrieve start/end used in restrictxy below
 for ep = 1:length(session.behavioralTracking)
     epoch = session.behavioralTracking{1,ep}.epoch;
-    start = [start,session.epochs{epoch}.startTime];
-    stop = [stop,session.epochs{epoch}.stopTime];
     
     % load maze coords
     maze_coords_df = readtable(fullfile(basepath,...
