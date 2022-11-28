@@ -28,9 +28,9 @@ if batch
     
 end
 
-
-% update behavior.trials from trial_start/stop columns
-update_trials(basepath,df)
+if isempty(behavior.trials)
+    update_trials(basepath,df)
+end
 
 % update maze size
 update_maze_size(basepath,df)
@@ -74,10 +74,10 @@ for i = 1:length(basenames)
     
     if ~isempty(behavior.trials)
         continue
-    end
-    
+    else
     % update behavior.trials from trial_start/stop columns
     update_trials(basepath,df)
+    end
     % update behavior.epochs.maze_size from maze_size column
     update_maze_size(basepath,df)
     
