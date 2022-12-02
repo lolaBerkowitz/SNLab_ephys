@@ -8,7 +8,7 @@ addParameter(p,'force_overwrite',false); % overwrite previously saved data (will
 addParameter(p,'save_mat',true); % save animal.behavior.mat
 addParameter(p,'primary_coords_dlc',1:2); % deeplabcut tracking point to extract (extracts all, but main x and y will be this)
 addParameter(p,'likelihood_dlc',.95); % deeplabcut likelihood threshold
-addParameter(p,'smooth_factor',10); % n frames to smooth over (default 10 = 167ms for 60Hz)
+addParameter(p,'smooth_factor',1); % n frames to smooth over (default 10 = 167ms for 60Hz)
 % addParameter(p,'maze_size',30); % maze size in cm
 
 parse(p,varargin{:});

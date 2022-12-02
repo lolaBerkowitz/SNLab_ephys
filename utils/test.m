@@ -23,12 +23,13 @@ for i = 1:length(folders)
         session = loadSession(basepath,basename);
         
         try
-            ripple_channel = session.brainRegions.CA1sp.channels(end)+1;
+            ripple_channel = session.brainRegions.CA1sp.channels(end-1);
+            
             ripples = FindRipples('basepath',basepath,...
                 'channel',ripple_channel,...
                 'thresholds',[0.25 1],...
-                'durations',[20 100],...
-                'minDuration',20);
+                'durations',[50 500]);
+            
             save([basename '.ripples.events.mat'],'ripples')
         catch
             disp('CA1sp not found, skipping session')
