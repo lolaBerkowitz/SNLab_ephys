@@ -22,11 +22,13 @@ function process_tracking(basepath,varargin)
 % LB 2022
 p = inputParser;
 p.addParameter('maze_coords',true,@islogical)
+p.addParameter('overwrite_behavior',true,@islogical)
 p.addParameter('config_path','C:\Users\schafferlab\github\SNLab_ephys\behavior\behavior_configs\')
 p.addParameter('metadata_path','Y:\laura_berkowitz\app_ps1_ephys\behavior\behavior_metadata.csv')
 
 p.parse(varargin{:})
 maze_coords = p.Results.maze_coords;
+overwrite_behavior = p.Results.overwrite_behavior;
 config_path = p.Results.config_path;
 metadata_path = p.Results.metadata_path;
 
@@ -42,11 +44,12 @@ end
 try 
     load(fullfile(basepath,'digitalIn.events.mat'))
 catch
-    disp('no digitalin.events found. Can''t run general behavior file for ephys')
+    disp('no digitalin.events found. Can''t sync tracking for general behavior file for ephys')
     return
 end
+
 % run main function
-general_behavior_file_SNlab('basepath',basepath,'force_overwrite',true)
+general_behavior_file_SNlab('basepath',basepath,'force_overwrite',overwrite_behavior)
 
 % update trials from metadata csv
 update_behavior_from_metadata(metadata_path,'basepath',basepath)
