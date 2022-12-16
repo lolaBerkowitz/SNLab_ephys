@@ -8,7 +8,7 @@ addParameter(p,'force_overwrite',false); % overwrite previously saved data (will
 addParameter(p,'save_mat',true); % save animal.behavior.mat
 addParameter(p,'primary_coords_dlc',1:2); % deeplabcut tracking point to extract (extracts all, but main x and y will be this)
 addParameter(p,'likelihood_dlc',.95); % deeplabcut likelihood threshold
-addParameter(p,'smooth_factor',1); % n frames to smooth over (default 10 = 167ms for 60Hz)
+addParameter(p,'smooth_factor',.1); % time in seconds to smooth over (default .1 or 100ms)
 % addParameter(p,'maze_size',30); % maze size in cm
 
 parse(p,varargin{:});
@@ -44,7 +44,7 @@ update_behavioralTracking('basepath',basepath)
 
 % call extract_tracking which contains many extraction methods
 [t,x,y,v,a,angle,units,source,fs,notes,extra_points,vidnames] = ...
-    extract_tracking(basepath,primary_coords_dlc,likelihood_dlc,smooth_factor);
+    tracking.extract_tracking(basepath,primary_coords_dlc,likelihood_dlc,smooth_factor);
 
 % load session file 
 load([basepath,filesep,[basename,'.session.mat']]);
@@ -84,68 +84,4 @@ if save_mat
 end
 end
 
-function [t,x,y,v,a,angle,units,source,fs,notes,extra_points,vidnames] = ...
-    extract_tracking(basepath,primary_coords_dlc,likelihood_dlc,smooth_factor)
 
-% initalize variables to pull
-t = [];
-x = [];
-y = [];
-v = [];
-a = [];
-angle = [];
-units = [];
-source = [];
-notes = [];
-extra_points = [];
-vidnames = [];
-
-% below are many methods on locating tracking data from many formats
-[tracking,field_names] = process_and_sync_dlc_SNLab('basepath',basepath,...
-    'primary_coords',primary_coords_dlc,...
-    'likelihood',likelihood_dlc);
-
-t = tracking.timestamps;
-fs = 1/mode(diff(t));
-vidnames = tracking.vidnames;
-
-x = tracking.position.x(:,primary_coords_dlc);
-y = tracking.position.y(:,primary_coords_dlc);
-
-if length(primary_coords_dlc) > 1
-    angle = xy_angle(x,y);
-    % compute average point between two coords 
-    x = median(x,2);
-    y = median(y,2);
-    [v, a,~] = linear_motion(x,y,fs,smooth_factor);
-else
-    [v, a,~] = linear_motion(x,y,fs,smooth_factor);
-end
-
-% multiple tracking points will likely exist, extract here
-x_col = field_names(contains(field_names,'x'));
-y_col = field_names(contains(field_names,'y'));
-extra_points = struct();
-for i = 1:length(x_col)
-    extra_points.([x_col{i},'_point']) = tracking.position.x(:,i);
-    extra_points.([y_col{i},'_point']) = tracking.position.y(:,i);
-end
-
-units = 'pixels';
-source = 'deeplabcut';
-
-if length(t) > length(x)
-    t = t(1:length(x));
-elseif length(x) > length(t)
-    x = x(1:length(t));
-    y = y(1:length(t));
-    % adjust other tracker points
-    for name = fields(extra_points)'
-        extra_points.(name{1}) = extra_points.(name{1})(1:length(t));
-    end
-end
-
-notes = ['primary_coords: ',num2str(primary_coords_dlc),...
-    ', likelihood: ',num2str(likelihood_dlc)];
-
-end
