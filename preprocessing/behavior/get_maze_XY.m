@@ -43,7 +43,7 @@ p.addParameter('config_path','C:\Users\schafferlab\github\SNLab_ephys\behavior\b
 p.parse(varargin{:})
 basepath = p.Results.basepath; % not used currently
 vid_type = p.Results.vid_type; % not used currently
-vid_time = p.Results.vid_time; % not used currently
+vid_time = p.Results.vid_time; 
 config_path = p.Results.config_path;
 
 % find all video files indicated by vid_type
@@ -66,12 +66,12 @@ if ~exist([basepath,filesep,[basename,'.animal.behavior.mat']],'file')
 end
 
 % get coords
-main(session, config_path, vid_time)
+main(session, config_path, vid_time,vid_type)
 
 
 end
 
-function main(session, config_path, vid_time)
+function main(session, config_path, vid_time, vid_type)
 % runs main process of looping through videos in basepath, pulling up
 % image via local grab_coords function which allows user to collect coordinate data
 % and outputs coords for object A center, object A edge, object B center,
@@ -100,18 +100,23 @@ for file = 1:length(session.behavioralTracking) %loop through folders containing
     epoch = session.behavioralTracking{1,file}.epoch;
     % choose config based on epoch
     config = get_behavior_config(session,epoch,config_path);
-    
+    crop_params = session.behavioralTracking{1, file}.crop_params;
     % pulls up video frame and grabs coords
-    coords_table = grab_coords(img_path,session.behavioralTracking{1,file}.notes,config);
+    coords_table = grab_coords(img_path,session.behavioralTracking{1,file}.notes,config,crop_params);
+    
+    % save to session 
+    session.behavioralTracking{1,file}.maze_coords = coords_table;
+    
+    % save data to csv 
+    save_file = fullfile(basepath,[extractBefore(session.behavioralTracking{1,file}.notes,vid_type),'_maze_coords.csv']);
+    writetable(coords_table,save_file);
     
     % delete the image you created
     delete(img_path)
-
-    % save data
-    save_file = fullfile(basepath,[extractBefore(session.behavioralTracking{1,file}.notes,'.avi'),'_maze_coords.csv']);
-    writetable(coords_table,save_file);
-    
 end
+
+% save session back to basepath 
+save(fullfile(basepath,[basename,'.session.mat']),'session');
 
 end
 
@@ -132,14 +137,17 @@ prompt = join(prompt);
 
 end
 
-function config_file = grab_coords(img_path,vidname,config_path)
+function config_file = grab_coords(img_path,vidname,config_path, crop_params)
 % Uses config to prompt users to define xy coordinates of an image
 % (videoObj). Outputs xy coordinates in form of a table. 
 
 % go to folder containing video & image
 figure;
-imshow(imread(img_path)) % display the first frame
-axis('equal')
+im = imread(img_path);
+
+im2 = im(crop_params.y_min:crop_params.y_max,crop_params.x_min:crop_params.x_max,:);
+imshow(im2) % display t he first frame
+axis('equal')      
 set(gcf,'CurrentCharacter','@')
 hold on
 i=1;
