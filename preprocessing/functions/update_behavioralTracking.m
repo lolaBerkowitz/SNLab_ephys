@@ -17,14 +17,12 @@ function update_behavioralTracking(varargin)
 %input parser
 p=inputParser;
 addParameter(p,'basepath',pwd); % single or many basepaths in cell array or uses pwd
-p.addParameter('dlc_crop','C:\Users\schafferlab\github\SNLab_ephys\behavior\dlc_crop_parameters.csv',@ischar);
 addParameter(p,'annotate',false); % save animal.behavior.mat
 addParameter(p,'tags',{'base','learning','test','OF','open_field','morph','track','context'}); % save animal.behavior.mat
-addParameter(p,'force',false); % save animal.behavior.mat
+addParameter(p,'force',true); % save animal.behavior.mat
 
 parse(p,varargin{:});
 basepath = p.Results.basepath;
-dlc_crop = p.Results.dlc_crop;
 annotate = p.Results.annotate;
 tags = p.Results.tags;
 force = p.Results.force;
@@ -61,7 +59,7 @@ if isempty(dlc_files)
 end
 
 % update session with dlc and video files 
-session = main(session,vid_files,dlc_files,tags,dlc_crop); 
+session = main(session,vid_files,dlc_files,tags); 
 
 % save data
 save(fullfile(basepath,[basename, '.session.mat']),'session');
@@ -74,26 +72,8 @@ end
 
 end
 
-function mdl_params = grab_dlc_crop(file_name,dlc_crop_path)
-% pulls cropping parameters from dlc_crop_path (csv with croppsing
-% parameters for model indicated in dlc output.
 
-% load csv with model parameters for cropping 
-dlc_crop = readtable(dlc_crop_path);
-
-% initialize output
-mdl_params = table;
-% loop through models
-for i = 1:length(dlc_crop.model)
-    % save parameters if file name contains the model name
-    if contains(file_name,dlc_crop.model{i})
-        mdl_params = dlc_crop(i,:);
-    end
-end
-
-end
-
-function session = main(session,vid_files,dlc_files,tags,dlc_crop_path)
+function session = main(session,vid_files,dlc_files,tags)
 
 % if found update behavioralTracking field
 disp('Videos found!!')
@@ -129,7 +109,7 @@ for i = 1:length(vid_files)
     videoObj = VideoReader(fullfile(basepath,vidname));
     
     % get model parameters for file
-    mdl_params = grab_dlc_crop(dlc_files(dlc_idx).name,dlc_crop_path);
+    crop_params = tracking.grab_dlc_crop(dlc_files(dlc_idx).name);
     
     % save to session file
     session.behavioralTracking{1, i}.filenames = dlc_files(dlc_idx).name;
@@ -138,7 +118,7 @@ for i = 1:length(vid_files)
     session.behavioralTracking{1, i}.type  = 'DLC';
     session.behavioralTracking{1, i}.notes  = vidname;
     session.behavioralTracking{1, i}.framerate  = videoObj.FrameRate;
-    session.behavioralTracking{1, i}.dlc_model_crop = mdl_params;
+    session.behavioralTracking{1, i}.crop_params = crop_params;
 end
 
 
