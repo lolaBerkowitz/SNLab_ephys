@@ -21,6 +21,8 @@ acceleration = gradient(velocity,1/fr); %instanteous acceleration
 frames_to_smooth = nearest_odd(fr*smooth_factor);
 velocity = sgolayfilt(velocity,3,frames_to_smooth);
 
+% set negative values to nan
+velocity(velocity < 0) = nan;
 end
 
 % to set the number of frames to smooth - must be odd for Savitzky-Golay
