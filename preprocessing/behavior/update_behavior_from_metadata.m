@@ -28,7 +28,7 @@ if batch
     
 end
 
-if isempty(behavior.trials)
+if ~isfield(behavior,'trials')
     update_trials(basepath,df)
 end
 
