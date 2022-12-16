@@ -1,4 +1,4 @@
-function [start,ends,ngroups]=findgroups(x)
+function [start,ends,ngroups]=find_groups(x)
 % findgroups: locates the start and end index of a congigous binary index
 % Often used after contigousframes.m to find the locations of groups of contigous frames
 % and the corresponding number of groups 
