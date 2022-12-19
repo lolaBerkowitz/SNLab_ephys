@@ -28,9 +28,7 @@ if batch
     
 end
 
-if ~isfield(behavior,'trials')
-    update_trials(basepath,df)
-end
+update_trials(basepath,df)
 
 % update maze size
 update_maze_size(basepath,df)
