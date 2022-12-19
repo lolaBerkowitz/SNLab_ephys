@@ -1,4 +1,4 @@
-function [tracking,field_names] = process_and_sync_dlc_SNLab(varargin)
+function [tracking_struct,field_names] = process_and_sync_dlc_SNLab(varargin)
 % Unpacks DLC and syncs with digitalin.events.mat timestamps
 %
 % Run this after you have exported deeplabcut csv results, have
@@ -58,14 +58,14 @@ session = loadSession(basepath,basename);
 
 if isfield(session,'behavioralTracking')
     
-    [dlc_files,vidnames,ep_idx,frame_rate] =  get_tracking_info_from_session(session,basename);
+    [dlc_files,vidnames,ep_idx,frame_rate] =  tracking.get_tracking_info_from_session(session,basename);
     
 else % create it and reload session and pull dlc,video, and epoch info
     % update session with dlc/video info
     update_behavioralTracking('basepath',basepath)
     session = loadSession(basepath,basename); % reload updated session file
     % pull tracking info
-    [dlc_files,vidnames,ep_idx,frame_rate] =  get_tracking_info_from_session(session,basename);
+    [dlc_files,vidnames,ep_idx,frame_rate] =  tracking.get_tracking_info_from_session(session,basename);
     
 end
 
@@ -111,7 +111,7 @@ for ii = 1:length(dlc_files)
     y = df{:,y_col};
     
     % store tracking for each video file
-    tempTracking{ii} = sync_ttl(basepath,video_ttl{ii},x,y,ts,fs,pulses_delta_range);
+    tempTracking{ii} = tracking.sync_ttl(basepath,video_ttl{ii},x,y,ts,fs,pulses_delta_range);
     trackFolder(ii) = ii;
 end
 
@@ -127,92 +127,16 @@ for ii = 1:size(tempTracking,2)
 end
 
 % save data to ouput structure
-tracking.position.x = x;
-tracking.position.y = y;
-tracking.folders = folder;
-tracking.samplingRate = samplingRate;
-tracking.timestamps = timestamps;
-tracking.description = description;
-tracking.vidnames = vidnames;
+tracking_struct.position.x = x;
+tracking_struct.position.y = y;
+tracking_struct.folders = folder;
+tracking_struct.samplingRate = samplingRate;
+tracking_struct.timestamps = timestamps;
+tracking_struct.description = description;
+tracking_struct.vidnames = vidnames;
 
 end
 
-% Local functions 
-function [tracking] = sync_ttl(basepath,video_ttl,x,y,ts,fs,pulses_delta_range)
 
-% if ~exist(fullfile(folder,'digitalIn.events.mat'),'file')
-%     digitalIn = getDigitalIn('all','folder',folder);
-% end
-%
-% load(fullfile(folder,'digitalIn.events.mat'))
-%
-% Len = cellfun(@length, digitalIn.timestampsOn, 'UniformOutput', false);
-% [~,idx] = max(cell2mat(Len));
-% bazlerTtl = digitalIn.timestampsOn{idx};
-
-%check for extra pulses of much shorter distance than they should
-extra_pulses = diff(video_ttl)<((1/fs)-(1/fs)*pulses_delta_range);
-video_ttl(extra_pulses) = [];
-
-video_intan_diff = length(video_ttl) - size(x,1);
-
-[x,y,ts,video_ttl] = match_video_frames_to_ttl(video_ttl,video_intan_diff,x,y,ts,fs);
-
-[~,folder_name] = fileparts(basepath);
-tracking.position.x = x;
-tracking.position.y = y;
-tracking.timestamps = video_ttl;
-tracking.originalTimestamps = ts;
-tracking.folder = folder_name;
-tracking.samplingRate = fs;
-tracking.description = '';
-end
-
-function [x,y,t,video_ttl] = match_video_frames_to_ttl(video_ttl,basler_intan_diff,x,y,t,fs)
-
-% match basler frames con ttl pulses
-if (length(video_ttl) == size(x,1)) || abs(basler_intan_diff)<=2 %assumes 1 frame could be cut at 0 and 1 frame at end
-    disp('N of frames match!!');
-elseif basler_intan_diff>0 && abs(basler_intan_diff)<fs
-    disp([num2str(abs(length(video_ttl) - size(x,1))) ' of frames dont match, probably at the end of the recording']);
-    video_ttl = video_ttl(1:size(x,1));
-elseif basler_intan_diff<0 && abs(basler_intan_diff)<fs
-    disp([num2str(abs(length(video_ttl) - size(x,1))) ' of frames dont match, probably at the beggining of the recording']);
-    x = x(1:length(video_ttl),:);
-    y = y(1:length(video_ttl),:);
-elseif basler_intan_diff<0 && abs(basler_intan_diff)>fs
-    disp([num2str(abs(size(x,1) - length(video_ttl)))...
-        ' video frames without TTL... was the recording switched off before the camera? Cutting positions accordingly...']);
-    x = x(1:length(video_ttl),:);
-    y = y(1:length(video_ttl),:);
-elseif abs(basler_intan_diff)>2*fs
-    warning('More than 2 seconds missalignment in total in this session...will adjust to the closer one...');
-    if basler_intan_diff>0
-        video_ttl = video_ttl(1:size(x,1));
-    else
-        x = x(1:length(video_ttl),:);
-        y = y(1:length(video_ttl),:);
-    end
-elseif isempty(video_ttl)
-    video_ttl = t;
-else
-    warning('Unnoticed problem with Camera/Intan... I would go back and check both step by step');
-end
-end
-
-function [tracking_files,vid_names,ep_idx,frame_rate] =  get_tracking_info_from_session(session,basename)
-% extracts tracking information (tracking filename, video name, and epoch index
-% basename.session.behavioralTracking
-
-disp(['Checking for DLC files in ', basename, '.session.behavioralTracking'])
-
-for i = 1:length(session.behavioralTracking)
-    tracking_files{i} = session.behavioralTracking{1,i}.filenames;
-    vid_names{i} = session.behavioralTracking{1,i}.notes;
-    ep_idx(i) =  session.behavioralTracking{1,i}.epoch;
-    frame_rate(i) = session.behavioralTracking{1,i}.framerate;
-end
-
-end
 
 
