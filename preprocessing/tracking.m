@@ -59,7 +59,10 @@ classdef tracking
         
         function behavior = scale_coords(session,behavior,basepath)
             % updates behavior file scale and translate coordinates (centered at 0,0)
-            
+            if contains(behavior.position.units,'cm')
+                disp('Coordinates already scaled')
+                return
+            end
             
             % get max/min for maze per epoch from maze_coords.csv. Uses info from
             % session.behaviorTracking to load relevant maze_coords for each epoch.
@@ -87,12 +90,13 @@ classdef tracking
                 % update speed to match new units
                 [speed_ep, accel_ep,~] = linear_motion(behavior.position.x(idx_ep),...
                     behavior.position.y(idx_ep),behavior.sr,.1);
-                behavior.speed(idx_ep) = speed_ep;
-                behavior.acceleration(idx_ep) = accel_ep;
+                behavior.speed(idx_ep(1:end-1)) = speed_ep;
+                behavior.acceleration(idx_ep(1:end-1)) = accel_ep;
             end
             
             behavior.position.units = 'cm';
-            
+            save(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
+
         end
         
         function behavior = restrict(session,behavior,basepath)
@@ -133,6 +137,9 @@ classdef tracking
             % for primary xy coordinates, restrict to boundaries provided by good_idx
             behavior.position.x(~good_idx) = NaN;
             behavior.position.y(~good_idx) = NaN;
+            
+            save(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
+
         end
         
         function [t,x,y,v,a,angle,units,source,fs,notes,extra_points,vidnames] = ...

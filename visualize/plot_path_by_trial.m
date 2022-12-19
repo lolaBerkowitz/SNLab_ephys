@@ -18,4 +18,18 @@ for i = 1:length(behavior.trialsID)
     axis off
 end
 
+fig = figure;
+for i = 1:length(behavior.trialsID)
+    idx = behavior.timestamps > behavior.trials(i,1)...
+        & behavior.timestamps < behavior.trials(i,2);
+    [occ,map] = behavior_funcs.occ_map(behavior.position.x(idx),behavior.position.y(idx),binsize,fr)
+
+    subplot(1,length(behavior.trialsID),i)
+    plot(behavior.position.x(idx),behavior.position.y(idx),'k')
+    title(behavior.trialsID{i})
+    axis image
+    axis equal
+    axis off
+end
+
 end
