@@ -24,17 +24,15 @@ end
 
 % load sessions file
 load(fullfile(basepath,[basename,'.session.mat']))
-load(fullfile(basepath,[basename,'.animal.behavior.mat']))
 
 % restrict the coordinates and save back to behavior file
-behavior = tracking.restrict(session,behavior,basepath);
+tracking.restrict(session,behavior,basepath);
 
 % scales coordinates determined by known maze size and measurements in pixels
 % from image
-behavior = tracking.scale_coords(session,behavior,basepath);
+tracking.scale_coords(session,behavior,basepath);
 
 % save updates
-save(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
 
 end
  
