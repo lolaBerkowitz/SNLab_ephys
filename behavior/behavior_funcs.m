@@ -179,7 +179,7 @@ classdef behavior_funcs
             
         end
         
-        function [occ,map] = occ_map(x,y,diameter,binsize,fr)
+        function [occ,map] = occ_map(x,y,binsize,fr)
             % Builds an occupancy map for maze. Assums params table.
             % inputs:
             %   x: position vector of x-coordinates of length n
@@ -192,8 +192,8 @@ classdef behavior_funcs
             %   map: raw occupancy map
             
             %Creates bin edges for heatmap
-            xedge=linspace(min(x),max(x),round(diameter/binsize));
-            yedge=linspace(min(y),max(y),round(diameter/binsize));
+            xedge=linspace(min(x),max(x),round(range(x)/binsize));
+            yedge=linspace(min(y),max(y),round(range(y)/binsize));
             
             %Bin coordinates for heat map and apply guassian filter to smooth
             [map] = histcounts2(x,y,xedge,yedge);
