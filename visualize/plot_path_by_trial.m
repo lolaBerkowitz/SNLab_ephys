@@ -10,23 +10,17 @@ fig = figure;
 for i = 1:length(behavior.trialsID)
     idx = behavior.timestamps > behavior.trials(i,1)...
         & behavior.timestamps < behavior.trials(i,2);
-    subplot(1,length(behavior.trialsID),i)
-    plot(behavior.position.x(idx),behavior.position.y(idx),'k')
-    title(behavior.trialsID{i})
+    [occ,~] = behavior_funcs.occ_map(behavior.position.x(idx),behavior.position.y(idx),2,behavior.sr);
+    axs(1) = subplot(2,length(behavior.trialsID),i,'align');
+    b = imagesc(flipud(occ));
     axis image
     axis equal
     axis off
-end
+    set(b,'AlphaData',~isnan(flipud(occ)))
+        title(behavior.trialsID{i})
 
-fig = figure;
-for i = 1:length(behavior.trialsID)
-    idx = behavior.timestamps > behavior.trials(i,1)...
-        & behavior.timestamps < behavior.trials(i,2);
-    [occ,map] = behavior_funcs.occ_map(behavior.position.x(idx),behavior.position.y(idx),binsize,fr)
-
-    subplot(1,length(behavior.trialsID),i)
+    axs(2) = subplot(2,length(behavior.trialsID),i+length(behavior.trialsID)) ;
     plot(behavior.position.x(idx),behavior.position.y(idx),'k')
-    title(behavior.trialsID{i})
     axis image
     axis equal
     axis off
