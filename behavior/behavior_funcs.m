@@ -201,8 +201,9 @@ classdef behavior_funcs
             map=map/fr;
             
             % smooths over 1.5 cm
-            occ = imgaussfilt(map, 1.5);
+            occ = imgaussfilt(map, 1);
             occ(map==0) = nan;
+            map(map==0) = nan;
         end
         
         function [out] = thigmotaxis(x,y,fr,diameter,center_proportion)
