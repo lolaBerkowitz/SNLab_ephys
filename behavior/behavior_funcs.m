@@ -14,7 +14,7 @@ classdef behavior_funcs
         
         %% General locomotion
         
-        function length = path_length(x,y,velocity)
+        function length = path_length(x,y,velocity,varargin)
             % Computes total path length during running
             % inputs:
             %   x: position vector of x-coordinates of length n
@@ -23,17 +23,63 @@ classdef behavior_funcs
             % output:
             %   length: total path length in cm for active motion
             
+            p = inputParser;
+            addParameter(p,'run_threshold',3,@isnumeric);
+            
+            parse(p,varargin{:});
+            run_threshold = p.Results.run_threshold;
             
             %distance formula
             distance_vector = sqrt((diff(x)).^2 + (diff(y)).^2);
             
-            % Summary Path Measures
-            length = sum(distance_vector(velocity>=3,1));%Total Path length for points greater than 3cm/s
+            % length of path when animal is running
+            length = sum(distance_vector(velocity >= run_threshold,1));%Total Path length for points greater than 3cm/s
             
         end
         
-        function stop_measures = stops(x,y,ts,velocity,fr,epoch)
-            % Finds when animal stops ( < 3cm/s velocity for at least 1
+        function [stopIdx,startStop,endStop] = stop_epochs(velocity,varargin)
+            % Given a vector of velocity, find when the vector falls below 
+            % input: 
+            % run_threshold: velocity that separates movement from
+            %   non-movement in same unites as xy coordinates (ie cm/s or
+            %   pixels/s) default: 3 cm/s
+            % epoch: number of contiguous frames to search for stops.
+            % Default is 60 frames assuming 60Hz sample rate (i.e. animal
+            %   is stopped for 1 second). 
+            % output: 
+            %   stopIdx: logical index of time associated with stop
+            %   startStop: row index for start of stops
+            %   endStop: row index for end of stops
+            
+            p = inputParser;
+            addParameter(p,'run_threshold',3,@isnumeric);
+            addParameter(p,'epoch',60,@isnumeric);
+
+            parse(p,varargin{:});
+            run_threshold = p.Results.run_threshold;
+            epoch = p.Results.epoch;
+
+            stopIdx = contiguousframes(velocity <= run_threshold,epoch);
+            [startStop,endStop,~] = find_groups(stopIdx);
+        end
+        
+        function center = center_of_mass(x,y)
+            %Find center of mass for set of x,y coordinates
+            % uses min_encl_ellipsoid to find center of mass of coordinates
+            % and results [x,y] as 'center'
+            temp=[x,y];
+            % remove nans 
+            temp(any(isnan(temp),2),:)=[];
+            % min_encl_ellipsoid requires size > 1
+            if ~isempty(temp) && size(temp,1)>1
+                [ ~,~, center] = min_encl_ellipsoid(temp(:,1),temp(:,2));
+            else
+                center = [NaN,NaN];
+            end  
+        end
+        
+        function stop_measures = stops(x,y,ts,velocity,fr,epoch,varargin)
+            % Finds when animal stop ( < 3cm/s velocity for at least 1
             % second) and computes stop features.
             % inputs:
             %       x: position vector for x of length n
@@ -51,16 +97,19 @@ classdef behavior_funcs
             %           tsStop: cell array of time stamps corresponding to stop
             %           NumStops: number of stops made
             %
+            p = inputParser;
+            addParameter(p,'run_threshold',3,@isnumeric);
             
+            parse(p,varargin{:});
+            run_threshold = p.Results.run_threshold;
             
-            stop_measures.stopIdx = contiguousframes(velocity < 3,epoch);
-            [startStop,endStop,~]=findgroups(stop_measures.stopIdx);
+            [stop_measures.stopIdx,startStop,endStop] = behavior_funcs.stop_epochs(velocity,epoch,'run_threshold',run_threshold);
             
-            %     This finds coords for stopping
+            %     This finds coordinates associated with stop
             for ii=1:length(startStop)
-                motionless{ii}=[x(startStop(ii):endStop(ii)),y(startStop(ii):endStop(ii))];
-                timeMotionless{ii}=size(motionless{ii},1)/fr;
-                tsStop{ii}=ts(startStop(ii):endStop(ii));
+                motionless{ii} = [x(startStop(ii):endStop(ii)),y(startStop(ii):endStop(ii))];
+                timeMotionless{ii} = size(motionless{ii},1)/fr;
+                tsStop{ii} = ts(startStop(ii):endStop(ii));
             end
             
             stop_measures.stops = motionless;
@@ -72,29 +121,20 @@ classdef behavior_funcs
             
             %Find center of mass for stops.
             for ii=1:size(stop_measures.stops,2)
-                temp=[stop_measures.stops{1,ii}(:,1),stop_measures.stops{1,ii}(:,2)];
-                temp(any(isnan(temp),2),:)=[];
-                if ~isempty(temp) && size(temp,1)>1
-                    [ ~,~, stopCenter] = min_encl_ellipsoid(temp(:,1),temp(:,2));
-                else
-                    stopCenter(1,1)=NaN;
-                    stopCenter(2,1)=NaN;
-                end
-                stop(ii,1)=stopCenter(1,1);
-                stop(ii,2)=stopCenter(2,1);
+                center(ii) = center_of_mass(stop_measures.stops{1,ii}(:,1),stop_measures.stops{1,ii}(:,2));
             end
             
-            stop_measures.stopCenter = stop;
+            stop_measures.stopCenter = center;
             
         end
         
-        function quad_measures = quadrant(j,params,fr,numQuad)
+        function quad_measures = quadrant(x,y,fr,varargin)
             % Finds when animal stops ( < 3cm/s velocity for at least 1
             % second) and computes stop features.
             % inputs:
-            %       j: subject index
-            %       params: table made from OF_preprocess
-            %       fr: frame rate
+            %       x: vector of cordinates for x
+            %       y: vector of cordinates for y
+            %       fr: video sampling rate in Hz
             % outputs:
             %       quad_measures: structure containing outcome measures.
             %           stopIdx: logical index of points where rat is
@@ -104,13 +144,14 @@ classdef behavior_funcs
             %           tsStop: cell array of time stamps corresponding to stop
             %           NumStops: number of stops made
             %
-            
-            back = params.backCM{j};
-            head = params.headCM{j};
-            nose = params.noseCM{j};
-            
-            ts = params.ts{j};
-            x = back(:,1); y = back(:,2);
+                        % LB 2022
+            p = inputParser;
+            p.addParameter('n_quadrants',4,@isnumeric)
+            p.addParameter('run_threshold',3,@isnumeric)
+
+            p.parse(varargin{:})
+            n_quadrants = p.Results.n_quadrants;
+            run_threshold = p.Results.run_threshold;
             
             %squared distance between consecutive points
             sqrXDiff = (diff(x)).^2;
@@ -118,21 +159,24 @@ classdef behavior_funcs
             
             %distance formula
             distance_vector = sqrt(sqrXDiff + sqrYDiff);
+            %instanteous velocity
             velocity = (distance_vector)*fr; %instanteous velocity
-            velocity = smoothdata(velocity,'movmedian',fr*.8); %smoothed with moving median window over less than 1 second
+            velocity = smoothdata(velocity,'sgolay',fr*.8); %smoothed with moving median window over less than 1 second
             
             clear sqrXDiff sqrYDiff
             
-            %Stops
-            stopIdx=contiguousframes(velocity < 3,30);
-            [startStop,endStop,~]=findgroups(stopIdx);
+            [stopIdx,startStop,endStop] = behavior_funcs.stop_epochs(velocity,epoch,'run_threshold',run_threshold);
+
+            % animal is stopped for in quadrant for 1 second 
+            stopIdx = contiguousframes(velocity <= run_threshold,fr);
+            [startStop,endStop,~] = find_groups(stopIdx);
             
             %     This finds coords for stopping
             for ii=1:length(startStop)
                 motionless{ii}=[back(startStop(ii):endStop(ii),1),back(startStop(ii):endStop(ii),2)];
             end
             
-            stops=motionless;
+            stops = motionless;
             
             clear startStop endStop
             
@@ -154,13 +198,13 @@ classdef behavior_funcs
             
             clear stop
             
-            HD=wrapTo360(fixNLXangle(rad2deg(atan2(head(:,2)-nose(:,2),...
+            HD = wrapTo360(fixNLXangle(rad2deg(atan2(head(:,2)-nose(:,2),...
                 head(:,1)-nose(:,1))),round(0.1667*30)));
-            angVel=insta_angvel(HD',fr);
+            angVel = insta_angvel(HD',fr);
             
             
             %calculate verticies for quadrants
-            quadrants=createZones([0,0],params.dia{j},'numQuad',numQuad,'fig',0); %16 pie shaped segments
+            quadrants = createZones([0,0],params.dia{j},'numQuad',n_quadrants,'fig',0); %16 pie shaped segments
             
             
             %Calculate dwell time per quadrant
@@ -192,6 +236,7 @@ classdef behavior_funcs
             %   map: raw occupancy map
             
             %Creates bin edges for heatmap
+            
             xedge=linspace(min(x),max(x),round(range(x)/binsize));
             yedge=linspace(min(y),max(y),round(range(y)/binsize));
             
@@ -206,8 +251,16 @@ classdef behavior_funcs
             map(map==0) = nan;
         end
         
-        function [out] = thigmotaxis(x,y,fr,diameter,center_proportion)
+        function [out] = thigmotaxis(x,y,fr,diameter,varargin)
+            % NOT FUNCTION YET NEED TO ADJUST CREATEZONES FOR SQUARE
+            % ENVIORNMENT LB 12/2022
+            
             % Computes time spent near outside wall
+             p = inputParser;
+            addParameter(p,'center_proportion',.8,@ischar);
+            
+            parse(p,varargin{:});
+            center_proportion = p.Results.center_proportion;
             
             %Create annuli for center and outter edge of maze
             outsideDwell = createZones([0,0],diameter,'type','annulus','fig',0,'annulusSize',center_proportion); %default annulus size is 80% for createZones
@@ -264,9 +317,9 @@ classdef behavior_funcs
         function metrics = home_base_metics(out_home,x,y,velocity,x_home,y_home,stopIdx,tsStop)
             
             % This finds stops that occur in the home base boundary
-            [startStop,~,~] = findgroups(stopIdx);
+            [startStop,~,~] = find_groups(stopIdx);
             
-            [~,~,metrics.entries] = findgroups(out_home);
+            [~,~,metrics.entries] = find_groups(out_home);
             
             % total time in home base
             metrics.hbOcc = nansum(out_home)/fr;
@@ -398,7 +451,6 @@ classdef behavior_funcs
             
         end
         
-        
         function metrics = object_explore_vectors(object_center,object_edge,behavior,varargin)
             % calculate object interaction for all xy coordinates and
             % return as structure.  LB 2022
@@ -431,10 +483,10 @@ classdef behavior_funcs
             out_home = contiguousframes(in_home,behavior.sr/2); %has to be inside of hb for at least 1 sec to count as entryd
             
             % This finds stops that occur in the home base boundary
-            [startStop,~,~] = findgroups(stopIdx);
+            [startStop,~,~] = find_groups(stopIdx);
             
             % get n entries into object area
-            [~,~,metrics.entries] = findgroups(out_home);
+            [~,~,metrics.entries] = find_groups(out_home);
             
             % total time near object
             metrics.obj_Occ = nansum(out_home)/fr;
@@ -472,6 +524,14 @@ classdef behavior_funcs
                 
             end
             
+        end
+        
+        %% locomotion over time 
+        function locomotion_over_epochs(x,y,[startIdx,endIdx])
+            % examine path length, search area, velocity, and stops as a
+            % function of epoch (could be trials, behavior epochs, or time
+            % bins
+            disp('NOT FUNCTIONTIONAL LB 12/2022')
         end
         
         %%  behavior utils
