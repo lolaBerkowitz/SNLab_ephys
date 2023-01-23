@@ -526,27 +526,16 @@ classdef behavior_funcs
             
         end
         
-        %% locomotion over time 
-        function locomotion_over_epochs(x,y,[startIdx,endIdx])
-            % examine path length, search area, velocity, and stops as a
-            % function of epoch (could be trials, behavior epochs, or time
-            % bins
-            disp('NOT FUNCTIONTIONAL LB 12/2022')
-        end
-        
+%         %% locomotion over time 
+%         function locomotion_over_epochs(x,y,[startIdx,endIdx])
+%             % examine path length, search area, velocity, and stops as a
+%             % function of epoch (could be trials, behavior epochs, or time
+%             % bins
+%             disp('NOT FUNCTIONTIONAL LB 12/2022')
+%         end
+%         
         %%  behavior utils
         
-        function read_maze_coords(basepath)
-            basname = basenameFromBasepath(basepath);
-            session = loadSession(basepath,basename);
-            
-            % loop through behavioral tracking epochs
-            for i = 1:length(session.behavioralTracking)
-                temp_sess = session.behavioralTracking{1,i};
-                
-            end
-            
-        end
         
     end
 end
