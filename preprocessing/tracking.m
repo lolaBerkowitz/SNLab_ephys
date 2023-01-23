@@ -53,11 +53,18 @@ classdef tracking
                 scale_factor_x{ep} = (x_max - x_min)/behavior.epochs{1, epoch}.maze_size; %pixels/cm
                 scale_factor_y{ep} = (y_max - y_min)/behavior.epochs{1, epoch}.maze_size; %pixels/cm
                 
+                % add scaled parameters to maze_coord_df
+                maze_coords_df.x_scaled = tracking.scale_transform(maze_coords_df.x,x_origin{ep},scale_factor_x{ep});
+                maze_coords_df.y_scaled = tracking.scale_transform(maze_coords_df.y,y_origin{ep},scale_factor_y{ep});
+                % save back to basepath
+                writetable(maze_coords_df,fullfile(basepath,...
+                    [extractBefore(session.behavioralTracking{1,ep}.notes,'.avi'),'_maze_coords.csv']))
             end
             
         end
         
         function behavior = scale_coords(session,behavior,basepath)
+            basename = basenameFromBasepath(basepath);
             % updates behavior file scale and translate coordinates (centered at 0,0)
             if contains(behavior.position.units,'cm')
                 disp('Coordinates already scaled')
@@ -71,7 +78,7 @@ classdef tracking
             
             % rescale coordinates relative to parameters for each epoch
             coord_names = fieldnames(behavior.position);
-            
+
             for ep = 1:length(session.behavioralTracking)
                 idx_ep = idx{ep};
                 
@@ -86,14 +93,14 @@ classdef tracking
                     behavior.position.(coord_names{i})(idx_ep) = tracking.scale_transform(y(idx_ep),...
                         y_origin{ep},scale_factor_y{ep});
                 end
-                
-                % update speed to match new units
-                [speed_ep, accel_ep,~] = linear_motion(behavior.position.x(idx_ep),...
-                    behavior.position.y(idx_ep),behavior.sr,.1);
-                behavior.speed(idx_ep(1:end-1)) = speed_ep;
-                behavior.acceleration(idx_ep(1:end-1)) = accel_ep;
+               
             end
             
+                            % update speed to match new units
+                [speed_, accel_,~] = linear_motion(behavior.position.x,...
+                    behavior.position.y,behavior.sr,.1);
+            behavior.speed = speed_;
+            behavior.acceleration = accel_;
             behavior.position.units = 'cm';
             save(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
 
@@ -450,5 +457,44 @@ classdef tracking
             
         end
         
+        % Utils 
+        function rescale_maze_coords(basepath)
+            % rescale_maze_coords converts cooridnates maze_coords.csv to
+            % scaled coords using the scale params. Assumes tracking has
+            % been processed process_tracking. 
+            %
+            %
+           
+             % check for maze_coords and if doesn't exist return
+            if isempty(dir(fullfile(basepath,'*_maze_coords.csv')))
+                warning('No maze coords found. Run get_maze_XY.m to obtain maze coords')
+                return
+            end
+            
+            % load files
+            basename = basenameFromBasepath(basepath);
+            session = loadSession(basepath,basename);
+            load(fullfile(basepath,'*.animal.behavior.mat'))
+            
+            % get the scale parameters 
+            [x_origin,y_origin,scale_factor_x,scale_factor_y] = tracking.get_scale_params(session,behavior,basepath);
+
+            % loop through behavioral tracking epochs, rescale xy and save
+            % back to maze_coord_df. 
+            for i = 1:length(session.behavioralTracking)
+                % load coords from struct or csv in session folder
+                if isfield(session.behavioralTracking{1, i},'maze_coords')
+                    maze_coord_temp = session.behavioralTracking{1, i}.maze_coords;
+                else
+                    maze_coord_temp = readtable(fullfile(basepath,...
+                    [extractBefore(session.behavioralTracking{1,i}.notes,'.avi'),'_maze_coords.csv']));
+                end
+                maze_coord_temp.x_scaled = tracking.scale_transform(maze_coord_temp.x,x_origin{i},scale_factor_x{i});
+                maze_coord_temp.y_scaled = tracking.scale_transform(maze_coord_temp.y,y_origin{i},scale_factor_y{i});
+                session.behavioralTracking{1, i}.maze_coords = maze_coord_temp;
+            end
+            % save session file
+            save(fullfile(basepath,[basename,'.session.mat']))
+        end
     end
 end
