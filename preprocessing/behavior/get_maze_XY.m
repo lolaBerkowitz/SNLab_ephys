@@ -36,13 +36,15 @@ function get_maze_XY(varargin)
 p = inputParser;
 p.addParameter('basepath',pwd,@isfolder);
 p.addParameter('vid_type','.avi',@ischar);
+p.addParameter('overwrite',false,@islogical);
 p.addParameter('vid_time',300,@isnumeric); % time of video to load in seconds
 p.addParameter('config_path','C:\Users\schafferlab\github\SNLab_ephys\behavior\behavior_configs',@isfolder); % time of video to load in seconds
 
 
 p.parse(varargin{:})
-basepath = p.Results.basepath; % not used currently
-vid_type = p.Results.vid_type; % not used currently
+basepath = p.Results.basepath; 
+vid_type = p.Results.vid_type; 
+overwrite = p.Results.overwrite;
 vid_time = p.Results.vid_time; 
 config_path = p.Results.config_path;
 
@@ -50,7 +52,7 @@ config_path = p.Results.config_path;
 basename = basenameFromBasepath(basepath);
 session = loadSession(basepath,basename);
 
-if length(dir(fullfile(basepath,'*maze_coords.csv'))) == length(session.behavioralTracking)
+if length(dir(fullfile(basepath,'*maze_coords.csv'))) == length(session.behavioralTracking) && ~overwrite
     disp('Maze coords found for each behavioralTracking entry')
     return
 end
