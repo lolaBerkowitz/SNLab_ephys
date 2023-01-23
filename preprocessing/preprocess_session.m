@@ -176,12 +176,14 @@ if kilosort
     command = ['robocopy "',basepath,'" ',ssd_folder,' chanMap.mat'];
     system(command);
     
-    % Spike sort using kilosort 1 (data on ssd)
+    % Spike sort using kilosort 1 (data on ssd)l
     run_ks1(basepath,'ssd_folder',ssd_folder)
 end
 % Get tracking positions
 
 if tracking
+    % update epochs so process_tracking can run
+    gui_session
     % saves general behavior file, restrictxy, maze_coords, and updates
     % session.behavioralTracking. Requires dlc output in basepath
     process_tracking(basepath)
