@@ -124,7 +124,7 @@ classdef place_cell_analysis
         end
         
         
-        function [fields]=getPlaceFields_2d(varargin)
+        function [fields] = getPlaceFields_2d(varargin)
             % getPlaceFields_2d: locate firing fields in 2d map
             % First uses uses Kmeans and contourc (segmentImage.m - RH)
             % Then removes fields based on below params
@@ -159,7 +159,7 @@ classdef place_cell_analysis
             addParameter(p,'minFieldWidth',3,@isnumeric) % in bins
             addParameter(p,'minActiveBins',10,@isnumeric) % in bins
             addParameter(p,'maxFieldWidth',30,@isnumeric) % in bins
-            addParameter(p,'maze_size_cm',100,@isnumeric)
+            addParameter(p,'maze_size_cm',30,@isnumeric)
             addParameter(p,'debugging_fig',0,@isnumeric)
             
             parse(p,varargin{:})
@@ -174,9 +174,10 @@ classdef place_cell_analysis
             
             
             if nansum(ratemap(:)) == 0
+                
                 fields.fieldwidth{1} = length(ratemap)*(maze_size_cm/length(ratemap));
                 fields.area{1} = length(ratemap)*length(ratemap)*(maze_size_cm/length(ratemap));
-                [r,c]=find(~isnan(ratemap));
+                [r,c] = find(~isnan(ratemap));
                 [k,~] = convhull(r,c);
                 fields.bounds{1} = [r(k),c(k)];
                 fields.masked_field{1} = ~isnan(ratemap);
@@ -203,10 +204,10 @@ classdef place_cell_analysis
             end
             
             % collect field info
-            for f=1:length(x)
+            for f = 1:length(x)
                 %rescale coordinates
-                x_temp=rescale([x{f},upscalefac+1,length(X)-upscalefac],1,(length(ratemap)));
-                y_temp=rescale([y{f},upscalefac+1,length(X)-upscalefac],1,(length(ratemap)));
+                x_temp = rescale([x{f},upscalefac+1,length(X)-upscalefac],1,(length(ratemap)));
+                y_temp = rescale([y{f},upscalefac+1,length(X)-upscalefac],1,(length(ratemap)));
                 x_temp = x_temp(1:end-2);
                 y_temp = y_temp(1:end-2);
                 
@@ -245,7 +246,7 @@ classdef place_cell_analysis
             end
             
             % sort fields by firing rate
-            [~,idx]=sort([fields.peakFR{:}],'descend');
+            [~,idx] = sort([fields.peakFR{:}],'descend');
             fields.fieldwidth = fields.fieldwidth(idx);
             fields.area = fields.area(idx);
             fields.bounds = fields.bounds(idx);
@@ -295,8 +296,8 @@ classdef place_cell_analysis
                 
                 if debugging_fig
                     subplot(2,2,2)
-                    imAlpha=ones(size(ratemap));
-                    imAlpha(isnan(ratemap))=0;
+                    imAlpha = ones(size(ratemap));
+                    imAlpha(isnan(ratemap)) = 0;
                     imagesc(ratemap,'AlphaData',imAlpha);
                     axis off
                     axis image
@@ -347,6 +348,7 @@ classdef place_cell_analysis
             for f = 1:length(fields.peakLoc)
                 fielddets(f,:) = [fields.peakLoc{f},fields.fieldwidth{f}];
             end
+            
             [~,idx]=sort(fielddets(:,3),'ascend');
             
             [C,ia,~]=unique(fielddets(:,1:2),'rows','stable');
@@ -521,7 +523,7 @@ classdef place_cell_analysis
         end
         
         
-        function [fields]=getPlaceFields(varargin)
+        function [fields] = getPlaceFields(varargin)
             % USAGE
             %
             %
@@ -681,7 +683,7 @@ classdef place_cell_analysis
         end
         
         
-        function r=IntraTrialStability(mat,track,track_length)
+        function r = IntraTrialStability(mat,track,track_length)
             
             if isempty(mat)
                 r=NaN;
@@ -698,12 +700,15 @@ classdef place_cell_analysis
             
             
             split=round(size(mat,1)/2);
-            S{1}=mat(1:split,:);
-            S{2}=mat(split+1:end,:);
-            MinY=min(mat(:,3));MaxY=max(mat(:,3));MinX=min(mat(:,2));MaxX=max(mat(:,2));
+            S{1} = mat(1:split,:);
+            S{2} = mat(split+1:end,:);
+            MinY = min(mat(:,3));
+            MaxY = max(mat(:,3));
+            MinX = min(mat(:,2));
+            MaxX = max(mat(:,2));
             nBinsx = round(track_length/2);
-            edges{1}=linspace(MinY,MaxY,nBinsy+1);
-            edges{2}=linspace(MinX,MaxX,nBinsx+1);
+            edges{1} = linspace(MinY,MaxY,nBinsy+1);
+            edges{2} = linspace(MinX,MaxX,nBinsx+1);
             
             for i=1:2
                 mat=S{i};
