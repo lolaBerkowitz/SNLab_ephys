@@ -25,20 +25,23 @@ contFile = fullfile(basepath,dat_name);
 % samples = file.bytes/2/16; % 16 is n_channels for intan digitial in
 D.Data = memmapfile(contFile,'Format','uint16','writable',false);
 
-digital_word2 = double(D.Data.Data);
+digital_word2 = D.Data.Data;
 Nchan = 16;
 Nchan2 = 17;
+filter_channels = [6 7];
 for k = 1:Nchan
-    tester(:,Nchan2-k) = (digital_word2 - 2^(Nchan-k))>=0;
-    digital_word2 = digital_word2 - tester(:,Nchan2-k)*2^(Nchan-k);
-    test = tester(:,Nchan2-k) == 1;
-    test2 = diff(test);
-    pulses{Nchan2-k} = find(test2 == 1);
-    pulses2{Nchan2-k} = find(test2 == -1);
-    data(k,:) = test;
+    test = bitand(digital_word2,2^(Nchan-k)) > 0;
+    if any((filter_channels-1)==(Nchan-k))
+        test = medfilt1(single(test),5) > 0;
+    end
+    %digital_word2 = digital_word2 - tester(:,Nchan2-k)*2^(Nchan-k);
+    %test = tester(:,Nchan2-k) == 1;
+    digital_on{Nchan2-k} = find(diff(test) == 1);
+    digital_off{Nchan2-k} = find(diff(test) == -1);
+%     data(k,:) = test;
 end
-digital_on = pulses;
-digital_off = pulses2;
+% digital_on = pulses;
+% digital_off = pulses2;
 
 
 for ii = 1:size(digital_on,2)
