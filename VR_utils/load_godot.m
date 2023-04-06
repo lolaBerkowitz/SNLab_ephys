@@ -1,4 +1,4 @@
-function vr_pos = load_godot(basepath)
+function vr_pos = load_godot(basepath,varargin)
 % load_gadot
 % 
 % Input:
@@ -39,6 +39,14 @@ addParameter(p,'savefile',true,@islogical);
 parse(p,varargin{:});
 
 savefile = p.Results.savefile;
+
+% look for processed file and return if present
+if ~isempty(dir(fullfile(basepath,'*vr_godot.csv')))
+    disp('godot files processed. Loading csv')
+    temp = dir(fullfile(basepath,'*vr_godot.csv'));
+    vr_pos = readtable(fullfile(basepath,temp.name));
+    return
+end
 % get file info
 param = dir(fullfile(basepath,'*godotlogs.txt'));
 vr_pos = table;
@@ -58,9 +66,9 @@ if ~isempty(param)
     % add column labels
     vr_pos.Properties.VariableNames = {'yaw','pitch','roll','x',...
             'z','xz_angle','reward','lick','experiment_ts','lap_n','reward_n','mouse_id'};
-        
+    vr_pos = sortrows(vr_pos,'lap_n'); 
     if savefile
-        writetable(vr_pos,fullfile(basepath,[session_date,'_vr_pos.csv']))
+        writetable(vr_pos,fullfile(basepath,[session_date,'_vr_godot.csv']))
     end
 else
     disp('No godotlogs found. Check basepath')
