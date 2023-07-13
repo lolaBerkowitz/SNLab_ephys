@@ -91,9 +91,8 @@ if ~isempty(dir([basepath,filesep,'amplifier.xml']))
 end
 
 % Create SessionInfo (only run this once!)
-session = sessionTemplate(basepath,'showGUI',false);
-save(fullfile(basepath,[basename, '.session.mat']),'session');
-
+session = sessionTemplate(basepath,'showGUI',true);
+ 
 % Process additional inputs
 
 % Analog inputs
@@ -134,7 +133,7 @@ end
 
 if getLFP
     % create downsampled lfp low-pass filtered lfp file
-    ce_LFPfromDat(session,'outFs',lfp_fs);
+    LFPfromDat(basepath,'outFs',lfp_fs);
 end
 
 % Calcuate estimated emg
