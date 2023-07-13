@@ -11,20 +11,20 @@ for i = 1:length(basepaths)
     % if Ran in 2022, overwrite
     basepath = basepaths{i};
     basename = basenames{i};
-    
+    session = loadSession(basepath,basename);
     behav = dir(fullfile(basepath,[basename,'.animal.behavior.mat']));
     
     % skip basepaths that don't have a behavior file or were created after
     % the edits made in 2023
     if isempty(behav)
-        continue
-    elseif contains(behav.date,'2023')
+        process_tracking(basepath)
         continue
     end
     
     % run check - will overwrite if position coordinates are not scaled to cm 
     % or centered at 0,0
     check_position_scaling(basepath)
-    
+    load(fullfile(basepath,[basename,'.animal.behavior.mat']))
+    tracking.restrict(session,behavior,basepath);
    
 end
