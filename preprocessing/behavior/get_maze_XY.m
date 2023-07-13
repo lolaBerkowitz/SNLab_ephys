@@ -91,6 +91,11 @@ load(fullfile(basepath,[basename,'.animal.behavior.mat']))
 % loop through video
 for file = 1:length(session.behavioralTracking) %loop through folders containing subject videos
     
+    % exclude VR 
+    if contains(session.behavioralTracking{1,file}.filenames,'godot')
+        continue
+    end
+    
     vid_path = fullfile(basepath,session.behavioralTracking{1,file}.notes);
     img_path = fullfile(basepath,'temp_img.png');
     % create image save to current directory
