@@ -112,7 +112,7 @@ end
 vid_files = dir([data_path,filesep,'*.avi']);
 vids = {vid_files.name};
 % Order of folders should match port_order and digitalin_order
-
+%%
 digidx = 1;
 for port = find(~cellfun(@isempty,subject_order))
     
@@ -382,12 +382,14 @@ function digitalIn = parse_digitalIn(old_digitalIn,channel_index,basepath,vararg
 p = inputParser;
 addParameter(p,'video_idx',1,@isnumeric)
 addParameter(p,'event_idx',2,@isnumeric)
+addParameter(p,'other_input',[6:16],@isnumeric)
 addParameter(p,'trim_dat_epoch',[],@isnumeric)
 parse(p,varargin{:});
 
 video_idx = p.Results.video_idx;
 trim_dat_epoch = p.Results.trim_dat_epoch;
 event_idx = p.Results.event_idx;
+other_input = p.Results.other_input;
 
 lag = 100;
 if ~isempty(trim_dat_epoch)
@@ -440,6 +442,17 @@ else
     digitalIn.ints{event_idx} = old_digitalIn.ints{1, channel_index};
     digitalIn.dur{event_idx} = old_digitalIn.dur{1, channel_index};
     digitalIn.intsPeriods{event_idx} = old_digitalIn.intsPeriods{1, channel_index};
+    
+    % add other digital_inputs 
+    try
+        digitalIn.timestampsOn{other_input} = old_digitalIn.timestampsOn{1, other_input};
+        digitalIn.timestampsOff{other_input} = old_digitalIn.timestampsOff{1, other_input};
+        digitalIn.ints{other_input} = old_digitalIn.ints{1, other_input};
+        digitalIn.dur{other_input} = old_digitalIn.dur{1, other_input};
+        digitalIn.intsPeriods{other_input} = old_digitalIn.intsPeriods{1, other_input};
+    catch
+        disp('No other inputs detected')
+    end
     
 end
 save([basepath,filesep,'digitalIn.events.mat'],'digitalIn');
