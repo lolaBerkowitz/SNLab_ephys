@@ -17,6 +17,7 @@
 function find_interictal_spikes(data_path,varargin)
 
 p = inputParser;
+addParameter(p,'basepath',[],@isstr)
 addParameter(p,'overwrite',true,@islogical)
 addParameter(p,'annotate_only',false,@islogical)
 
@@ -24,22 +25,25 @@ addParameter(p,'annotate_only',false,@islogical)
 parse(p,varargin{:})
 overwrite = p.Results.overwrite;
 annotate_only = p.Results.annotate_only;
+basepath = p.Results.basepath;
 
 
 % Load sessions 
-df = compile_sessions(data_path);
-
-sessions = df.basepath;
+if ~isempty(basepath)
+    sessions = {basepath};
+else
+    df = compile_sessions(data_path);
+    sessions = [df.basepath{:}];
+end
 % loop through folders and process those that don't have evidence of
 % processing (in this case chanMap.mat)
 for i = 1:length(sessions)
-    
-    
+   
     basepath = sessions{i};
     basename = basenameFromBasepath(basepath);
         
     % see if interictal_spikes events have been processed
-    check = dir([basename,'.interictal_spikes.events.mat']);
+    check = dir(fullfile(basepath,[basename,'.interictal_spikes.events.mat']));
     
     if annotate_only
         
@@ -59,13 +63,20 @@ for i = 1:length(sessions)
          channel_mapping('basepath',basepath,'fig',false)
          
         session = loadSession(basepath,basename);
-        bad_channels = session.channelTags.Bad.channels;
+        try
+            bad_channels = session.channelTags.Bad.channels;
+        catch
+            warning('no bad channels found. Consider verifying.')
+            bad_channels = [];
+        end
         
         channel = [];
-        % will fail if no cortical channels are present
+        % Find cortical channel
         try
             cortex_channels = session.brainRegions.Cortex.channels;
-            cortex_channels(ismember(cortex_channels,bad_channels)) = [];
+            if ~isempty(bad_channels)
+                cortex_channels(ismember(cortex_channels,bad_channels)) = [];
+            end
             channel = cortex_channels(1);
             
          catch
@@ -73,7 +84,7 @@ for i = 1:length(sessions)
             continue
         end
         
-          % will fail if no cortical channels are present
+          % use Dentate channel instead
         if isempty('channel')
             disp('No Cortex channel. Using last dentate channel')
             dentate_channels = session.brainRegions.Dentate.channels;
@@ -83,14 +94,14 @@ for i = 1:length(sessions)
         
             interictal_spikes = FindRipples('basepath',basepath,...
                 'channel',channel,...
-                'thresholds',[.25 6],...
+                'thresholds',[.25 3],...
                 'durations',[10 150],...
                 'minDuration',10,...
                  'passband',[40 250],...
                  'saveMat',false,...
                  'EMGThresh',.90); % Removes events that are above 90% corrrelated across all channels
              
-            save(fullfile(basepath,[basename '.interictal_spikes_.events.mat']),'interictal_spikes')
+            save(fullfile(basepath,[basename '.interictal_spikes.events.mat']),'interictal_spikes')
         
 %         % Load ripples, if ripple event overlaps with IED then define as
 %         % IED ( Gelinas et al 2016)
