@@ -7,7 +7,7 @@ classdef behavior_funcs
     
     
     properties
-        Property1
+        Property
     end
     
     methods(Static)
@@ -38,15 +38,15 @@ classdef behavior_funcs
         end
         
         function [stopIdx,startStop,endStop] = stop_epochs(velocity,varargin)
-            % Given a vector of velocity, find when the vector falls below 
-            % input: 
+            % Given a vector of velocity, find when the vector falls below
+            % input:
             % run_threshold: velocity that separates movement from
             %   non-movement in same unites as xy coordinates (ie cm/s or
             %   pixels/s) default: 3 cm/s
             % epoch: number of contiguous frames to search for stops.
             % Default is 60 frames assuming 60Hz sample rate (i.e. animal
-            %   is stopped for 1 second). 
-            % output: 
+            %   is stopped for 1 second).
+            % output:
             %   stopIdx: logical index of time associated with stop
             %   startStop: row index for start of stops
             %   endStop: row index for end of stops
@@ -54,11 +54,11 @@ classdef behavior_funcs
             p = inputParser;
             addParameter(p,'run_threshold',3,@isnumeric);
             addParameter(p,'epoch',60,@isnumeric);
-
+            
             parse(p,varargin{:});
             run_threshold = p.Results.run_threshold;
             epoch = p.Results.epoch;
-
+            
             stopIdx = contiguousframes(velocity <= run_threshold,epoch);
             [startStop,endStop,~] = find_groups(stopIdx);
         end
@@ -68,14 +68,14 @@ classdef behavior_funcs
             % uses min_encl_ellipsoid to find center of mass of coordinates
             % and results [x,y] as 'center'
             temp=[x,y];
-            % remove nans 
+            % remove nans
             temp(any(isnan(temp),2),:)=[];
             % min_encl_ellipsoid requires size > 1
             if ~isempty(temp) && size(temp,1)>1
                 [ ~,~, center] = min_encl_ellipsoid(temp(:,1),temp(:,2));
             else
                 center = [NaN,NaN];
-            end  
+            end
         end
         
         function stop_measures = stops(x,y,ts,velocity,fr,epoch,varargin)
@@ -144,11 +144,11 @@ classdef behavior_funcs
             %           tsStop: cell array of time stamps corresponding to stop
             %           NumStops: number of stops made
             %
-                        % LB 2022
+            % LB 2022
             p = inputParser;
             p.addParameter('n_quadrants',4,@isnumeric)
             p.addParameter('run_threshold',3,@isnumeric)
-
+            
             p.parse(varargin{:})
             n_quadrants = p.Results.n_quadrants;
             run_threshold = p.Results.run_threshold;
@@ -166,8 +166,8 @@ classdef behavior_funcs
             clear sqrXDiff sqrYDiff
             
             [stopIdx,startStop,endStop] = behavior_funcs.stop_epochs(velocity,epoch,'run_threshold',run_threshold);
-
-            % animal is stopped for in quadrant for 1 second 
+            
+            % animal is stopped for in quadrant for 1 second
             stopIdx = contiguousframes(velocity <= run_threshold,fr);
             [startStop,endStop,~] = find_groups(stopIdx);
             
@@ -256,7 +256,7 @@ classdef behavior_funcs
             % ENVIORNMENT LB 12/2022
             
             % Computes time spent near outside wall
-             p = inputParser;
+            p = inputParser;
             addParameter(p,'center_proportion',.8,@ischar);
             
             parse(p,varargin{:});
@@ -287,7 +287,7 @@ classdef behavior_funcs
             
             parse(p,varargin{:});
             maze_type = p.Results.maze_type;
-
+            
             %Use meshgrid to serve as basis for logical mask.
             imageSizeX = size(map,1);
             imageSizeY = size(map,2);
@@ -304,13 +304,38 @@ classdef behavior_funcs
                     + (columnsInImage - centerX).^2 <= radius.^2;
                 map(~circlePixels)=NaN; %indicate area outside the maze by labelling with NaN
             end
-     
+            
             clear rowsInImage columnsInImage
             
             
             sa = sum(sum(map>0))/sum(sum(~isnan(map))); %Calculate the proportion of bins occupied by animal.
             
         end
+        
+        function ED = egocentric_direction(pos, object_center)
+            ED = mod(atan2d(pos.data(:,2)-object_center(2),pos.data(:,1)-object_center(1)),rad2deg(2*pi));
+      
+            % get xy as analog signal array for easy epoching
+            ED = analogSignalArray(...
+                'data',ED,...
+                'timestamps',pos.timestamps,...
+                'sampling_rate',pos.sampling_rate);
+        end
+        
+        function CD = cue_direction(ED, HD)
+            % takes in egocentric direction and head direction
+            % (analogSignalArray objects) and computes direction to cue by
+            % taking the circular distance between the two headings. 
+            % returns analougSignalArray with cue direction. 
+            r = angle(exp(1i*deg2rad(ED.data(:,1)))./exp(1i*deg2rad(HD.data(:,1))));
+            
+            % shift all by 45 
+            r = angle(exp(1i*r)./exp(1i*deg2rad(45)));
+            CD = rad2deg(r');
+            
+
+        end
+        
         
         %% Home base functions
         
@@ -432,6 +457,272 @@ classdef behavior_funcs
         
         %% Object exploration functions
         
+        function [results,results_as_cell,explore_vectors] = score_object_exploration(basepath,varargin)
+            % within basepath, scores epochs with 'object' indicated in
+            % session.epoch.name. Determines the time spent exploring
+            % objects by positions listed in
+            % session.behavioralTracking.maze_coords.
+            %
+            % Animal scoring adapted from Leger et al 2013, with exception
+            % that climbing is included  as exploration.
+            % https://doi.org/10.1038/nprot.2013.155
+            
+            % Output:
+            %   structure containing,
+            %   point statistics: first object explored (string),
+            %   time to object exploration (s), discrimination ratio for
+            %   first 180 and 300 seconds after first object is explored.
+            
+            %   vectors: object A & B min distance to object boundary.
+            
+            % Assumes general behavior file and *maze_coords.csv is in basepath.
+            p = inputParser;
+            p.addParameter('distance_threshold',6,@isnumeric) %6cm as tracking is of back of electrode cage for ephys experiments
+            p.addParameter('duration_in_seconds',300,@isnumeric)
+            p.addParameter('heading_thresh',45,@isnumeric)
+            p.addParameter('bin_width',5,@isnumeric)% in minutes
+            p.addParameter('fig',false,@islogical)
+            
+            p.parse(varargin{:});
+            distance_threshold = p.Results.distance_threshold;
+            duration_in_seconds = p.Results.duration_in_seconds;
+            heading_thresh = p.Results.heading_thresh;
+            bin_width = p.Results.bin_width;
+            fig = p.Results.fig;
+
+            
+            basename = basenameFromBasepath(basepath);
+            
+            % load animal behavior and session files
+            session = loadSession(basepath);
+            try
+                load(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
+            catch
+                disp(['No behavior file found for basepath ',basepath,'. Exiting function'])
+                results = NaN;
+                explore_vectors = NaN;
+                return
+            end
+            % load behavior epochs
+            behave_ep = behavior_funcs.load_epochs(basepath);
+            % load trials epochs
+            trial_ep = behavior_funcs.load_trials(basepath);
+            
+            % get xy as analog signal array for easy epoching
+            positions = analogSignalArray(...
+                'data',[behavior.position.x;behavior.position.y],...
+                'timestamps',behavior.timestamps,...
+                'sampling_rate',behavior.sr);
+            
+            HD = behavior_funcs.load_HD(basepath);
+  
+            
+            % determine which object moved
+            moved_object_id =  behavior_funcs.find_moved_object(basepath);
+            % for each behavior epoch, get exploration of objects within
+            % epoch
+            results = table;
+            results.basepath = repmat(basepath,behave_ep.n_intervals,1);
+            
+            for ep = 1:behave_ep.n_intervals
+                
+                epoch_name{ep} = session.epochs{1,session.behavioralTracking{1, ep}.epoch}.name;
+                % get maze coords for object coordinates
+                [object_center,object_edge,object_id] = behavior_funcs.load_object_coords_for_epoch(session,behavior,ep);
+                obj_idx = contains(object_id,'A');
+                % get intervalArray of current epoch
+                cur_ep = behave_ep(ep) & trial_ep;
+                
+                % animal position in epoch
+                cur_pos = positions(cur_ep);
+                cur_HD = HD(cur_ep);
+                
+                % compute cue angle for each object 
+                for obj = 1:size(object_center,1)
+                    cur_ED = behavior_funcs.egocentric_direction(cur_pos, object_center(obj,:));
+                    cue_angle(obj,:) = behavior_funcs.cue_direction(cur_ED, cur_HD);
+                end
+
+                % cue angle 
+                % get object boundary
+                [bound_x, bound_y] = behavior_funcs.object_boudary(object_center,object_edge);
+                
+                % get distances from objects
+                object_distances =  behavior_funcs.dist_from_object(cur_pos.data(:,1)...
+                    ,cur_pos.data(:,2)...
+                    ,bound_x,bound_y);
+                
+                % get exploration time for each object 
+                [explore_time,explore_vec] =  behavior_funcs.object_explore(cur_pos,...
+                        cue_angle,...
+                        heading_thresh,...
+                        object_distances,...
+                        distance_threshold);
+                % compute discrimination_ratio
+                
+                
+                % exploration over time
+                bin_explore = behavior_funcs.object_explore_over_time(cur_pos,...
+                    bin_width,... % time in min
+                    cue_angle,... %xy for each object center
+                    heading_thresh,...% instantaneous distance from objects
+                    object_distances,...% threshold for close enought
+                    distance_threshold); % threashold for heading 
+                
+               
+                % time to first object explored
+                 [start_explore, idx] = min([min(explore_vec{obj_idx}), min(explore_vec{~obj_idx})]);
+                 
+                 for obj = 1:length(object_id)
+                    object_explore_restrict(obj,:) = behavior_funcs.limit_explore_to_segment(start_explore,...
+                        duration_in_seconds,explore_vec{obj});
+                    
+                 end
+                 
+                 % if they didn't explore any objects
+                if ~isempty(idx) 
+                    first_object_explored{ep} = object_id{idx};
+                    time_2_object_explore(ep) = start_explore - cur_pos.timestamps(1); % first object explore ts minus start timestamps
+
+                else
+                    first_object_explored{ep} = 'None';
+                    time_2_object_explore(ep) = NaN;
+                end
+                                
+               
+                % Discrimination ratio for entire session
+                if ismember(moved_object_id,'A')
+                    DR_overall(ep) = behavior_funcs.discrimination_ratio(explore_time(~obj_idx),explore_time(obj_idx));
+                    DR_restrict(ep) = behavior_funcs.discrimination_ratio(object_explore_restrict(~obj_idx),object_explore_restrict(obj_idx));
+                else
+                    DR_overall(ep) = behavior_funcs.discrimination_ratio(explore_time(obj_idx),explore_time(~obj_idx));
+                    DR_restrict(ep) = behavior_funcs.discrimination_ratio(object_explore_restrict(obj_idx),object_explore_restrict(~obj_idx));
+                end
+                
+               % save for results
+                obj_A_explore(ep) = explore_time(obj_idx);
+                obj_B_explore(ep) = explore_time(~obj_idx);
+                obj_A_explore_restrict(ep) = object_explore_restrict(obj_idx);
+                obj_B_explore_restrict(ep) = object_explore_restrict(~obj_idx);
+                
+               % store vectors for each epoch 
+               explore_vectors{ep}.task_id = session.epochs{1,session.behavioralTracking{1, 1}.epoch}.name;
+               explore_vectors{ep}.object_id = object_id;
+               explore_vectors{ep}.bin_explore = bin_explore;
+               explore_vectors{ep}.explore_vec = explore_vec;
+               explore_vectors{ep}.cue_angle = cue_angle;
+               explore_vectors{ep}.object_distances = object_distances;
+               
+               clear cue_angle object_distances bin_explore explore_vec
+            end
+            
+            % store results
+            results.epoch = epoch_name';
+            results.moved_object_id =repmat(moved_object_id,behave_ep.n_intervals,1);
+            results.first_object_explored = first_object_explored';
+            results.time_2_object_explore = time_2_object_explore';
+            results.DR_overall = DR_overall';
+            results.DR_restrict = DR_restrict';
+            results.object_A_explore = obj_A_explore';
+            results.object_B_explore = obj_B_explore';
+            results.object_A_explore_restrict = obj_A_explore_restrict';
+            results.object_B_explore_restrict = obj_B_explore_restrict';
+            if fig
+                plot_object_explore_results(basepath,explore_vectors,results)
+            end
+            
+            results_as_cell = table2cell(results); 
+        end
+        
+        function [explore_time_obj,explore_vec_obj] =  object_explore(cur_pos,cue_angle,heading_thresh,object_distances,distance_threshold)
+            
+            for i = 1:size(object_distances,1)
+                % gather point statitics
+                % time near each object (time when animal is within 5cm of object)
+                [explore_time, explore_vec] = behavior_funcs.time_near_object(cur_pos,...
+                    object_distances(i,:),...
+                    distance_threshold,...
+                    cue_angle(i,:),...
+                    heading_thresh);
+                
+                explore_time_obj(i,:) = explore_time;
+                explore_vec_obj{i,1} = explore_vec';
+                
+            end
+        end
+        
+        function bin_explore = object_explore_over_time(pos, bin_width,cue_angle,heading_thresh,object_distances,distance_threshold)
+
+           
+           for obj = 1:size(object_distances,1) 
+               
+            % create bins with
+            edges = pos.timestamps(1):bin_width*pos.sampling_rate:pos.timestamps(end);
+            angle_idx = cue_angle(obj,:) >= -heading_thresh & cue_angle(obj,:) <= heading_thresh;
+
+            explore_ts = pos.timestamps(object_distances(obj,:) <= distance_threshold & angle_idx);
+              
+            for i = 1:length(edges)-1
+                idx = explore_ts >= edges(i) & explore_ts <= edges(i+1);
+                bin_explore(obj,i) = behavior_funcs.explore_time(explore_ts(idx));
+            end
+           end
+        end
+        
+        function moved_object_id =  find_moved_object(basepath)
+            % determines which object was moved based on distance between learning
+            % and test center coordinates.
+            %
+            % input
+            
+            % load behavior epochs
+            basename =  basenameFromBasepath(basepath);
+            behave_ep = behavior_funcs.load_epochs(basepath);
+            session = loadSession(basepath);
+            load(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
+            
+            
+            for ep = 1:behave_ep.n_intervals
+                % get maze coords for object coordinates
+                [object_center{ep},~,object_id{ep}] = behavior_funcs.load_object_coords_for_epoch(session,behavior,ep);
+            end
+            
+            % euclidean distance between center coordinates
+            epoch_dist = sqrt((object_center{1}(:,1) - object_center{2}(:,1)).^2 +...
+                (object_center{1}(:,2) - object_center{2}(:,2)).^2);
+            
+            % find max
+            [~,idx] = max(epoch_dist);
+            
+            % identify object
+            moved_object_id = object_id{1}{idx};
+            
+            
+            
+        end
+        
+        function [object_explore,explore_ts] = time_near_object(pos,distance_vector,dist_thresh,egocentric_heading,heading_thresh)
+            % calcultes the time near an object
+            % input:
+            %  - pos: analogSignalArray of position (length n)
+            %  - distance_vector: instantaneous distance from object (length n)
+            %  - dist_thresh: threshold of distance in same units as position.
+            %  - egocentric_heading: relative heading of animal from object center
+            %  (degrees)
+            %  - heading_thresh: value in degrees to limit (ie 45 will give +/-45
+            %  from object).
+            % output:
+            %  object_explore: total time in units of timestamps that reflects
+            
+            
+            angle_idx = egocentric_heading >= -heading_thresh & egocentric_heading <= heading_thresh;
+            dist_idx = distance_vector <= dist_thresh;
+            explore_ts = pos.timestamps(dist_idx & angle_idx);
+            object_explore = behavior_funcs.explore_time(explore_ts);
+            
+            
+        end
+        
         function [bound_x, bound_y] = object_boudary(object_center,object_edge)
             % Given the center and edge of an object, compute and return xy
             % coordinates representing the radius around an object
@@ -439,15 +730,34 @@ classdef behavior_funcs
             % object_center: [x,y] from maze_coords.csv
             % object_edge: [x, y]
             % center of object
-            x0 = object_center(:,1);%%origin
-            y0 = object_center(:,2);%%origin
             
-            % radius (difference from center to edge
-            r = abs(sqrt((object_center(1,1)-object_edge(1,1))^2+(object_center(1,2)-object_edge(1,2)).^2));
             
-            % create circle of 25 points around object
-            bound_x = (cos(linspace(-pi,pi,25)) * r) + x0;
-            bound_y = (sin(linspace(-pi,pi,25)) * r) + y0;
+            % given camera position to objects, the radius may be
+            % different. We'll compile the radius for both to calculate an
+            % average that will be used for the boundary. 
+            for i = 1:size(object_center,1)
+                x0 = object_center(i,1);%%origin
+                y0 = object_center(i,2);%%origin
+                
+                % radius (difference from center to edge
+                r(i) = abs(sqrt((object_center(i,1)-object_edge(i,1))^2+(object_center(i,2)-object_edge(i,2)).^2));
+                
+            end
+            
+            % get mean of radius 
+            r = mean(r);
+            
+            % get boundary position for each object
+            for i = 1:size(object_center,1)
+                x0 = object_center(i,1);%%origin
+                y0 = object_center(i,2);%%origin
+               
+                % create circle of 25 points around object
+                bound_x(i,:) = cos(linspace(-pi,pi,25)) * r + x0;
+                bound_y(i,:) = sin(linspace(-pi,pi,25)) * r + y0;
+                
+            end
+   
             
         end
         
@@ -456,12 +766,14 @@ classdef behavior_funcs
             % return as structure.  LB 2022
             
             p = inputParser;
-            p.addParameter('perimeter',3,@isnumeric) % perimeter around object in units as coordinates (default cm)
+            p.addParameter('near_obj_dist',3,@isnumeric) % perimeter around object in units as coordinates (default cm)
             p.addParameter('run_thres',5,@isnumeric)
             
             p.parse(varargin{:})
-            perimeter = p.Results.perimeter;
+            near_obj_dist = p.Results.near_obj_dist;
             run_thres = p.Results.run_thres;
+            
+            % get behavior epoch
             
             % grab xy coordinates
             x = behavior.position.x;
@@ -471,7 +783,14 @@ classdef behavior_funcs
             [velocity, ~,~] = linear_motion(x,y,behavior.sr,1);
             
             % get object boundary
-            [bound_x, bound_y] = object_boudary(object_center,object_edge,perimeter);
+            [bound_x, bound_y] = behavior_funcs.object_boudary(object_center,object_edge);
+            
+            % distance of animal relative to object boundaries
+            object_distances =  behavior_funcs.dist_from_object(x,y,[bound_x, bound_y]);
+            
+            % find distances when animal was close to object and moving
+            % slow
+            explore_obj_idx = (object_distances <= near_obj_dist) &  (velocity < run_thres);
             
             % logical index for all coordinates inside object boundary
             in_home = inpolygon(x,y,bound_x',bound_y');
@@ -526,16 +845,130 @@ classdef behavior_funcs
             
         end
         
-%         %% locomotion over time 
-%         function locomotion_over_epochs(x,y,[startIdx,endIdx])
-%             % examine path length, search area, velocity, and stops as a
-%             % function of epoch (could be trials, behavior epochs, or time
-%             % bins
-%             disp('NOT FUNCTIONTIONAL LB 12/2022')
-%         end
-%         
+        function object_distances =  dist_from_object(x,y,bound_x,bound_y)
+            % calculating distance of xy to object boundary.
+            
+            for i = 1:size(bound_x,1)
+                for ii = 1:length(bound_x(i,:))
+                    distances(:,ii) = sqrt(sum(bsxfun(@minus, [bound_x(i,ii)',bound_y(i,ii)'], [x,y]).^2,2));
+                end
+                object_distances(i,:) = min(distances,[],2)'; %Find minimum distance from cue boundary to animal location
+            end
+            
+        end
+        
+        function [object_center,object_edge,object_id] = load_object_coords_for_epoch(session,behavior,idx)
+            % loads the object center and edge within a given behavior
+            % epoch.
+            % input:
+            % session: CellExplorer session file
+            % behavior: CellExplorer behavior file
+            % idx: index of cell position for
+            % session.behavioralTracking
+            
+            % output:
+            % object_center: [x, y] for each object in maze_coords
+            % object_edge: [x, y] for edge of obejct in maze_coords
+            % object id: cell array containing string indicating object
+            % (either 'A' or 'B')
+            
+            % get maze coords for object coordinates
+            maze_coords = session.behavioralTracking{1, idx}.maze_coords;
+            obj_idx = contains(maze_coords.object,{'A','B'});
+            obj_center = contains(maze_coords.position,{'center'});
+            object_id = unique(maze_coords.object(obj_idx));
+            
+            % fetch xy for center of object
+            if ~contains(behavior.position.units,'pixels')
+                % load scaled position as scaled coordinates are not in
+                % pixels
+                object_center = [maze_coords.x_scaled(obj_idx & obj_center), ...
+                    maze_coords.y_scaled(obj_idx & obj_center)];
+                object_edge = [maze_coords.x_scaled(obj_idx & ~obj_center), ...
+                    maze_coords.y_scaled(obj_idx & ~obj_center)];
+            else
+                %load raw coords (in pixels)
+                object_center = [maze_coords.x(obj_idx & obj_center), ...
+                    maze_coords.y(obj_idx & obj_center)];
+                object_edge = [maze_coords.x(obj_idx & ~obj_center), ...
+                    maze_coords.y(obj_idx & ~obj_center)];
+            end
+            
+        end
+        %         %% locomotion over time
+        %         function locomotion_over_epochs(x,y,[startIdx,endIdx])
+        %             % examine path length, search area, velocity, and stops as a
+        %             % function of epoch (could be trials, behavior epochs, or time
+        %             % bins
+        %             disp('NOT FUNCTIONTIONAL LB 12/2022')
+        %         end
+        %
         %%  behavior utils
         
+        function DR = discrimination_ratio(object_A_explore,object_B_explore)
+            % returns the discrimination ratio that represents the relative
+            % proportion of time spent exploring object B relative to all
+            % object exploration.
+            % input:
+            %   object_A_explore: total time exploring object A in seconds
+            %   object_B_explore: total time exploring object B in seconds
+            
+            DR = (object_B_explore - object_A_explore) / (object_B_explore + object_A_explore);
+            
+            
+        end
+        
+        function object_explore = limit_explore_to_segment(start_time,duration_in_seconds,object_explore_vec)
+            % limits explore vector to a specific segment, for example for the
+            % first five minutes after object exploration.
+            object_explore_vec = object_explore_vec(object_explore_vec >= start_time & object_explore_vec <= (start_time+duration_in_seconds));
+            
+            object_explore = behavior_funcs.explore_time(object_explore_vec);
+            
+        end
+        
+        function object_explore = explore_time(explore_ts)
+            % for a set of timestamps corresponding to object exploration
+            % 'explore_ts', explore time computes the overall time and removes
+            % jumps by keeping only frames with frame rates that match the mode.
+            
+            delta_explore = diff(explore_ts);
+            delta_explore(delta_explore > mode(delta_explore)) = nan;
+            object_explore = nansum(delta_explore);
+        end
+        
+        function trial_ep = load_trials(basepath)
+            basename = basenameFromBasepath(basepath);
+            load(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior');
+            
+            trial_ep = IntervalArray(behavior.trials);
+        end
+        
+        function behave_ep = load_epochs(basepath)
+            % load session
+            session = loadSession(basepath);
+            
+            % loop through behavioral epochs
+            behave_ep = [];
+            for ep = 1:length(session.behavioralTracking)
+                behave_ep(ep,:) = [session.epochs{1,session.behavioralTracking{1,ep}.epoch}.startTime, ...
+                    session.epochs{1,session.behavioralTracking{1,ep}.epoch}.stopTime];
+            end
+            behave_ep = IntervalArray(behave_ep);
+            
+        end
+        
+        function heading_direction = load_HD(basepath)
+            % load behavior
+            basename = basenameFromBasepath(basepath);
+            load(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
+            % get xy as analog signal array for easy epoching
+            heading_direction = analogSignalArray(...
+                'data',rad2deg(behavior.angle),...
+                'timestamps',behavior.timestamps,...
+                'sampling_rate',behavior.sr);
+            
+        end
         
     end
 end
