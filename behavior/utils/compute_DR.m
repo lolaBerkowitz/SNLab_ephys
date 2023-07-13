@@ -1,5 +1,5 @@
-basepath = 'Y:\laura_berkowitz\behavior_validation\appps1_cpp\data\cohort 2\3775N_pretest-07122023121951DLC_resnet50_mouse_cppJun28shuffle1_175000_filtered.csv';
-save_path = 'Y:\laura_berkowitz\behavior_validation\appps1_cpp\data\cohort 2';
+basepath = 'Y:\laura_berkowitz\behavior_validation\appps1_cpp\data\cohort 2\day1\3775N_pretest-07122023121951DLC_resnet50_mouse_cppJun28shuffle1_175000_filtered.csv';
+save_path = 'Y:\laura_berkowitz\behavior_validation\appps1_cpp\data\day1\cohort 2';
 
 df = load_dlc_csv(basepath);
 fs = 30;
