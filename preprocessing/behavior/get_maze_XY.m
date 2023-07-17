@@ -207,13 +207,16 @@ name = session.epochs{1, epoch}.name;
 multi_idx = contains(configs,'multi');
 object_idx = contains(configs,'object');
 open_field_idx = contains(configs,'open_field');
+place_preference_idx = contains(configs,'conditioned_place'); 
 
 if contains(name,{'multi'})
     config_name = configs{multi_idx & ~object_idx};
 elseif contains(name,{'object'})
     config_name = configs{~multi_idx & object_idx & ~open_field_idx};
-elseif contains(name,{'context','open_field','morph','circular_track'})
+elseif contains(name,{'context','open_field','morph','circular_track','pairing_A','pairing_B'})
     config_name = configs{~multi_idx & ~object_idx & open_field_idx};
+elseif contains(name,{'pre_test','post_test'})
+    config_name = configs{place_preference_idx};
 end
 
 config_name = fullfile(config_path,config_name);
