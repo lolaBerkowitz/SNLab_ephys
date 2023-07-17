@@ -4,6 +4,7 @@ classdef tracking
     
     methods(Static)
         
+       
         function vec_out = scale_transform(vec,origin,scale_factor)
             % translate coordiante vector relative to origin and scale
             vec_out =(vec - origin)/scale_factor;
@@ -30,9 +31,16 @@ classdef tracking
             %
             % outputs are cell arrays for each behavioral epoch
             
+            basename = basenameFromBasepath(basepath);
             
             % loop through epochs to retrieve start/end used in restrictxy below
             for ep = 1:length(session.behavioralTracking)
+                
+                % exclude VR 
+                if contains(session.behavioralTracking{1,ep}.filenames,'godot')
+                    continue
+                end
+                
                 epoch = session.behavioralTracking{1,ep}.epoch;
                 
                 % load maze coords for given epoch video
@@ -50,16 +58,24 @@ classdef tracking
                 x_origin{ep} = median(x_min:x_max);
                 y_origin{ep} = median(y_min:y_max);
                 
-                scale_factor_x{ep} = (x_max - x_min)/behavior.epochs{1, epoch}.maze_size; %pixels/cm
-                scale_factor_y{ep} = (y_max - y_min)/behavior.epochs{1, epoch}.maze_size; %pixels/cm
-                
+                if length(behavior.epochs{1, epoch}.maze_size) > 1
+                scale_factor_x{ep} = (x_max - x_min)/behavior.epochs{1, epoch}.maze_size(1); %pixels/cm
+                scale_factor_y{ep} = (y_max - y_min)/behavior.epochs{1, epoch}.maze_size(2); %pixels/cm
+                else 
+                scale_factor_x{ep} = (x_max - x_min)/behavior.epochs{1, epoch}.maze_size(1); %pixels/cm
+                scale_factor_y{ep} = (y_max - y_min)/behavior.epochs{1, epoch}.maze_size(1); %pixels/cm
+                end
                 % add scaled parameters to maze_coord_df
                 maze_coords_df.x_scaled = tracking.scale_transform(maze_coords_df.x,x_origin{ep},scale_factor_x{ep});
                 maze_coords_df.y_scaled = tracking.scale_transform(maze_coords_df.y,y_origin{ep},scale_factor_y{ep});
+                % save scaled parameters to behavioralTracking 
+                session.behavioralTracking{1, ep}.maze_coords = maze_coords_df;
+           
                 % save back to basepath
                 writetable(maze_coords_df,fullfile(basepath,...
                     [extractBefore(session.behavioralTracking{1,ep}.notes,'.avi'),'_maze_coords.csv']))
             end
+            save(fullfile(basepath,[basename,'.session.mat']),'session')
             
         end
         
@@ -80,27 +96,43 @@ classdef tracking
             coord_names = fieldnames(behavior.position);
 
             for ep = 1:length(session.behavioralTracking)
+                
+                % exclude VR 
+                if contains(session.behavioralTracking{1,ep}.filenames,'godot')
+                    continue
+                end
+                
                 idx_ep = idx{ep};
                 
                 for i = find(contains(coord_names,{'x'}))'
                     x = behavior.position.(coord_names{i});
+                    if length(idx_ep) ~= length(x)
+                        continue
+                    end
                     behavior.position.(coord_names{i})(idx_ep) = tracking.scale_transform(x(idx_ep),...
                         x_origin{ep},scale_factor_x{ep});
                 end
                 
                 for i = find(contains(coord_names,{'y'}))'
                     y = behavior.position.(coord_names{i});
+                    if length(idx_ep) ~= length(y)
+                        continue
+                    end
                     behavior.position.(coord_names{i})(idx_ep) = tracking.scale_transform(y(idx_ep),...
                         y_origin{ep},scale_factor_y{ep});
                 end
                
+                % BROKEN 
+              % update speed to match new units 
+              % TOO FIX - broken but not
+              % necessarily needed as we just recreate them during analysis
+              
+%             [speed_, accel_,~] = linear_motion(behavior.position.x(idx_ep),...
+%                     behavior.position.y(idx_ep),session.behavioralTracking{1, ep}.framerate,.1);
+%             behavior.speed(idx_ep(2:end)) = speed_;
+%             behavior.acceleration(idx_ep(2:end)) = accel_;
             end
             
-                            % update speed to match new units
-                [speed_, accel_,~] = linear_motion(behavior.position.x,...
-                    behavior.position.y,behavior.sr,.1);
-            behavior.speed = speed_;
-            behavior.acceleration = accel_;
             behavior.position.units = 'cm';
             save(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
 
@@ -123,10 +155,10 @@ classdef tracking
             stop = [];
             % gets index to restrict xy
             for ep = 1:length(session.behavioralTracking)
+                
                 epoch = session.behavioralTracking{1,ep}.epoch;
                 start = [start,session.epochs{epoch}.startTime];
                 stop = [stop,session.epochs{epoch}.stopTime];
-                
             end
             
             % Get good index (coordinates within boundary) from file or
@@ -150,6 +182,55 @@ classdef tracking
         end
         
         function [t,x,y,v,a,angle,units,source,fs,notes,extra_points,vidnames] = ...
+                extract_godot_tracking(basepath)
+            
+            % initalize variables to pull
+            t = [];
+            x = [];
+            y = [];
+            v = [];
+            a = [];
+            angle = [];
+            units = [];
+            source = [];
+            notes = [];
+            extra_points = [];
+            vidnames = [];
+            
+        
+            % below are many methods on locating tracking data from many formats
+            tracking_struct = tracking.process_and_sync_godot_SNLab('basepath',basepath);
+            
+            t = tracking_struct.timestamps;
+            fs = nan;
+            vidnames = tracking_struct.vidnames;
+            v = tracking_struct.v; 
+            
+            x = tracking_struct.position.x*100;
+            y = tracking_struct.position.y*100;
+            angle = tracking_struct.angle; 
+            
+            % remove spurious velocities due to end of track
+            v = smooth(v,round((1/median(diff(t)))/2)); 
+            % calculate acceleration
+            a = gradient(v);
+       
+            units = 'virtual_cm';
+            source = 'godot';
+            
+            if length(t) > length(x)
+                t = t(1:length(x));
+            elseif length(x) > length(t)
+                x = x(1:length(t));
+                y = y(1:length(t));
+            end
+            
+            notes = [];   
+        end
+        
+
+        
+        function [t,x,y,v,a,angle,units,source,fs,notes,extra_points,vidnames] = ...
                 extract_tracking(basepath,primary_coords_dlc,likelihood_dlc,smooth_factor)
             
             % initalize variables to pull
@@ -165,10 +246,12 @@ classdef tracking
             extra_points = [];
             vidnames = [];
             
+        
             % below are many methods on locating tracking data from many formats
             [tracking_struct,field_names] = tracking.process_and_sync_dlc_SNLab('basepath',basepath,...
                 'primary_coords',primary_coords_dlc,...
                 'likelihood',likelihood_dlc);
+       
             
             t = tracking_struct.timestamps;
             fs = 1/mode(diff(t));
@@ -215,6 +298,124 @@ classdef tracking
             
         end
         
+        % Sync gadot to ttl for ephys 
+        function [tracking_struct] = process_and_sync_godot_SNLab(varargin)
+            
+             % parse inputs
+            p = inputParser;
+            p.addParameter('basepath',pwd,@isfolder);
+            p.addParameter('sync_ttl_channel',7,@isnumeric); % digitalin channel that contains video ttl           
+            
+            p.parse(varargin{:});
+            basepath = p.Results.basepath;
+            sync_ttl_channel = p.Results.sync_ttl_channel;
+            
+            basename = basenameFromBasepath(basepath);
+            session = loadSession(basepath,basename);
+            
+            % check for events, cannot process without them
+            if exist(fullfile(basepath,'digitalin.events.mat'),'file') % only load if timestamps have been processed
+                load(fullfile(basepath,'digitalin.events.mat'));
+                
+                if exist('parsed_digitalIn','var')
+                    digitalIn = parsed_digitalIn;
+                end
+            else % if none, make them and update basename.session
+                disp('processing events, one moment')
+                % make digitalin.events.mat
+                process_digitalin(basepath,session.extracellular.sr)
+                % update epochs
+                update_epochs('basepath',basepath,'annotate',true)
+                % update behavioralTracking
+                update_behavioralTracking('basepath',basepath)
+            end
+            
+            % check for behavioralTracking field from session file and if present, grab
+            % tracking info (tracking file name, epoch index, and frame
+            % rate
+            
+            if isfield(session,'behavioralTracking')
+                
+                [godot_files,vidnames,ep_idx,~] =  tracking.get_tracking_info_from_session(session,basename);
+                
+            else % create it and reload session and pull dlc,video, and epoch info
+                % update session with dlc/video info
+                update_behavioralTracking('basepath',basepath)
+                session = loadSession(basepath,basename); % reload updated session file
+                % pull tracking info
+                [godot_files,vidnames,ep_idx,~] =  tracking.get_tracking_info_from_session(session,basename);
+                
+            end
+            ep_idx = ep_idx(contains(godot_files,'godot'));
+            godot_files = godot_files(contains(godot_files,'godot'));
+            for i = 1:length(godot_files)
+                
+                % load godot 
+                vr_pos = readtable(fullfile(basepath,godot_files{i}));
+
+               % get intan timestamp associated with first index 
+                sync_ts = digitalIn.timestampsOn{1, sync_ttl_channel};
+                % limit sync_ts to epoch
+                keep_idx = sync_ts > session.epochs{1,ep_idx}.startTime & sync_ts < session.epochs{1,ep_idx}.stopTime;
+                sync_ts = sync_ts(keep_idx);
+                
+                % find the first reward 
+                reward_interval = findIntervals(logical(vr_pos.reward));
+%                 between_reward_interval = findIntervals(~logical(vr_pos.reward));
+
+                
+                
+                behav_ts = vr_pos.experiment_ts(reward_interval(1,1));
+                computer_time_intan_diff = sync_ts(1) - behav_ts;
+                vr_ts_sync = vr_pos.experiment_ts + computer_time_intan_diff;
+                
+                
+%                 for interval_i = 1:size(reward_interval,1)
+%                     
+%                     behav_ts = vr_pos.experiment_ts(reward_interval(interval_i,1));
+%                     computer_time_intan_diff(interval_i) = sync_ts(interval_i) - behav_ts;
+%                     
+%                 end
+                
+                
+                % interpolate with the session time to get the remaining
+                % timestamps 
+%                 interp_times = fill_in_missing_timestamps(sync_ts,diff(vr_pos.experiment_ts)); 
+                
+                tempTracking{i}.position.x = vr_pos.z;
+                tempTracking{i}.position.y = vr_pos.x;
+                tempTracking{i}.v = sqrt(vr_pos.pitch.^2 + vr_pos.roll.^2);
+                tempTracking{i}.angle = vr_pos.xz_angle;
+                tempTracking{i}.timestamps = vr_ts_sync;
+                tempTracking{i}.folder = vidnames{i};
+                tempTracking{i}.samplingRate = NaN;
+                tempTracking{i}.description = vidnames{i};
+            end 
+            
+            % Concatenating tracking fields...
+            x = []; y = []; v = []; xy_angle = []; timestamps = []; folder = []; samplingRate = []; description = [];
+            for ii = 1:size(tempTracking,2)
+                x = [x; tempTracking{ii}.position.x];
+                y = [y; tempTracking{ii}.position.y];
+                v = [v; tempTracking{ii}.v];
+                xy_angle = [xy_angle; tempTracking{ii}.angle];
+                timestamps = [timestamps; tempTracking{ii}.timestamps];
+                folder{ii} = tempTracking{ii}.folder;
+                samplingRate = [samplingRate; tempTracking{ii}.samplingRate];
+                description{ii} = tempTracking{ii}.description;
+            end
+            
+            % save data to ouput structure
+            tracking_struct.position.x = x;
+            tracking_struct.position.y = y;
+            tracking_struct.v = v; 
+            tracking_struct.angle = xy_angle;
+            tracking_struct.folders = folder;
+            tracking_struct.samplingRate = samplingRate;
+            tracking_struct.timestamps = timestamps;
+            tracking_struct.description = description;
+            tracking_struct.vidnames = vidnames;
+        end
         % Sync dlc to ttl for ephys
         function [tracking_struct,field_names] = process_and_sync_dlc_SNLab(varargin)
             % Unpacks DLC and syncs with digitalin.events.mat timestamps
@@ -287,6 +488,11 @@ classdef tracking
                 
             end
             
+            file_idx = find(contains(dlc_files,'DLC'));
+            dlc_files = dlc_files(file_idx);
+            vidnames = vidnames(file_idx);
+            ep_idx = ep_idx(file_idx);
+            frame_rate = frame_rate(file_idx);
             % grab video ttls
             behav = 1;
             for epoch = ep_idx
@@ -421,7 +627,7 @@ classdef tracking
             % extracts tracking information (tracking filename, video name, and epoch index
             % basename.session.behavioralTracking
             
-            disp(['Checking for DLC files in ', basename, '.session.behavioralTracking'])
+            disp(['Checking for tracking files in ', basename, '.session.behavioralTracking'])
             
             for i = 1:length(session.behavioralTracking)
                 tracking_files{i} = session.behavioralTracking{1,i}.filenames;
@@ -474,9 +680,9 @@ classdef tracking
             % load files
             basename = basenameFromBasepath(basepath);
             session = loadSession(basepath,basename);
-            load(fullfile(basepath,'*.animal.behavior.mat'))
+            load(fullfile(basepath,[basename,'.animal.behavior.mat']))
             
-            % get the scale parameters 
+            % get the scale parameters for each epoch
             [x_origin,y_origin,scale_factor_x,scale_factor_y] = tracking.get_scale_params(session,behavior,basepath);
 
             % loop through behavioral tracking epochs, rescale xy and save
@@ -492,9 +698,11 @@ classdef tracking
                 maze_coord_temp.x_scaled = tracking.scale_transform(maze_coord_temp.x,x_origin{i},scale_factor_x{i});
                 maze_coord_temp.y_scaled = tracking.scale_transform(maze_coord_temp.y,y_origin{i},scale_factor_y{i});
                 session.behavioralTracking{1, i}.maze_coords = maze_coord_temp;
+                writetable(maze_coord_temp,fullfile(basepath,...
+                    [extractBefore(session.behavioralTracking{1,i}.notes,'.avi'),'_maze_coords.csv']));
             end
             % save session file
-            save(fullfile(basepath,[basename,'.session.mat']))
+            save(fullfile(basepath,[basename,'.session.mat']),'session')
         end
     end
 end
