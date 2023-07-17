@@ -22,7 +22,7 @@ addParameter(p,'acquisition_event_flag',false); % overwrite previously saved dat
 addParameter(p,'epoch_events',2); % index for where epoch events are saved in digitalIn.events.mat file
 addParameter(p,'overwrite',true); % by default update epochs
 addParameter(p,'annotate',true); % save animal.behavior.mat
-
+addParameter(p,'ttl_method','pulse') % if ttl is pulse, one event spans i:i+1 rows, else each row is a start.
 % addParameter(p,'maze_size',30); % maze size in cm
 
 parse(p,varargin{:});
@@ -31,6 +31,8 @@ acquisition_event_flag = p.Results.acquisition_event_flag;
 annotate = p.Results.annotate;
 overwrite = p.Results.overwrite;
 epoch_events = p.Results.epoch_events;
+ttl_method = p.Results.ttl_method;
+
 basename = basenameFromBasepath(basepath);
 
 if exist(fullfile(basepath,'digitalIn.events.mat'),'file')
@@ -65,14 +67,24 @@ if exist(fullfile(basepath,'digitalIn.events.mat'),'file')
             start_idx = 1;
         end
         
-        % loop through the other epochs
-        ii = start_idx;
-        for i = start_idx:2:size(digitalIn.timestampsOn{1, 2},1)-1 % by default 2nd column is events
-            session.epochs{ii}.name =  char(i);
-            session.epochs{ii}.startTime =  digitalIn.timestampsOn{1, 2}(i);
-            session.epochs{ii}.stopTime =  digitalIn.timestampsOff{1, 2}(i+1);
-            ii = ii+1;
+        if ismember(ttl_method,'pulse')
+            % loop through the other epochs
+            ii = start_idx;
+            for i = start_idx:2:size(digitalIn.timestampsOn{1, 2},1)-1 % by default 2nd column is events
+                session.epochs{ii}.name =  char(i);
+                session.epochs{ii}.startTime =  digitalIn.timestampsOn{1, 2}(i);
+                session.epochs{ii}.stopTime =  digitalIn.timestampsOff{1, 2}(i+1);
+                ii = ii+1;
+            end
+        else
+            % loop through the other epochs
+            for i = start_idx:1:size(digitalIn.timestampsOn{1, 2},1) % by default 2nd column is events
+                session.epochs{i}.name =  char(i);
+                session.epochs{i}.startTime =  digitalIn.timestampsOn{1, 2}(i)
+                session.epochs{i}.stopTime =  digitalIn.timestampsOff{1, 2}(i)
+            end
         end
+        
     end
     
     % save updated session file
