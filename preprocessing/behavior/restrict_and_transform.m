@@ -15,7 +15,7 @@ overwrite = p.Results.overwrite;
 basename = basenameFromBasepath(basepath);
 
 % load behavior file
-load(fullfile(basepath,[basename,'.animal.behavior.mat']))
+load(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
 % check if units are in cm and if so return
 if contains(behavior.position.units,'cm') && ~overwrite
     disp('Coordinates already scaled')
@@ -25,14 +25,15 @@ end
 % Scales xy coordinates in behavior and saves back to behavior structure
 
 % load sessions file
-load(fullfile(basepath,[basename,'.session.mat']))
-
-% restrict the coordinates and save back to behavior file
-tracking.restrict(session,behavior,basepath);
+load(fullfile(basepath,[basename,'.session.mat']),'session')
 
 % scales coordinates determined by known maze size and measurements in pixels
 % from image
 tracking.scale_coords(session,behavior,basepath);
+% reload behavior file
+load(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
 
+% restrict the coordinates and save back to behavior file
+tracking.restrict(session,behavior,basepath);
 end
  
