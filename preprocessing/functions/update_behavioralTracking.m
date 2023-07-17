@@ -18,7 +18,8 @@ function update_behavioralTracking(varargin)
 p=inputParser;
 addParameter(p,'basepath',pwd); % single or many basepaths in cell array or uses pwd
 addParameter(p,'annotate',false); % save animal.behavior.mat
-addParameter(p,'tags',{'base','learning','test','OF','open_field','morph','track','context','vr'}); % save animal.behavior.mat
+addParameter(p,'tags',{'base','learning','test','OF','open_field','morph',...
+    'track','context','vr','pre_test','pairing_A','pairing_B'}); % save animal.behavior.mat
 addParameter(p,'force',false); % save animal.behavior.mat
 
 parse(p,varargin{:});
@@ -46,7 +47,7 @@ vid_files = dir(fullfile(basepath,['*.','avi']));
 vid_files = vid_files(idx);
 
 % check basepath for dlc tracking
-dlc_files = dir([basepath,filesep,'*DLC*.csv']); % check for dlc output
+dlc_files = get_dlc_files_in_basepath(basepath);
 godot_files = dir(fullfile(basepath,'*vr_godot.csv'));
 
 if isempty(vid_files) & isempty(godot_files)
@@ -105,24 +106,24 @@ basepath = session.general.basePath;
 
 % remove empty behave files 
  behave_files = behave_files(~cellfun('isempty',behave_files));
- 
+ behave_files = vertcat(behave_files{:});
 % loop through videos
 for i = 1:length(behave_files)
     
     % associate the epoch with the behavior file type     
-    files = behave_files{i};
-    filename = files(1).name;
+    file = behave_files(i);
+    filename = file(1).name;
         
-    if contains(files(1).name,'_vr_godot')
+    if contains(file(1).name,'_vr_godot')
         
-        file_idx = find(contains({files.name},extractBefore(filename,'_vr_godot')));
+        file_idx = find(contains({file.name},extractBefore(filename,'_vr_godot')));
         
         if length(file_idx) > 1
             warning('Multiple DLC outputs found for one video, keeping first index')
             file_idx = file_idx(1); % grab first one
         end
         
-        session.behavioralTracking{1, i}.filenames = files(file_idx).name;
+        session.behavioralTracking{1, i}.filenames = file(file_idx).name;
         session.behavioralTracking{1, i}.epoch  = ep_idx(find(contains(epoch_name,'vr')));
         session.behavioralTracking{1, i}.equipment  = 'VR_arduino_godot_controller_V3';
         session.behavioralTracking{1, i}.type  = 'MouseVR Godot Project V0.8';
@@ -135,7 +136,7 @@ for i = 1:length(behave_files)
         % this code associates a dlc file for a specific video, in case
         % there are multiple dlc/video files in basepath
         vidname = vid_files(i).name;
-        dlc_idx = find(contains({files.name},extractBefore(vidname,'.avi')));
+        dlc_idx = find(contains({vid_files.name},extractBefore({file.name},'DLC')));
         
         if length(dlc_idx) > 1
             warning('Multiple DLC outputs found for one video, keeping first index')
@@ -145,11 +146,11 @@ for i = 1:length(behave_files)
         videoObj = VideoReader(fullfile(basepath,vidname));
         
         % get model parameters for file
-        crop_params = tracking.grab_dlc_crop(files(dlc_idx).name);
+        crop_params = tracking.grab_dlc_crop(filename);
         
         % save to session file
-        session.behavioralTracking{1, i}.filenames = files(dlc_idx).name;
-        session.behavioralTracking{1, i}.epoch  = ep_idx(find(~contains(epoch_name,'vr')));
+        session.behavioralTracking{1, i}.filenames = filename;
+        session.behavioralTracking{1, i}.epoch  = ep_idx(dlc_idx);
         session.behavioralTracking{1, i}.equipment  = 'FireFlyS';
         session.behavioralTracking{1, i}.type  = 'DLC';
         session.behavioralTracking{1, i}.notes  = vidname;
