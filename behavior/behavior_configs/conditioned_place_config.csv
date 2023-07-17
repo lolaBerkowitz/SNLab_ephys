@@ -3,11 +3,11 @@ A,corner,A
 A,corner,B
 A,corner,C
 A,corner,D
+hallway,corner,A
+hallway,corner,B
+hallway,corner,C
+hallway,corner,D
 B,corner,A
 B,corner,B
 B,corner,C
 B,corner,D
-C,corner,A
-C,corner,B
-C,corner,C
-C,corner,D
