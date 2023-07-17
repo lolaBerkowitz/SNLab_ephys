@@ -17,7 +17,7 @@ df = readtable(metadata_path);
 basename = basenameFromBasepath(basepath);
 % skip if behavior file doesn't exist
 try
-    load(fullfile(basepath,[basename,'.animal.behavior.mat']))
+    load(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
 catch
     return
 end
@@ -28,6 +28,7 @@ if batch
     
 end
 
+% update trials
 update_trials(basepath,df)
 
 % update maze size
@@ -58,11 +59,11 @@ for i = 1:length(basenames)
     
     % load animal behavior file
     if exist(fullfile(basepath,[basename,'.animal.behavior.mat']),'file')
-        load(fullfile(basepath,[basename,'.animal.behavior.mat']))
+        load(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
     else
         try
             general_behavior_file_SNlab('basepath',basepath)
-            load(fullfile(basepath,[basename,'.animal.behavior.mat']))
+            load(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
         catch
             disp('Failed - check DLC outputs are present')
             continue
@@ -99,7 +100,7 @@ temp_df = df(contains(df.basename,basename),:);
 
 % setup
 vars = fieldnames(temp_df);
-col_idx = find(contains(vars,'maze_length_cm'));
+col_idx = find(contains(vars,{'maze_width_cm','maze_length_cm'}));
 
 % loop through videos indicated in session.behavioralTracking
 for ii = 1:length(session.behavioralTracking)
@@ -123,7 +124,7 @@ function update_trials(basepath,df)
 % crate basename from basepath
 basename = basenameFromBasepath(basepath);
 % load session and animal behavior file
-load(fullfile(basepath,[basename,'.animal.behavior.mat']));
+load(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior');
 
 session = loadSession(basepath,basename);
 
@@ -140,6 +141,10 @@ t_n = 1;
 % loop through videos indicated in session.behavioralTracking
 for ii = 1:length(session.behavioralTracking)
     
+    % exclude VR 
+    if contains(session.behavioralTracking{1,ii}.filenames,'godot')
+        continue
+    end 
     % load epoch to get start/end for timestamps
     epoch = session.behavioralTracking{1,ii}.epoch;
     name = session.epochs{1,epoch}.name;
