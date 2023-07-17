@@ -25,43 +25,51 @@ p.addParameter('maze_coords',true,@islogical)
 p.addParameter('overwrite_behavior',true,@islogical)
 p.addParameter('config_path','C:\Users\schafferlab\github\SNLab_ephys\behavior\behavior_configs\')
 p.addParameter('metadata_path','Y:\laura_berkowitz\app_ps1_ephys\behavior\behavior_metadata.csv')
+p.addParameter('experiment_type','ephys')
+
 
 p.parse(varargin{:})
 maze_coords = p.Results.maze_coords;
 overwrite_behavior = p.Results.overwrite_behavior;
 config_path = p.Results.config_path;
 metadata_path = p.Results.metadata_path;
-
+experiment_type = p.Results.experiment_type; 
 basename = basenameFromBasepath(basepath);
 
 % skip if no tracking found
-if isempty(dir([basepath,filesep,'*DLC*.csv']))
-    disp('No DLC tracking found. Skipping session')
-    return
+if isempty(dir([basepath,filesep,'*DLC*.csv'])) || isempty(dir([basepath,filesep,'*godot*.csv']))
+    disp('No tracking found. Skipping session')
 end
 
-% skip if no digitalin events
-try 
-    load(fullfile(basepath,'digitalIn.events.mat'))
-catch
-    disp('no digitalin.events found. Can''t sync tracking for general behavior file for ephys')
-    return
+if ismember(experiment_type,'ephys')
+
+    % skip if no digitalin events
+    try 
+        load(fullfile(basepath,'digitalIn.events.mat'))
+    catch
+        disp('no digitalin.events found. Can''t sync tracking for general behavior file for ephys')
+        return
+    end
+
+    % run main function
+    general_behavior_file_SNlab('basepath',basepath,'force_overwrite',overwrite_behavior)
+
+    % update trials from metadata csv
+    update_behavior_from_metadata(metadata_path,'basepath',basepath)
+
+    % get maze coords
+    if maze_coords
+        get_maze_XY('basepath',basepath,'config_path', config_path)
+    end
+
+    % restrict and transform primary coordinates to maze and convert to cm
+    restrict_and_transform(basepath)
+    
+else
+    
+        general_behavior_file_SNlab('basepath',basepath,'force_overwrite',overwrite_behavior)
+
 end
 
-% run main function
-general_behavior_file_SNlab('basepath',basepath,'force_overwrite',overwrite_behavior)
-
-% update trials from metadata csv
-update_behavior_from_metadata(metadata_path,'basepath',basepath)
-
-% get maze coords
-if maze_coords
-    get_maze_XY('basepath',basepath,'config_path', config_path)
-end
-
-% restrict and transform primary coordinates to maze and convert to cm
-restrict_and_transform(basepath)
-
-end
 
 
