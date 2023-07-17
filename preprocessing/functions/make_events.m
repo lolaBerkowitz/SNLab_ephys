@@ -140,6 +140,7 @@ function ts = get_ts_from_dlc(dlc_file,files)
 dlc_file_name = basenameFromBasepath(dlc_file);
 vid_name = extractBefore(dlc_file_name,'DLC_');
 all_vid_files = files(contains({files.name},{'.avi','.mpg'}));
+all_vid_files(cellfun(@(x) ismember(x(1,2),'._'), {all_vid_files.name})) = [];
 current_vid = all_vid_files(contains({all_vid_files.name},vid_name));
 vid_file_path = fullfile(current_vid.folder,current_vid.name);
 %%
