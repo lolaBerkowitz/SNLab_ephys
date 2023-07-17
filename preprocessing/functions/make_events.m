@@ -88,7 +88,7 @@ end
 dlc_files(toss_idx,:) = [];
 
 % sort
-dlc_files = sort_files(dlc_files);
+dlc_files = sort_files_with_timestamp(dlc_files);
 
 % loop through files and generate digitalIn
 if length(dlc_files) > 1
@@ -121,20 +121,7 @@ digitalIn = make_digitalin_vars(digitalIn);
 
 end
 
-function file_struct = sort_files(file_struct)
-% Extract the timestamps from the filenames
-timestamps = regexp({file_struct.name}, '-\d+', 'match');
-timestamps = cellfun(@(x) extractAfter(x,'-'),timestamps,'UniformOutput',false);
-timestamps = cellfun(@(x) str2double(x),timestamps,'UniformOutput',false);
 
-% Convert the timestamps to numeric values
-
-% Sort the file list based on the timestamps
-[~, sortedIndices] = sort( [timestamps{:}]);
-
-% Sort the file list using the sorted indices
-file_struct = file_struct(sortedIndices);
-end
 
 function ts = get_ts_from_dlc(dlc_file,files)
 dlc_file_name = basenameFromBasepath(dlc_file);
