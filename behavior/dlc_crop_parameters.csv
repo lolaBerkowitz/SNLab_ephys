@@ -1,3 +1,4 @@
 ﻿model,x_min,x_max,y_min,y_max
 30cm_open_field,230,1080,80,900
 40cm_open_field,295,1175,56,947
+mouse_cpp,1,1440,1,1080
