@@ -66,25 +66,27 @@ function output = tablegen (basepath2)
         %exposure and condition
         
         if contains(basename,'pretest')
-            exposure=[exposure;1];
+            
             if contains(vid,'pretest')
                 condition=[condition;"pretest"];
+                exposure=[exposure;1];
             elseif contains(vid,'pairing')|| contains(vid,'paring')
+                exposure=[exposure;2];
                 condition=[condition;"pairing"];
             end
          elseif contains(basename,'posttest')
             if contains(vid,'posttest')
-                exposure=[exposure;2];
+                exposure=[exposure;5];
                 condition=[condition;"posttest"];
 
             elseif contains(vid,'pairing')|| contains(vid,'paring')
-                exposure=[exposure;3];
+                exposure=[exposure;4];
                 condition=[condition;"pairing"];
 
             end
         elseif contains(basename,'day02')
             condition=[condition;"pairing"];
-            exposure=[exposure;2];
+            exposure=[exposure;3];
         else
             % condition=[condition;'pairing'];
             exposure=[exposure;9];
