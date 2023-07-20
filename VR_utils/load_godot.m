@@ -36,9 +36,12 @@ function vr_pos = load_godot(basepath,varargin)
 
 p = inputParser;
 addParameter(p,'savefile',true,@islogical);
+addParameter(p,'tags',{'lineartrack','openfield'},@iscell);
+
 parse(p,varargin{:});
 
 savefile = p.Results.savefile;
+tags = p.Results.tags; 
 
 % look for processed file and return if present
 if ~isempty(dir(fullfile(basepath,'*vr_godot.csv')))
@@ -49,29 +52,75 @@ if ~isempty(dir(fullfile(basepath,'*vr_godot.csv')))
 end
 % get file info
 param = dir(fullfile(basepath,'*godotlogs.txt'));
-vr_pos = table;
+if isempty(param)
+    disp('No godot logs found.')
+    vr_pos = table; 
+    return
+end
 
-% run if file is found in basepath
-if ~isempty(param)
+%% run if file is found in basepath
+[param_new,task_type] = parse_param(param, tags);
+
+for task = 1:length(param_new)
+    param = param_new{task};
+    task_name = task_type{task};
     
-    for lap = 1:length(param)
-        temp_pos = readtable(fullfile(basepath,param(lap).name),'FileType','text');
-        % identify trial from file name 
-        temp_pos.lap_n = repmat(str2double(extractBetween(param(lap).name,'rep','_')),size(temp_pos,1),1);
-        temp_pos.reward_n = repmat(str2double(extractBetween(param(lap).name,'reward','_')),size(temp_pos,1),1);
-        temp_pos.mouse_id = repmat(str2double(extractBetween(param(lap).name,'mouse','_')),size(temp_pos,1),1);
-        vr_pos = [vr_pos; temp_pos];
-    end
-    session_date = extractBefore(param(lap).name,'_linear');
+    [vr_pos,session_date] = load_text_files(param,basepath);
+
+if savefile
+    writetable(vr_pos,fullfile(basepath,[session_date,'_',task_name,'_vr_godot.csv']))
+end
+
+end
+
+
+end
+
+function [vr_pos,session_date] = load_text_files(param,basepath)
+vr_pos = table;
+for lap = 1:length(param)
+    filename = param(lap).name;
+    temp_pos = readtable(fullfile(basepath,filename),'FileType','text');
+    % identify trial from file name
+    temp_pos.lap_n = repmat(str2double(extractBetween(filename,'rep','_')),size(temp_pos,1),1);
+    godot_date = regexp(filename, '(\d+)_(\d+)_(\d+)_(\d+)_(\d+)_(\d+)', 'match');
+    temp_pos.session_date = repmat(godot_date,size(temp_pos,1),1);
+%     temp_pos.reward_n = repmat(str2double(extractBetween(param(lap).name,'reward','_')),size(temp_pos,1),1);
+%     temp_pos.mouse_id = repmat(str2double(extractBetween(param(lap).name,'mouse','_')),size(temp_pos,1),1);
+    vr_pos = [vr_pos; temp_pos];
+end
+
+% add headers for each task type 
+if contains(filename,'open')
+    vr_pos.Properties.VariableNames = {'yaw','pitch','roll','x',...
+        'z','xz_angle','reward','reward_x','reward_z','lick','experiment_ts','lap_n','godot_date'};
+
+elseif contains(filename,'linear')
     % add column labels
     vr_pos.Properties.VariableNames = {'yaw','pitch','roll','x',...
-            'z','xz_angle','reward','lick','experiment_ts','lap_n','reward_n','mouse_id'};
-    vr_pos = sortrows(vr_pos,'lap_n'); 
-    if savefile
-        writetable(vr_pos,fullfile(basepath,[session_date,'_vr_godot.csv']))
-    end
-else
-    disp('No godotlogs found. Check basepath')
-end 
+        'z','xz_angle','reward','lick','experiment_ts','lap_n','godot_date'};
+end
 
+% sort rows in data. 
+vr_pos = sortrows(vr_pos,{'godot_date','lap_n'});
+
+% convert experiment timestamps to seconds
+vr_pos.experiment_ts = vr_pos.experiment_ts/1000; % divide by 1000 as godot ts are in ms
+session_date = vr_pos.godot_date{1};
+end
+
+
+function [param_new,task_type] = parse_param(param, tags)
+
+% For different VR tasks, parse files into individual tasks 
+for n = 1:length(tags)
+    if any(contains({param.name},tags{n}))
+        param_new{n} = param(contains({param.name},tags{n}));
+        task_type{n} = tags{n};
+    end
+end
+
+% remove empty cells 
+param_new = param_new(~cellfun('isempty',param_new));
+task_type = task_type(~cellfun('isempty',task_type));
 end
