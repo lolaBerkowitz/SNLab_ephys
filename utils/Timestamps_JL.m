@@ -2,7 +2,7 @@
 % Get all the videos from the directory
 basepath='/Volumes/sn data server 3/laura_berkowitz/behavior_validation/appps1_cpp/data/cohort2/3779/3779_pretest_pairing_day01';
 file_struct = dir(fullfile(basepath,'*.avi'));
-fil
+
 % maybe use later
 File_name=basepath(1+max(strfind(basepath,'/')):end); 
 % Extract the timestamps from the filenames

@@ -1,12 +1,12 @@
 
-function output = tablegen (basepath2)
+function output = tablegen (basepath)
     % Get all the videos from the directory
-    file_struct = dir(fullfile(basepath2,'*.avi'));
+    file_struct = dir(fullfile(basepath,'*.avi'));
     %remove hidden files
-    file_struct = file_struct(~strncmp({file_struct.name}, '.', 1));
+    file_struct = file_struct(~startsWith({file_struct.name}, '.'));
     % Extract base name
-    bstring=char(basepath2);
-    File_name=bstring(1+max(strfind(basepath2,'\')):end); % ***** edit '\' or '/' depending on mac or windows
+    bstring=char(basepath);
+    File_name=bstring(1+max(strfind(basepath,'/')):end); % ***** edit '\' or '/' depending on mac or windows
     % Extract the timestamps from the filenames
     timestamps = regexp({file_struct.name}, '-\d+', 'match');
     timestamps = cellfun(@(x) extractAfter(x,'-'),timestamps,'UniformOutput',false);
@@ -14,7 +14,7 @@ function output = tablegen (basepath2)
     [~, sortedIndices] = sort( [timestamps{:}]);
     file_struct=file_struct(sortedIndices);
     subid=[];
-    basepath=[];
+    basepath3=[];
     genotype=[];
     age=[];
     session_date=[];
@@ -53,7 +53,7 @@ function output = tablegen (basepath2)
         subid=[subid;vid(1:4)];
         %Basepath
         pos=find(sortedIndices==i);
-        basepath=[basepath;string(basepath2)];
+        basepath3=[basepath3;string(basepath)];
         %Session Date
         daytemp=extractBefore(file_struct(pos).date," "); 
         date=datetime(daytemp, 'InputFormat', 'dd-MMM-yyyy');
@@ -88,7 +88,7 @@ function output = tablegen (basepath2)
             condition=[condition;"pairing"];
             exposure=[exposure;3];
         else
-            % condition=[condition;'pairing'];
+            condition=[condition;'pairinadsfafdsfsdg'];
             exposure=[exposure;9];
         end
         %maze width and type and color
@@ -125,7 +125,7 @@ function output = tablegen (basepath2)
     moved_object=none;
     treatment=none;
     notes=na;
-    output=table(subid,basepath,genotype,age,session_date,dob,vidname,basename,exposure,...
+    output=table(subid,basepath3,genotype,age,session_date,dob,vidname,basename,exposure,...
         maze_width_cm,maze_length_cm,maze_type,maze_color,cue_position,task_name,condition,...
         treatment,objects,paradigm,moved_object,trial_start_1,trial_stop_1,trial_start_2,...
         trial_stop_2,trial_start_3,trial_stop_3,trial_start_4,trial_stop_4);
