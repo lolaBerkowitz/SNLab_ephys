@@ -68,7 +68,7 @@ for task = 1:length(param_new)
     [vr_pos,session_date] = load_text_files(param,basepath);
 
 if savefile
-    writetable(vr_pos,fullfile(basepath,[session_date,'_',task_name,'_vr_godot.csv']))
+    writetable(vr_pos,fullfile(basepath,[task_name,'_vr_godot-',session_date,'.csv']))
 end
 
 end
@@ -106,7 +106,10 @@ vr_pos = sortrows(vr_pos,{'godot_date','lap_n'});
 
 % convert experiment timestamps to seconds
 vr_pos.experiment_ts = vr_pos.experiment_ts/1000; % divide by 1000 as godot ts are in ms
-session_date = vr_pos.godot_date{1};
+temp_ts = strsplit(vr_pos.godot_date{1},'_');
+% reorder date to MMDDYYHHMMSS
+session_date = [temp_ts{2},temp_ts{3},temp_ts{1},...
+    temp_ts{4},temp_ts{5},temp_ts{6}];
 end
 
 
