@@ -44,7 +44,8 @@ check_scoring = p.Results.check_scoring;
 col_names = {'basepath','lfp','sleep_states','tracking_dlc',...
     'tracking_animalBehavior','tracking_restrictxy',...
     'sorting_Kilosort','sorting_phyRez','tracking_sessionBehavioralTracking',...
-    'cell_metrics','ripples','anatomical_map','behavior_scoring'};
+    'cell_metrics','ripples','anatomical_map','behavior_scoring','behavior_scoring_date'};
+
 session_status = cell2table(cell(0,length(col_names)),'VariableNames', col_names);
 
 % find all sessions in data_folder
@@ -52,11 +53,13 @@ session_status = cell2table(cell(0,length(col_names)),'VariableNames', col_names
 if contains(data_folder,'.csv')
     df = readtable(data_folder);
     data_folder = fileparts(data_folder);
+    basepaths = unique(df.basepath);
 else
     df = compile_sessions(data_folder);
+    basepaths = unique([df.basepath{:}]);
 end
 
-basepaths = unique(df.basepath);
+% basepaths = unique(df.basepath);
 % loop through basepaths
 for i = 1:length(basepaths)
     basepath = basepaths{i};
