@@ -27,10 +27,10 @@ for i = 1:length(folders)
             
             ripples = FindRipples('basepath',basepath,...
                 'channel',ripple_channel,...
-                'thresholds',[0.25 1],...
+                'thresholds',[0.5 1.5],...
                 'durations',[50 500]);
             
-            save([basename '.ripples.events.mat'],'ripples')
+            save(fullfile(basepath,[basename '.ripples.events.mat']),'ripples')
         catch
             disp('CA1sp not found, skipping session')
             continue
@@ -44,7 +44,6 @@ for i = 1:length(folders)
             if ~exist([basepath '\Ripple_Profile'])
                 mkdir('Ripple_Profile');
             end
-            save([basename '.ripples.events.mat'],'ripples');saveas(gcf,['Ripple_Profile\SWRmua.png']);
         end
         
     end
