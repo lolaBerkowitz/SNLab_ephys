@@ -36,7 +36,7 @@ addParameter(p,'lfp_fs',1250,@isnumeric);
 addParameter(p,'specialChannels',[30,59,17],@isnumeric) % default for ASYpoly2A64
 addParameter(p,'acquisition_event_flag',false,@islogical) % if you have start and stop recording
 % events else default uses first and last event as indicies for start and stop of recording
-addParameter(p,'check_epochs',false,@islogical) % fixes bouncy events
+addParameter(p,'check_epochs',true,@islogical) % fixes bouncy events
 addParameter(p,'maze_size',30,@isnumeric); % in cm
 
 
@@ -119,7 +119,7 @@ if digitalInputs
 end
 
 % Epochs derived from digital inputs for multianimal recordings
-update_epochs('basepath',basepath,'annotate',check_epochs,'overwrite',true)
+update_epochs('basepath',basepath,'annotate',check_epochs,'overwrite',false)
 
 % Auxilary input
 if getAcceleration
@@ -138,8 +138,14 @@ end
 
 % Calcuate estimated emg
 if getEMG
-    EMGFromLFP = ce_EMGFromLFP(session,'overwrite',false,'noPrompts',true,...
-        'specialChannels',specialChannels);
+    if isempty(specialChannels)
+        EMGFromLFP = getEMGFromLFP(basepath,'overwrite',false,'noPrompts',true,...
+            'rejectChannels',session.channelTags.Bad.channels);
+    else
+        
+        EMGFromLFP = getEMGFromLFP(basepath,'overwrite',false,'noPrompts',true,...
+            'specialChannels',specialChannels,'rejectChannels',session.channelTags.Bad.channels);
+    end
 end
 
 % Get brain states
@@ -154,7 +160,11 @@ end
 
 if kilosort
     % For Kilosort: create channelmap
-    create_channelmap(basepath)
+    if ~isempty(session.channelTags.Bad.channels)
+        createChannelMapFile_KSW(basepath,basename,'staggered',session.channelTags.Bad.channels);
+    else
+         createChannelMapFile_KSW(basepath,basename,'staggered');
+    end
     
     % creating a folder on the ssd for chanmap,dat, and xml
     ssd_folder = fullfile(ssd_path, basename);
@@ -175,7 +185,7 @@ if kilosort
     command = ['robocopy "',basepath,'" ',ssd_folder,' chanMap.mat'];
     system(command);
     
-    % Spike sort using kilosort 1 (data on ssd)l
+    % Spike sort using kilosort 1 (data on ssd)
     run_ks1(basepath,'ssd_folder',ssd_folder)
 end
 % Get tracking positions
