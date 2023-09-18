@@ -65,7 +65,7 @@ function initialize_dir_for_CellExplorer(subject_path)
 % Use dir to get sessions in subject folder 
 session_list = dir(subject_path);
 session_list = session_list(~ismember({session_list.name},{'.','..'}),:); 
-
+session_list = session_list(~cellfun(@(x) contains(x,'DS_Store'),{session_list.name})); 
 % loop through session and create a basename.session file
 for i = 1:length(session_list)
     
