@@ -113,6 +113,7 @@ for i = 1:length(basepaths)
             %session_status.lfp_date(i)=dir(fullfile(basepath,[basename,'.lfp'])).date;
             session_status.lfp_date(i)=insert_date(nameExt);
         end
+
     end
     
     if check_sleep
@@ -120,9 +121,11 @@ for i = 1:length(basepaths)
         session_status.sleep_states(i) = isfile(nameExt) ...
         & isfile(fullfile(basepath,[basename,'.SleepScoreLFP.LFP.mat'])) ...
         & isfile(fullfile(basepath,[basename,'.SleepStateEpisodes.states.mat']));
+        
         if  ismember(session_status.lfp(i),1)
             session_status.sleep_states_date(i)=insert_date(nameExt);
         end
+
     end
     
     if check_tracking
