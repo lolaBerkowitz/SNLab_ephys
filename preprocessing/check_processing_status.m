@@ -41,20 +41,6 @@ check_ripples = p.Results.check_ripples;
 check_anatomical = p.Results.check_anatomical;
 check_scoring = p.Results.check_scoring;
 
-% 
-% session_status = table;
-% session_status.basepath{1} = [];
-% session_status.lfp_date{1} = [];
-% session_status.lfp(1) = 0;
-% session_status.sleep_states_date{1} = [];
-% session_status.sleep_states(1) = 0;
-% session_status.tracking_dlc_date{1} = [];
-% session_status.tracking_dlc(1) = 0;
-% session_status.tracking_animalBehavior_date{1} = [];
-% session_status.tracking_animalBehavior(1) = 0;
-% session_status.tracking_restrictxy_date{1} = [];
-% session_status.tracking_restrictxy(1) = 0;
-
 % find all sessions in data_folder
 % handle input as csv of basepaths or directory
 if contains(data_folder,'.csv')
