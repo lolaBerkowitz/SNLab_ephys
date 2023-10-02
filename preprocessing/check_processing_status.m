@@ -1,5 +1,4 @@
 function check_processing_status(data_folder,varargin)
-data_folder="/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07";
 
 % Check df of basepaths for processing steps required for analysis 
 %
