@@ -115,17 +115,21 @@ for i = 1:length(basepaths)
     end
     
     if check_tracking
-        nameExt=fullfile(basepath,[basename,'.animal.behavior.mat']);
+        
+        nameExt = fullfile(basepath,[basename,'.animal.behavior.mat']);
         session_status.tracking_animalBehavior(i) = isfile(nameExt);
         if  ismember(session_status.tracking_animalBehavior(i),1)
             session_status.tracking_animalBehavior_date(i)=insert_date(nameExt);
         end
-        nameExt=fullfile(basepath,[basename,'.restrictxy.mat']);
+        
+        nameExt = fullfile(basepath,[basename,'.restrictxy.mat']);
         session_status.tracking_restrictxy(i) = isfile(nameExt);
         if  ismember(session_status.tracking_animalBehavior(i),1)
             session_status.tracking_restrictxy_date(i)=insert_date(nameExt);
         end
+        
         if isfile(fullfile(basepath,[basename,'.session.mat']))
+            
             session = loadSession(basepath,basename);
             session_status.tracking_sessionBehavioralTracking(i) = isfield(session,'behavioralTracking');
             if ismember(session_status.tracking_sessionBehavioralTracking(i),1)
@@ -220,18 +224,18 @@ writetable(session_status,fullfile(data_folder,['session_check_',datestr(date),'
 end
 %Get date into proper format
 function out=date_compare(folder_contents,key)
-    names=folder_contents(find(contains({folder_contents.name},key)));
-    out=datetime(names(1).date);
+    names = folder_contents(find(contains({folder_contents.name},key)));
+    out = datetime(names(1).date);
     if length(names)>1
-        for i=2:length(names)
+        for i = 2:length(names)
             if datetime(names(i).date)>out
-            out=datetime(names(i).date);
+            out = datetime(names(i).date);
             end
         end
     end
     out=datestr(out,'mm/dd/yy');
 end
-function out=insert_date (name)
+function out = insert_date (name)
     tempPath=dir(name);
     out=datestr(tempPath(length(tempPath)).date, 'mm/dd/yy');
 end
