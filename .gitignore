@@ -131,3 +131,5 @@ dmypy.json
 # Matlab
 *.asv
 MyAppInstaller_mcr.exe
+preprocessing/.DS_Store
+.DS_Store
