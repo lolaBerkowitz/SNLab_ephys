@@ -10,8 +10,31 @@
 % load exsisting events
 digitalIn = process_digitalin(basepath,frequency_parameters.amplifier_sample_rate);
 
+%% remove pulses from electrical noise that is present on all channels 
+unused_channel = [4,5,8,9,10,11,12,13];
+used_channel = [2,3];
+
+for channel = used_channel
+    for unused = unused_channel
+        digitalIn.timestampsOff{1,channel}(ismember(digitalIn.timestampsOff{1,channel},digitalIn.timestampsOff{1,unused})) = [];
+        digitalIn.timestampsOn{1,channel}(ismember(digitalIn.timestampsOn{1,channel},digitalIn.timestampsOn{1,unused})) = [];
+    end
+end
+
+% remove unused ttl pulses
+for unused = unused_channel
+    digitalIn.timestampsOff{1,unused} = [];
+    digitalIn.timestampsOn{1,unused} = [];
+end
+
 % Examine digitialIn structure and verify events match written notes
-% if edited, delete ints, dur, and intsPeriods and remake below
+% if edited, delete ints, dur, and intsPeriods and remake belo
+%%
+
+digitalIn.timestampsOff{1,2} = digitalIn.timestampsOn{1,2} + .3;
+digitalIn.timestampsOff{1,3} = digitalIn.timestampsOn{1,3} + .3;
+
+
 
 %% and recalculate other variables
 for ii = 1:size(digitalIn.timestampsOn,2)
