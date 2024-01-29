@@ -6,7 +6,7 @@ function check_processing_status(data_folder,varargin)
 %   df: csv containing basepaths for checking
 
 % output: 
-%   saves session_status.csv to savepath indicating missing items from
+%   saves session_check.csv to savepath indicating missing items from
 %   basepath with 1 being found and 0 being not found. 
 
 % Items that are checked: 
@@ -52,9 +52,8 @@ else
     basepaths = unique([df.basepath{:}]);
 end
 
-% initialize table 
 % initialize session_status.csv as table
-col_names = {'basepath','lfp','lfp_date',...
+col_names = {'group','basepath','lfp','lfp_date',...
     'sleep_states','sleep_states_date',...
     'tracking_dlc','tracking_dlc_date',...
     'tracking_animalBehavior','tracking_animalBehavior_date',...
@@ -67,7 +66,7 @@ col_names = {'basepath','lfp','lfp_date',...
     'anatomical_map','anatomical_map_date',...
     'behavior_scoring','behavior_scoring_date'};
 
-col_types = {'string','logical','string',...
+col_types = {'string','string','logical','string',...
     'logical','string',...
     'logical','string',...
     'logical','string',...
@@ -83,37 +82,34 @@ col_types = {'string','logical','string',...
 session_status = table('Size',[length(basepaths), length(col_names)],'VariableNames',col_names,'VariableTypes',col_types);
 
 % loop through basepaths
-
 for i = 1:length(basepaths)
     basepath = basepaths{i};
     basename = basenameFromBasepath(basepath);
-    
     session_status.basepath{i} = basepath;
     folder_contents = dir(basepath);
-    
+    strList=strsplit(basepath,'/');
+    indexName=find(strcmp(strList, 'data'),1)+1;
+    session_status.group{i} = char(strList(indexName));  
+
     if check_lfp
         nameExt=fullfile(basepath,[basename,'.lfp']);
         session_status.lfp(i) = isfile(nameExt);
-
         if  ismember(session_status.lfp(i),1)
             %session_status.lfp_date(i)=dir(fullfile(basepath,[basename,'.lfp'])).date;
             session_status.lfp_date(i)=insert_date(nameExt);
         end
-
     end
-    
+
     if check_sleep
         nameExt=fullfile(basepath,[basename,'.SleepState.states.mat']);
         session_status.sleep_states(i) = isfile(nameExt) ...
         & isfile(fullfile(basepath,[basename,'.SleepScoreLFP.LFP.mat'])) ...
         & isfile(fullfile(basepath,[basename,'.SleepStateEpisodes.states.mat']));
-        
-        if  ismember(session_status.lfp(i),1)
+        if  ismember(session_status.sleep_states(i),1)
             session_status.sleep_states_date(i)=insert_date(nameExt);
         end
+    end    
 
-    end
-    
     if check_tracking
         
         nameExt = fullfile(basepath,[basename,'.animal.behavior.mat']);
@@ -144,9 +140,7 @@ for i = 1:length(basepaths)
         vid_files =fullfile(basepath,['*','.avi']);
         if length(find(contains({folder_contents.name},'DLC')))/length(dir(vid_files)) >= 3 % there are min 3 dlc files per video
             session_status.tracking_dlc(i) = true;
-            if  ismember(session_status.tracking_dlc(i),1)
-                
-                
+            if  ismember(session_status.tracking_dlc(i),1)                             
                 session_status.tracking_dlc_date(i)=date_compare(folder_contents,'DLC');
                 %TODO What if theres multiple videos
             end
@@ -154,7 +148,7 @@ for i = 1:length(basepaths)
             session_status.tracking_dlc(i) = false;
         end
     end
-    
+
     if check_sorting
         kiloPresent=find(contains({folder_contents.name},'Kilosort'));
         if ~isempty(kiloPresent)
@@ -164,20 +158,17 @@ for i = 1:length(basepaths)
             session_status.sorting_Kilosort_date(i)=date_compare(folder_contents,'Kilosort');
             nameExt=fullfile(basepath,[ks,filesep,'phy.log']);
             % check if phy log has been created, thereby the user opened
-            % session in phy
-            
+            % session in phy           
             session_status.sorting_phyRez(i) = isfile(nameExt);
             if ismember(session_status.sorting_phyRez(i),1)
                 session_status.sorting_phyRez_date(i)=insert_date(nameExt);
-            end
-   
+            end 
         else
             session_status.sorting_Kilosort(i) = false;
             session_status.sorting_phyRez(i) = false;
         end
-
     end
-    
+
     if check_cell_metrics
         nameExt=fullfile(basepath,[basename,'.cell_metrics.cellinfo.mat']);
         session_status.cell_metrics(i) = isfile(nameExt);
@@ -218,10 +209,12 @@ for i = 1:length(basepaths)
 end
 
 % save table to data_folder as csv
-writetable(session_status,fullfile(data_folder,['session_check_',datestr(date),'.csv']))
-
+writetable(session_status,fullfile(data_folder,['session_check.csv']))
 
 end
+
+
+
 %Get date into proper format
 function out = date_compare(folder_contents,key)
     names = folder_contents(find(contains({folder_contents.name},key)));
@@ -236,6 +229,7 @@ function out = date_compare(folder_contents,key)
     out=datestr(out,'mm/dd/yy');
 end
 
+
 function out=insert_date (name)
 %Helper function to get date into proper formatfunction out=insert_date (name)
 
@@ -246,7 +240,3 @@ function out=insert_date (name)
         out='MIA';
     end
 end
-
-
-
-
