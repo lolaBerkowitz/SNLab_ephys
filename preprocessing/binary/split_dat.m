@@ -127,6 +127,7 @@ for port = find(~cellfun(@isempty,subject_order))
     % make copy of rhd, and setting to basepath
     copyfile([data_path,filesep,'settings.xml'],basepath{port});
     copyfile([data_path,filesep,'info.rhd'],basepath{port});
+    copyfile([data_path,filesep,'time.dat'],basepath{port});
     
     if trim_dat
         % create digitalIn event structure and save to basepath, and reset
@@ -169,9 +170,12 @@ trim_dat_epoch = p.Results.trim_dat_epoch;
 % find ports to write
 write_port = unique({aux_input_channels.port_name}); 
 subject_order = subject_order(contains({'Port A','Port B','Port C','Port D'},write_port));
+% limit port to number of subjects 
+idx = ~cellfun(@isempty,subject_order);
+subject_order = subject_order(idx);
+write_port = write_port(~cellfun(@isempty,subject_order)); % write ports based on inputs
 basepath = basepath(contains(port_id,write_port));
 basepath = basepath(~cellfun(@isempty,subject_order));
-write_port = write_port(~cellfun(@isempty,subject_order)); % write ports based on inputs
 
 % if all files have been written, exit the function
 if isempty(write_port)
@@ -190,6 +194,7 @@ if isempty(trim_dat_epoch)
     batch = ceil(linspace(0,samples,100));
 end
 % initialize new dat, channel index, and batch
+idx = [];
 for port = 1:length(write_port)
     if ~isempty(trim_dat_epoch)
         batch{port} = round(linspace(trim_dat_epoch(port,1),trim_dat_epoch(port,2),100));
@@ -254,9 +259,9 @@ trim_dat_epoch = p.Results.trim_dat_epoch;
 % loop through ports
 write_port = unique({amplifier_channels.port_name}); 
 subject_order = subject_order(contains(port_id,write_port));
+write_port = write_port(~cellfun(@isempty,subject_order)); % write ports based on inputs
 basepath = basepath(contains({'Port A','Port B','Port C','Port D'},write_port));
 basepath = basepath(~cellfun(@isempty,subject_order));
-write_port = write_port(~cellfun(@isempty,subject_order)); % write ports based on inputs
 % loop through ports
 remove_port_idx = [];
 for port = 1:length(write_port)

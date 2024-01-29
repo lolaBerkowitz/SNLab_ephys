@@ -20,7 +20,7 @@ for i = 1:length(df.basepath)
     
     switch task_name
         case 'cpp'
-            task_phases = {'pretest_pairing_day01','pairing_day02','pairing_posttest_day03'};
+            task_phases = {'habituation_day01','habituation_day02','habituation_day03','cpptask_day04'};
         case 'object-location'
             task_phases = {'hab_day01','hab_day02','hab_day03','object_location_day04'};
         case 'novel-object'

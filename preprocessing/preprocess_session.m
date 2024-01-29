@@ -92,30 +92,33 @@ end
 
 % Create SessionInfo (only run this once!)
 session = sessionTemplate(basepath,'showGUI',true);
- 
+
+% Load rhd file 
+% Load info.rhd for recording parameters
+[amplifier_channels, ~, aux_input_channels, ~,...
+    ~, ~, frequency_parameters,board_adc_channels] = ...
+    read_Intan_RHD2000_file_snlab(basepath);
+
 % Process additional inputs
 
 % Analog inputs
 % check the two different fucntions for delaing with analog inputs and proably rename them
 if analogInputs
-    if  ~isempty(analogChannels)
-        analogInp = computeAnalogInputs('analogCh',analogChannels,'saveMat',true,'fs',session.extracellular.sr);
-    else
-        analogInp = computeAnalogInputs('analogCh',[],'saveMat',true,'fs',session.extracellular.sr);
-    end
-    
+%     if  ~isempty(analogChannels)
+%         analogInp = computeAnalogInputs('analogCh',analogChannels,'saveMat',true);
+%     else
+%         analogInp = computeAnalogInputs('analogCh',[],'saveMat',true);
+%     end
+%     
     % analog pulses ...
     [pulses] = getAnalogPulses('samplingRate',session.extracellular.sr);
 end
 
 % Digital inputs
 if digitalInputs
-    if ~isempty(digitalChannels)
-        % need to change to only include specified channels
-        digitalInp = getDigitalIn('all','filename',"digitalin.dat",'fs',session.extracellular.sr);
-    else
-        digitalInp = getDigitalIn('all','filename',"digitalin.dat",'fs',session.extracellular.sr);
-    end
+    
+    digitalIn = process_digitalin(basepath,frequency_parameters.amplifier_sample_rate);
+
 end
 
 % Epochs derived from digital inputs for multianimal recordings
@@ -151,11 +154,9 @@ end
 % Get brain states
 % an automatic way of flaging bad channels is needed
 if stateScore
-    if exist('pulses','var')
-        SleepScoreMaster(basepath,'ignoretime',pulses.intsPeriods); % try to sleep score
-    else
-        SleepScoreMaster(basepath); % takes lfp in base 0
-    end
+    
+    SleepScoreMaster(basepath,'rejectChannels',session.channelTags.Bad.channels); % takes lfp in base 0
+    
 end
 
 if kilosort

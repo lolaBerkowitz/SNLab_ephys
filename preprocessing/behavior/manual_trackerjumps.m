@@ -38,7 +38,7 @@ for i=1:length(StartofRec)
     % use the gui to cut out points
     [~,~,in]=restrictMovement(xtemp,ytemp,restic_dir,darkmode,axis_equal,alpha,add_scatter);
     % save the ts where the tracker error exists
-    savets=[savets,tstemp(in)];
+    savets=[savets; tstemp(in)];
 end
 % locate the index for each tracker error
 good_idx=ismember(ts,savets);

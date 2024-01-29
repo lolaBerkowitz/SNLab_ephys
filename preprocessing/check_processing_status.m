@@ -111,17 +111,21 @@ for i = 1:length(basepaths)
     end    
 
     if check_tracking
-        nameExt=fullfile(basepath,[basename,'.animal.behavior.mat']);
+        
+        nameExt = fullfile(basepath,[basename,'.animal.behavior.mat']);
         session_status.tracking_animalBehavior(i) = isfile(nameExt);
         if  ismember(session_status.tracking_animalBehavior(i),1)
             session_status.tracking_animalBehavior_date(i)=insert_date(nameExt);
         end
-        nameExt=fullfile(basepath,[basename,'.restrictxy.mat']);
+        
+        nameExt = fullfile(basepath,[basename,'.restrictxy.mat']);
         session_status.tracking_restrictxy(i) = isfile(nameExt);
         if  ismember(session_status.tracking_animalBehavior(i),1)
             session_status.tracking_restrictxy_date(i)=insert_date(nameExt);
         end
+        
         if isfile(fullfile(basepath,[basename,'.session.mat']))
+            
             session = loadSession(basepath,basename);
             session_status.tracking_sessionBehavioralTracking(i) = isfield(session,'behavioralTracking');
             if ismember(session_status.tracking_sessionBehavioralTracking(i),1)
@@ -210,20 +214,21 @@ writetable(session_status,fullfile(data_folder,['session_check.csv']))
 end
 
 
-function out=date_compare(folder_contents,key)
-%Helper function to compare dates 
 
-    names=folder_contents(find(contains({folder_contents.name},key)));
-    out=datetime(names(1).date);
+%Get date into proper format
+function out = date_compare(folder_contents,key)
+    names = folder_contents(find(contains({folder_contents.name},key)));
+    out = datetime(names(1).date);
     if length(names)>1
-        for i=2:length(names)
+        for i = 2:length(names)
             if datetime(names(i).date)>out
-            out=datetime(names(i).date);
+            out = datetime(names(i).date);
             end
         end
     end
     out=datestr(out,'mm/dd/yy');
 end
+
 
 function out=insert_date (name)
 %Helper function to get date into proper formatfunction out=insert_date (name)

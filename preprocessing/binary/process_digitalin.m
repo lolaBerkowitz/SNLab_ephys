@@ -4,7 +4,7 @@ function digitalIn = process_digitalin(basepath,fs,varargin)
 
 p = inputParser;
 addParameter(p,'dat_name','digitalin.dat',@ischar) %snlab rig wiring for events
-addParameter(p,'filter_channels',[1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16],@isnumeric) %channels to apply median filter in case of noise
+addParameter(p,'filter_channels',[1 2 3 4 5 6 7 8 9 10 11 12 13 14 15],@isnumeric) %channels to apply median filter in case of noise
 addParameter(p,'lag',20,@isnumeric)
 parse(p,varargin{:});
 
@@ -12,7 +12,7 @@ dat_name = p.Results.dat_name;
 filter_channels = p.Results.filter_channels;
 lag = p.Results.lag; 
 
-% check if digitalin.events.map exists and load if so
+% % check if digitalin.events.map exists and load if so
 if isfile([basepath,filesep,'digitalin.events.mat'])
     load([basepath,filesep,'digitalin.events.mat'])
     return 
