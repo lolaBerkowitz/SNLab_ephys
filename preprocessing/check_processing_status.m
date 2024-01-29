@@ -223,7 +223,7 @@ writetable(session_status,fullfile(data_folder,['session_check_',datestr(date),'
 
 end
 %Get date into proper format
-function out=date_compare(folder_contents,key)
+function out = date_compare(folder_contents,key)
     names = folder_contents(find(contains({folder_contents.name},key)));
     out = datetime(names(1).date);
     if length(names)>1
@@ -235,9 +235,16 @@ function out=date_compare(folder_contents,key)
     end
     out=datestr(out,'mm/dd/yy');
 end
-function out = insert_date (name)
+
+function out=insert_date (name)
+%Helper function to get date into proper formatfunction out=insert_date (name)
+
     tempPath=dir(name);
-    out=datestr(tempPath(length(tempPath)).date, 'mm/dd/yy');
+    try
+        out=datestr(tempPath(length(tempPath)).date, 'mm/dd/yy');
+    catch exception
+        out='MIA';
+    end
 end
 
 
