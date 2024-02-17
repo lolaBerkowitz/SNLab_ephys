@@ -213,7 +213,7 @@ if contains(name,{'multi'})
     config_name = configs{multi_idx & ~object_idx};
 elseif contains(name,{'object'})
     config_name = configs{~multi_idx & object_idx & ~open_field_idx};
-elseif contains(name,{'context','open_field','morph','circular_track','pairing_A','pairing_B'})
+elseif contains(name,{'context','open_field','morph','circular_track','pairing_A','pairing_B','linear_track'})
     config_name = configs{~multi_idx & ~object_idx & open_field_idx};
 elseif contains(name,{'pre_test','post_test'})
     config_name = configs{place_preference_idx};
