@@ -91,7 +91,7 @@ if ~isempty(dir([basepath,filesep,'amplifier.xml']))
 end
 
 % Create SessionInfo (only run this once!)
-session = sessionTemplate(basepath,'showGUI',true);
+session = sessionTemplate(basepath,'showGUI',false);
 
 % Load rhd file 
 % Load info.rhd for recording parameters
@@ -122,7 +122,7 @@ if digitalInputs
 end
 
 % Epochs derived from digital inputs for multianimal recordings
-update_epochs('basepath',basepath,'annotate',check_epochs,'overwrite',false)
+update_epochs('basepath',basepath,'annotate',check_epochs)
 
 % Auxilary input
 if getAcceleration
@@ -160,12 +160,15 @@ if stateScore
 end
 
 if kilosort
-    % For Kilosort: create channelmap
-    if ~isempty(session.channelTags.Bad.channels)
-        createChannelMapFile_KSW(basepath,basename,'staggered',session.channelTags.Bad.channels);
-    else
-         createChannelMapFile_KSW(basepath,basename,'staggered');
-    end
+
+    create_channelmap(basepath)
+    
+%     % For Kilosort: create channelmap
+%     if ~isempty(session.channelTags.Bad.channels)
+%         createChannelMapFile_KSW(basepath,basename,'staggered',session.channelTags.Bad.channels);
+%     else
+%          createChannelMapFile_KSW(basepath,basename,'staggered');
+%     end
     
     % creating a folder on the ssd for chanmap,dat, and xml
     ssd_folder = fullfile(ssd_path, basename);
