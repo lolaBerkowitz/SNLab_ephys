@@ -24,7 +24,7 @@ p = inputParser;
 p.addParameter('maze_coords',true,@islogical)
 p.addParameter('overwrite_behavior',true,@islogical)
 p.addParameter('config_path','C:\Users\schafferlab\github\SNLab_ephys\behavior\behavior_configs\')
-p.addParameter('metadata_path','Y:\laura_berkowitz\app_ps1_ephys\behavior\behavior_metadata.csv')
+p.addParameter('metadata_path','Y:\laura_berkowitz\behavior_metadata.csv')
 p.addParameter('experiment_type','ephys')
 
 
@@ -37,7 +37,7 @@ experiment_type = p.Results.experiment_type;
 basename = basenameFromBasepath(basepath);
 
 % skip if no tracking found
-if isempty(dir([basepath,filesep,'*DLC*.csv'])) || isempty(dir([basepath,filesep,'*godot*.csv']))
+if isempty(dir([basepath,filesep,'*DLC*.csv'])) && isempty(dir([basepath,filesep,'*godot*.csv']))
     disp('No tracking found. Skipping session')
 end
 
@@ -67,7 +67,7 @@ if ismember(experiment_type,'ephys')
     
 else
     
-        general_behavior_file_SNlab('basepath',basepath,'force_overwrite',overwrite_behavior)
+     general_behavior_file_SNlab('basepath',basepath,'force_overwrite',overwrite_behavior)
 
 end
 
