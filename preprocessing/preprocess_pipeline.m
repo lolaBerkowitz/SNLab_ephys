@@ -1,3 +1,4 @@
+
 % Procedure for processing electrophysiology data in the SNLab
 %
 % Dependencies
@@ -21,6 +22,8 @@
 % LBerkowitz 2021
 
 %% paths for individual research projects 
+% laura = 'Y:\laura_berkowitz\VR_ephys\data';
+% laura = 'Y:\laura_berkowitz\alz_stim';
 laura = 'Y:\laura_berkowitz\app_ps1_ephys\data';
 
 %% Multi-animal recording session 
@@ -28,16 +31,16 @@ laura = 'Y:\laura_berkowitz\app_ps1_ephys\data';
 % For SNLab, assumes one animal per active port (64 channel electrodes) as
 % of 2/22
 % subject folder corresponds to port A, B, C, D, respectively
-subject_order = {[],[],[],[]};
+subject_order = {'hpc07','hpc10','hpc09',[]};
 
 % folder where dat files reside that need to be split
-data_path = 'Y:\laura_berkowitz\app_ps1_ephys\data\to_split\hpc07_hpc09_hpc10_220608_095940';
+data_path ='Y:\laura_berkowitz\app_ps1_ephys\data\to_split\june13_220613_095101';
 
 % project folder where subjects data should be saved
 save_path = {laura,laura,laura,[]}; 
     
-% split dat files 
-split_dat(data_path,save_path, subject_order,'trim_dat',false)
+% split dat files a
+split_dat(data_path,save_path, subject_order,'trim_dat',true)
 
 %% Process tracking (Done first so tracking can be updated in preprocess_session)
 % Open anaconda prompt and open gui
@@ -52,14 +55,20 @@ split_dat(data_path,save_path, subject_order,'trim_dat',false)
 % to be analyzed. Let them run overnight while split dat runs. 
 
 %% Single Session Preprocess
-basepath = 'Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day35_220614_100545';
+basepath = 'Y:\laura_berkowitz\alz_stim\data\beta\beta_day18_230919_090816';
 
 % Check xml/channel mapping: verify channel map, skip bad channels, and save 
 % make_xml(basepath)
 
-% Preprocess (create lfp, get digital signals, behavior tracking, kilosort)
-preprocess_session(basepath,'digitalInputs',false,'kilosort',true,'tracking',false)
+% Preprocess (create lfp, kilosort)
 
+
+% OPTO ONLY - Preprocess (create lfp, kilosort)
+preprocess_session(basepath,'digitalInputs',true,'kilosort',false,'tracking',false)
+
+
+% multiple shank 
+preprocess_session(basepath,'digitalInputs',false,'kilosort',false,'tracking',false,'specialChannels',[])
 
 
 %% Batch preprocess (must make sure xml is made/accurate before running)
@@ -91,9 +100,12 @@ gui_session
 
 %% find ripples
 % first input [ripple channel, sharp wave channel] using intan channels. 
-ripples = DetectSWR([session.channelTags.Ripple.channels,...
-    session.channelTags.SharpWave.channels,...
-    session.channelTags.Bad.channels(1)],...
+ripple_channel = session.brainRegions.CA1sp.channels(end-1);
+sharp_wave_channel = session.brainRegions.CA1sr.channels(end-3);
+noise_channel = 46;
+ripples = DetectSWR([ripple_channel,...
+    sharp_wave_channel,...
+    noise_channel],...
     'thresSDrip',[.25,.5],...
     'thresSDswD',[.25,.5],...
     'saveMat',true,...
@@ -105,6 +117,7 @@ cell_metrics = ProcessCellMetrics('session',session,'manualAdjustMonoSyn',false)
 % GUI to manually curate cell classification. This is not neccesary at this point.
 % It is more useful when you have multiple sessions
 cell_metrics = CellExplorer('metrics',cell_metrics);
+channel_mapping('basepath',basepath)
 
 
 %% To load multiple sessions into CellExplorer
@@ -207,17 +220,17 @@ df = compile_sessions(data_folder);
 
 % loop through basepaths in df and process those that don't have evidence of
 % processing (in this case chanMap.mat)
-for i = 1:length({df.basepath})
+for i = 1:length(df.basepath)
     try
-    basepath = df.basepath{i};
-    
+    basepath = df.basepath{i}{:};
+    basename = basenameFromBasepath(basepath);
     % Check xml/channel mapping: verify channel map, skip bad channels, and save 
 %     if ~exist([basepath,filesep,'amplifier.xml'],'file')
 %         make_xml(basepath)
 %     end
      
-        if isempty(dir(fullfile(basepath,[folders(i).name,'.lfp'])))
-            preprocess_session(basepath,'digitalInputs',false,'check_epochs',false,'kilosort',true)
+        if isempty(dir(fullfile(basepath,[basename,'.lfp'])))
+            preprocess_session(basepath,'digitalInputs',false,'check_epochs',false,'kilosort',false)
             channel_mapping('basepath',basepath)
         else
             channel_mapping('basepath',basepath)
