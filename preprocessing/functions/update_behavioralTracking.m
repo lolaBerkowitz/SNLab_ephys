@@ -19,7 +19,7 @@ p=inputParser;
 addParameter(p,'basepath',pwd); % single or many basepaths in cell array or uses pwd
 addParameter(p,'annotate',false); % save animal.behavior.mat
 addParameter(p,'tags',{'base','learning','test','OF','open_field','morph',...
-    'track','context','vr','pre_test','pairing_A','pairing_B'}); % save animal.behavior.mat
+    'track','context','vr','pre_test','pairing_A','pairing_B','linear_track'}); % save animal.behavior.mat
 addParameter(p,'force',false); % save animal.behavior.mat
 
 parse(p,varargin{:});
