@@ -237,8 +237,8 @@ classdef behavior_funcs
             
             %Creates bin edges for heatmap
             
-            xedge=linspace(min(x),max(x),round(range(x)/binsize));
-            yedge=linspace(min(y),max(y),round(range(y)/binsize));
+            xedge=linspace(nanmin(x),nanmax(x),round(range(x)/binsize));
+            yedge=linspace(nanmin(y),nanmax(y),round(range(y)/binsize));
             
             %Bin coordinates for heat map and apply guassian filter to smooth
             [map] = histcounts2(x,y,xedge,yedge);
