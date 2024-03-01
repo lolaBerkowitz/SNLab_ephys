@@ -41,6 +41,15 @@ end
 
 function main(basepath,metadata_path)
 
+basename = basenameFromBasepath(basepath);
+% check is session file exists, if not make one 
+
+
+if  ~exist([basepath,filesep,[basename,'.session.mat']],'file')
+    session = sessionTemplate(basepath); 
+    save(fullfile(basepath,[basename,'.session.mat']),'session')
+end
+
 % Make events from DLC
 make_events('basepath',basepath);
 
