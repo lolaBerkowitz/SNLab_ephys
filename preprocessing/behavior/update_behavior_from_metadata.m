@@ -74,7 +74,7 @@ for i = 1:length(basenames)
     if ~isempty(behavior.trials)
         continue
     else
-    % update behavior.trials from trial_start/stop columns
+    %% update behavior.trials from trial_start/stop columns
     update_trials(basepath,df)
     end
     % update behavior.epochs.maze_size from maze_size column
@@ -170,7 +170,11 @@ for ii = 1:length(session.behavioralTracking)
     vid_ts = behavior.timestamps(behavior.timestamps >= start_ts & behavior.timestamps <= stop_ts);
     % frames are inicies for timestamps
     ts = vid_ts(frames(~isnan(frames)));
-    trial_ts = [trial_ts; ts(start_idx)' ts(stop_idx)'];
+    for t_idx = 1:length(start_idx)
+        temp_trial_ts(t_idx,:) = [ts(start_idx(t_idx)), ts(stop_idx(t_idx))];
+    end
+    trial_ts = [trial_ts; temp_trial_ts];
+    clear temp_trial_ts
 %     trial_name{t_n:t_n+length(ts(start_idx)')-1} = repmat(name,length(ts(start_idx)',1));
     for t = 1:length(ts(start_idx))
         trial_id{t_n} = [name,['_',num2str(t)]];
