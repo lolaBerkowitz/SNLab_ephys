@@ -23,24 +23,24 @@
 
 %% paths for individual research projects 
 % laura = 'Y:\laura_berkowitz\VR_ephys\data';
-% laura = 'Y:\laura_berkowitz\alz_stim';
-laura = 'Y:\laura_berkowitz\app_ps1_ephys\data';
+laura = 'Y:\laura_berkowitz\alz_stim\data';
+% laura = 'Y:\laura_berkowitz\app_ps1_ephys\data';
 
 %% Multi-animal recording session 
 % For sessions that record from multiple headstages from separate animals.
 % For SNLab, assumes one animal per active port (64 channel electrodes) as
 % of 2/22
 % subject folder corresponds to port A, B, C, D, respectively
-subject_order = {'hpc07','hpc10','hpc09',[]};
+subject_order = {'beta','crimp',[],[]};
 
 % folder where dat files reside that need to be split
-data_path ='Y:\laura_berkowitz\app_ps1_ephys\data\to_split\june13_220613_095101';
+data_path ='Y:\laura_berkowitz\alz_stim\data\to_split\beta_crimp_16Aug2023_230816_120120';
 
 % project folder where subjects data should be saved
-save_path = {laura,laura,laura,[]}; 
+save_path = {laura,laura,[],[]}; 
     
 % split dat files a
-split_dat(data_path,save_path, subject_order,'trim_dat',true)
+split_dat(data_path,save_path, subject_order,'trim_dat',false)
 
 %% Process tracking (Done first so tracking can be updated in preprocess_session)
 % Open anaconda prompt and open gui
@@ -64,7 +64,7 @@ basepath = 'Y:\laura_berkowitz\alz_stim\data\beta\beta_day18_230919_090816';
 
 
 % OPTO ONLY - Preprocess (create lfp, kilosort)
-preprocess_session(basepath,'digitalInputs',true,'kilosort',false,'tracking',false)
+preprocess_session(basepath,'digitalInputs',true,'kilosort',true,'tracking',true)
 
 
 % multiple shank 
