@@ -1,5 +1,5 @@
 % This script postprocesses behavior data only in CellExplorer format.
-function process_behavior_folder(data_path,metadata_path,varargin)
+function process_behavior_batch(data_path,metadata_path,varargin)
 
 
 % Assumes general behavior file and *maze_coords.csv is in basepath.
