@@ -20,6 +20,7 @@ function preprocess_session(basepath,varargin)
 
 p = inputParser;
 addParameter(p,'analogInputs',false,@islogical);
+addParameter(p,'multishank',false,@islogical);
 addParameter(p,'analogChannels',[],@isnumeric);
 addParameter(p,'digitalInputs',false,@islogical);
 addParameter(p,'digitalChannels',[],@isnumeric);
@@ -43,6 +44,7 @@ addParameter(p,'maze_size',30,@isnumeric); % in cm
 parse(p,varargin{:});
 
 analogInputs = p.Results.analogInputs;
+multishank = p.Results.multishank;
 analogChannels = p.Results.analogChannels;
 digitalInputs = p.Results.digitalInputs;
 digitalChannels = p.Results.digitalChannels;
@@ -92,6 +94,8 @@ end
 
 % Create SessionInfo (only run this once!)
 session = sessionTemplate(basepath,'showGUI',false);
+save([basepath,filesep,[basename,'.session.mat']],'session')
+
 
 % Load rhd file 
 % Load info.rhd for recording parameters
@@ -161,14 +165,18 @@ end
 
 if kilosort
 
-    create_channelmap(basepath)
+    if ~multishank
+        % for single poly2 shank 64channels
+        create_channelmap(basepath)
     
-%     % For Kilosort: create channelmap
-%     if ~isempty(session.channelTags.Bad.channels)
-%         createChannelMapFile_KSW(basepath,basename,'staggered',session.channelTags.Bad.channels);
-%     else
-%          createChannelMapFile_KSW(basepath,basename,'staggered');
-%     end
+    elseif multishank
+        % For Kilosort: create channelmap
+        if ~isempty(session.channelTags.Bad.channels)
+            createChannelMapFile_KSW(basepath,basename,'staggered',session.channelTags.Bad.channels);
+        else
+             createChannelMapFile_KSW(basepath,basename,'staggered');
+        end
+    end
     
     % creating a folder on the ssd for chanmap,dat, and xml
     ssd_folder = fullfile(ssd_path, basename);
