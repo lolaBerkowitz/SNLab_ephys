@@ -5,7 +5,7 @@ function check_process_summary(paths)
 %"data" folders
 %
 %Input (for mac):
-%   paths: ["/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys",...
+%   paths (str array): ["/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys",...
 %   "/Volumes/sn data server 3/laura_berkowitz/alz_stim"];
 %
 %Output:
@@ -13,6 +13,7 @@ function check_process_summary(paths)
 %   creates Combined.csv in folder containing check_process_summary.m which
 %   combines all session_check.csv created by check_processing_status
 
+% updated documention to clarify the output csv 
 
 filePaths=[];
 for i=1:length(paths)
