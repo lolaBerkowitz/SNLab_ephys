@@ -31,10 +31,10 @@ laura = 'Y:\laura_berkowitz\alz_stim\data';
 % For SNLab, assumes one animal per active port (64 channel electrodes) as
 % of 2/22
 % subject folder corresponds to port A, B, C, D, respectively
-subject_order = {'beta','crimp',[],[]};
+subject_order = {'grigri','etrier',[],[]};
 
 % folder where dat files reside that need to be split
-data_path ='Y:\laura_berkowitz\alz_stim\data\to_split\beta_crimp_16Aug2023_230816_120120';
+data_path ='Y:\laura_berkowitz\alz_stim\data\to_split\grigri_day17_etrier_day20_240320_124022';
 
 % project folder where subjects data should be saved
 save_path = {laura,laura,[],[]}; 
@@ -55,7 +55,7 @@ split_dat(data_path,save_path, subject_order,'trim_dat',false)
 % to be analyzed. Let them run overnight while split dat runs. 
 
 %% Single Session Preprocess
-basepath = 'Y:\laura_berkowitz\alz_stim\data\beta\beta_day18_230919_090816';
+basepath = 'Y:\laura_berkowitz\alz_stim\data\etrier\etrier_day17_231130_112605';
 
 % Check xml/channel mapping: verify channel map, skip bad channels, and save 
 % make_xml(basepath)
@@ -64,11 +64,11 @@ basepath = 'Y:\laura_berkowitz\alz_stim\data\beta\beta_day18_230919_090816';
 
 
 % OPTO ONLY - Preprocess (create lfp, kilosort)
-preprocess_session(basepath,'digitalInputs',true,'kilosort',true,'tracking',true)
+preprocess_session(basepath,'digitalInputs',true,'kilosort',true,'tracking',false)
 
 
 % multiple shank 
-preprocess_session(basepath,'digitalInputs',false,'kilosort',false,'tracking',false,'specialChannels',[])
+preprocess_session(basepath,'digitalInputs',false,'kilosort',true,'tracking',true,'specialChannels',[])
 
 
 %% Batch preprocess (must make sure xml is made/accurate before running)
@@ -100,8 +100,8 @@ gui_session
 
 %% find ripples
 % first input [ripple channel, sharp wave channel] using intan channels. 
-ripple_channel = session.brainRegions.CA1sp.channels(end-1);
-sharp_wave_channel = session.brainRegions.CA1sr.channels(end-3);
+ripple_channel = 62%session.brainRegions.CA1sp.channels(end-1);
+sharp_wave_channel = 58%session.brainRegions.CA1sr.channels(end-3);
 noise_channel = 46;
 ripples = DetectSWR([ripple_channel,...
     sharp_wave_channel,...
@@ -230,7 +230,7 @@ for i = 1:length(df.basepath)
 %     end
      
         if isempty(dir(fullfile(basepath,[basename,'.lfp'])))
-            preprocess_session(basepath,'digitalInputs',false,'check_epochs',false,'kilosort',false)
+            preprocess_session(basepath,'digitalInputs',false,'check_epochs',false,'kilosort',false,'overwrite',false)
             channel_mapping('basepath',basepath)
         else
             channel_mapping('basepath',basepath)
