@@ -14,7 +14,6 @@ for i = 1:length(behavior.trialsID)
     axs(1) = subplot(2,length(behavior.trialsID),i,'align');
     b = imagesc(flipud(occ));
     axis image
-    axis equal
     axis off
     set(b,'AlphaData',~isnan(flipud(occ)))
         title(behavior.trialsID{i})
@@ -22,7 +21,6 @@ for i = 1:length(behavior.trialsID)
     axs(2) = subplot(2,length(behavior.trialsID),i+length(behavior.trialsID)) ;
     plot(behavior.position.x(idx),behavior.position.y(idx),'k')
     axis image
-    axis equal
     axis off
 end
 
