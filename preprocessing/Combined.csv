@@ -1,343 +1,352 @@
 group,basepath,lfp,sleep_states,tracking_dlc,tracking_animalBehavior,tracking_restrictxy,sorting_Kilosort,sorting_phyRez,tracking_sessionBehavioralTracking,cell_metrics,ripples,anatomical_map,behavior_scoring
-hpc01,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc01/day00_211026_134000,1,1,0,0,0,1,1,0,1,1,1,0
-hpc01,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc01/day01_211027_123548,1,1,0,0,0,1,1,0,1,1,1,0
-hpc01,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc01/day02_211028_123848,1,0,0,0,0,1,1,0,1,1,1,0
-hpc01,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc01/day03_211029_153139,1,1,0,0,0,1,1,0,1,1,1,0
-hpc01,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc01/day04_211030_130255,1,1,0,0,0,1,1,0,1,1,1,0
-hpc01,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc01/day05_211101_140116,1,0,0,0,0,1,1,0,0,1,1,0
-hpc01,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc01/day06_211102_144909,1,1,0,0,0,1,1,0,1,1,1,0
-hpc01,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc01/day07_211103_083457,1,1,0,0,0,1,1,0,1,1,1,0
-hpc01,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc01/day08_211104_093612,1,1,0,0,0,1,1,0,1,1,1,0
-hpc01,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc01/day09_211105_093814,1,1,0,0,0,1,1,0,1,1,1,0
-hpc01,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc01/day10_211108_111237,1,1,0,0,0,1,1,0,0,1,1,0
-hpc01,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc01/day11_211109_121437,1,1,0,0,0,1,1,0,0,1,1,0
-hpc01,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc01/day12_211110_110332,1,1,0,0,0,1,1,0,1,1,1,0
-hpc01,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc01/day13_211112_090227,1,1,0,0,0,1,1,0,1,1,1,0
-hpc01,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc01/day14_211113_103545,1,1,0,0,0,1,1,0,0,1,1,0
-hpc01,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc01/day15_211114_131201,1,0,0,0,0,1,1,1,0,1,1,1
-hpc01,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc01/day16_211115_111612,1,1,0,1,0,1,1,1,1,1,1,0
-hpc01,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc01/day17_211117_103141,1,1,0,0,0,1,1,0,1,1,1,0
-hpc01,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc01/day18_211118_100756,1,1,0,0,0,1,1,0,1,1,1,0
-hpc01,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc01/day19_211119_111607,1,1,0,0,0,1,1,0,1,1,1,0
-hpc01,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc01/day21_211122_124408,1,1,0,0,0,1,1,0,1,1,1,0
-hpc01,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc01/day22_211123_115045,1,1,0,0,0,1,1,0,1,1,1,0
-hpc01,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc01/day23__211129_124432,1,1,0,0,0,1,1,0,1,1,1,0
-hpc01,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc01/day24_211130_123545,1,1,0,0,0,1,1,0,1,1,1,0
-hpc01,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc01/day25_211201_085422,1,1,0,0,0,1,1,0,1,1,1,0
-hpc01,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc01/day26_211202_100114,1,1,0,0,0,1,1,0,1,1,1,0
-hpc01,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc01/day27_211203_095713,1,1,0,0,0,1,1,0,1,1,1,0
-hpc04,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc04/day00_220211_155904,1,1,0,0,0,1,1,0,1,1,1,0
-hpc04,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc04/day01_220212_130538,1,1,0,0,0,1,1,0,1,1,1,0
-hpc04,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc04/hpc04_day02_220213_132346,1,1,0,0,0,1,1,0,1,1,1,0
-hpc04,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc04/hpc04_day03_220214_115829,1,1,1,1,1,1,1,1,1,1,1,0
-hpc04,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc04/hpc04_day04_220215_103627,1,1,1,0,0,1,1,0,1,1,1,0
-hpc04,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc04/hpc04_day05_220216_112541,1,1,1,1,1,1,1,1,1,1,1,0
-hpc04,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc04/hpc04_day06_220217_085558,1,1,1,1,1,1,1,1,1,1,1,1
-hpc04,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc04/hpc04_day07_220218_100553,1,1,0,0,0,1,1,0,1,1,1,0
-hpc04,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc04/hpc04_day08_220219_124637,1,1,0,0,0,1,1,0,1,1,1,0
-hpc04,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc04/hpc04_day09_220221_094101,1,1,1,1,1,1,1,1,1,1,1,1
-hpc04,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc04/hpc04_day10_220222_095721,1,1,0,0,0,1,1,0,1,1,1,0
-hpc04,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc04/hpc04_day11_220223_095442,1,1,0,0,0,1,1,0,1,1,1,0
-hpc04,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc04/hpc04_day12_220225_115348,1,1,1,1,1,1,1,1,1,1,1,1
-hpc04,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc04/hpc04_day13_220226_125913,1,1,0,0,0,1,1,0,1,1,1,0
-hpc04,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc04/hpc04_day14_220227_081649,1,1,0,0,0,1,1,0,1,1,1,0
-hpc04,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc04/hpc04_day15_220301_094823,1,1,1,1,1,1,1,1,1,1,1,1
-hpc04,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc04/hpc04_day16_220302_103144,1,1,0,0,0,1,1,0,1,1,1,0
-hpc04,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc04/hpc04_day17_220303_122516,1,1,0,0,0,1,1,0,1,1,1,0
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day00_220303_122516,1,1,0,0,0,1,1,0,1,1,1,0
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day01_220304_103857,1,1,0,0,0,1,1,0,1,1,1,0
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day02_220307_094326,1,1,0,0,0,1,1,0,0,1,1,0
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day03,1,1,0,0,0,1,0,0,0,1,1,0
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day04_220309_085753,1,1,1,1,1,1,0,1,0,1,1,0
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day05_220310_113927,1,1,1,1,1,1,0,1,0,1,1,0
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day06_220311_134342,1,1,1,1,1,1,0,1,0,1,1,0
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day07_220313_140520,1,1,0,0,0,1,0,0,0,1,1,0
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day08_220314_093036,1,1,0,0,0,1,1,0,1,1,1,0
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day09_220315_101140,1,1,0,0,0,1,0,0,0,1,1,0
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day10_220316_095114,1,1,1,1,1,1,1,1,1,1,1,1
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day11_220317_090555,1,1,0,0,0,1,1,0,1,1,1,0
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day12_220318_130744,1,1,0,0,0,1,0,0,0,1,1,0
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day13_220319_101549,1,1,0,0,0,1,0,0,0,1,1,0
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day14_220320_102335,1,1,1,1,1,1,1,1,1,1,1,1
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day15_220321_124146,1,1,0,0,0,1,0,0,0,1,1,0
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day16_220322_095924,1,1,0,0,0,1,0,0,0,1,1,0
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day17_220324_085048,1,1,1,1,1,1,1,1,1,1,1,1
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day18_220325_094521,1,1,0,0,0,1,0,0,0,1,1,0
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day19_220326_134737,1,1,0,0,0,1,0,0,0,1,1,0
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day20_220328_094147,1,1,1,1,1,1,1,1,1,1,1,1
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day21_220329_101843,1,1,0,0,0,1,1,0,1,1,1,0
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day22_220330_102036,1,1,0,0,0,1,0,0,0,1,1,0
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day23_220401_102719,1,1,0,0,0,1,1,0,1,1,1,0
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day24_220402_114358,1,1,1,1,1,1,1,1,1,1,1,0
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day25_220403_125728,1,1,1,0,0,0,0,0,0,1,1,0
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day26_220404_121037,1,1,1,0,0,0,0,0,0,1,1,0
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day27_220405_103420,1,1,1,0,0,0,0,0,0,1,1,0
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day28_220406_101032,1,1,1,1,1,0,0,1,0,1,1,0
-hpc05,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc05/hpc05_day29_220407_124118,1,1,1,1,1,1,1,1,1,1,1,0
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day00_220303_122516,1,1,0,0,0,1,0,0,0,0,1,0
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day01_220304_103857,1,1,0,0,0,1,0,0,0,1,1,0
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day02_220307_094326,1,1,0,0,0,1,0,0,0,1,1,0
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day03,1,1,0,0,0,1,0,0,0,0,1,0
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day04_220309_085753,1,1,1,0,1,1,1,1,1,1,1,0
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day05_220310_113927,1,1,1,1,1,1,1,1,0,1,1,0
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day06_220311_134342,1,1,1,1,1,1,1,1,0,1,1,0
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day07_220313_140520,1,1,0,0,0,1,0,0,0,1,1,0
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day08_220314_093036,1,1,0,0,0,1,0,0,0,1,1,0
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day09_220315_101140,1,1,0,0,0,1,0,0,0,1,1,0
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day10_220316_095114,1,1,0,0,0,1,0,0,0,1,1,0
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day11_220317_090555,1,1,0,0,0,1,0,0,0,1,1,0
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day12_220318_130744,1,1,0,0,0,0,0,0,0,1,1,0
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day13_220319_101549,1,1,0,0,0,0,0,0,0,1,1,0
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day14_220320_102335,1,1,1,1,1,1,1,1,1,1,1,1
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day15_220321_124146,1,1,0,0,0,0,0,0,0,1,1,0
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day16_220322_095924,1,1,0,0,0,0,0,0,0,1,1,0
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day17_220324_085048,1,1,1,1,1,1,1,1,1,1,1,1
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day18_220325_094521,1,1,0,0,0,0,0,0,0,1,1,0
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day19_220326_134737,1,1,0,0,0,0,0,0,0,1,1,0
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day20_220328_094147,1,1,1,0,0,0,0,0,0,1,1,0
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day21_220329_101843,1,1,0,0,0,0,0,0,0,1,1,0
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day22_220330_102036,1,1,0,0,0,0,0,0,0,1,1,0
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day23_220401_102719,1,1,1,1,1,1,1,1,1,1,1,1
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day24_220402_114358,1,1,0,0,0,0,0,0,0,1,1,0
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day25_220403_125728,1,1,0,0,0,0,0,0,0,1,1,0
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day26_220404_121037,1,1,0,0,0,0,0,0,0,1,1,0
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day27_220405_103420,1,1,1,1,1,1,1,1,1,1,1,1
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day28_220406_101032,1,1,0,0,0,0,0,0,0,1,1,0
-hpc06,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc06/hpc06_day29_220407_124118,1,1,0,0,0,0,0,0,0,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day00_220423_101033,1,1,0,0,0,0,0,0,0,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day01_220424_122746,1,1,0,0,0,0,0,0,0,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day02_220425_100010,1,1,1,1,1,1,1,1,1,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day03_220426_104417,1,1,1,1,1,0,0,1,0,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day04_220427_102034,1,1,1,1,1,1,1,1,0,0,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day06_220429_081606,1,1,1,0,0,1,1,0,1,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day07_220430_091926,1,1,1,1,1,1,1,1,1,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day08_220501_094841,1,1,1,1,1,1,1,1,1,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day09_220502_101004,1,1,0,0,0,0,0,0,0,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day10_220503_082347,1,1,1,1,1,1,1,1,1,1,1,1
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day11_220504_080057,1,1,1,1,1,1,1,1,1,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day12_220505_054652,1,1,1,1,1,1,1,1,1,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day13_220507_111833,1,1,1,0,0,0,0,0,0,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day14_220508_104051,1,1,0,0,0,0,0,0,0,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day15_220510_103311,1,1,0,0,0,0,0,0,0,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day16_220511_100658,1,1,0,0,0,0,0,0,0,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day17_220512_084716,1,1,1,0,0,0,0,0,0,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day18_220513_095958,1,1,1,0,0,0,0,0,0,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day19_220514_144542,1,1,0,0,0,0,0,0,0,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day20_220515_150105,1,1,0,0,0,0,0,0,0,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day21_220516_130204,1,1,1,1,1,0,0,1,0,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day22_220517_125646,1,1,1,0,0,0,0,0,0,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day23_220518_101128,1,1,1,0,0,0,0,0,0,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day24_220520_100539,1,1,0,0,0,0,0,0,0,0,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day25_220524_093304,1,1,1,1,1,1,1,1,1,1,1,1
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day26_220525_115604,1,1,0,0,0,1,1,0,1,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day27_220526_092204,1,1,1,1,1,0,0,1,0,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day28_220527_112747,0,0,1,0,0,0,0,0,0,0,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day29_220528_1105,1,1,1,1,1,1,1,1,1,1,1,1
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day30_220529_153136,1,1,0,0,0,1,1,0,1,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day31_220531_125150,1,1,1,1,1,1,1,1,1,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day32_220601_102938,0,0,1,0,0,0,0,0,0,0,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day33_220602_120600,1,1,1,1,1,0,0,1,0,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day34_220604_103918,0,0,0,0,0,0,0,0,0,0,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day35_220606_085359,1,1,1,1,1,1,1,1,1,1,1,1
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day36_220607_120154,1,1,1,1,1,1,1,1,1,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day37_220608_095940,1,1,1,0,0,1,1,0,0,0,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day38_220609_085949,0,0,1,0,0,0,0,0,0,0,0,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day39_220610_101437,1,1,1,1,1,1,1,1,1,1,1,1
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day40_220613_095101,0,0,1,0,0,0,0,0,0,0,0,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day41_220614_100545,1,1,1,1,1,1,1,1,1,1,1,1
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day42_220615_123134,1,1,1,0,0,1,1,0,1,0,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day43_220616_100529,0,0,0,0,0,0,0,0,0,0,0,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day44_220620_094419,0,0,1,0,0,0,0,0,0,0,0,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day45_220622_085917,1,1,0,0,0,0,0,0,0,0,0,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day46_220624_100710,0,0,0,0,0,0,0,0,0,0,0,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day47_220706_120851,0,0,0,0,0,0,0,0,0,0,0,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day48_220707_140624,0,0,1,0,0,0,0,0,0,0,0,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day49_220711_093702,0,0,1,0,0,0,0,0,0,0,0,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day50_220712_094047,1,1,1,1,1,1,1,1,1,1,1,1
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day51_220718_095343,1,1,1,0,0,1,1,0,0,0,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day52_220719_125658,1,1,1,1,1,1,0,1,0,1,1,0
-hpc07,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc07/hpc07_day53_220720_085700,1,1,1,1,1,1,1,1,1,1,1,1
-hpc08,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc08/hpc08_day01_220424_120935,0,0,0,0,0,0,0,0,0,0,0,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day00_220430_085919,1,1,0,0,0,0,0,0,0,1,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day01_220501_094841,1,1,1,0,0,0,0,0,0,1,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day02_220502_101004,1,1,0,0,0,0,0,0,0,1,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day03_220503_082347,1,1,1,1,1,0,0,1,0,1,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day04_220504_080057,1,1,1,1,1,0,0,1,0,1,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day05_220505_054652,1,1,1,1,1,1,1,1,1,1,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day06_220507_111833,1,1,1,1,1,1,1,1,1,1,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day07_220508_104051,1,1,0,0,0,0,0,0,0,1,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day08_220510_103311,1,1,0,0,0,1,1,0,1,1,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day09_220511_100658,1,1,0,0,0,0,0,0,0,1,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day10_220512_084716,1,1,1,1,1,1,1,1,1,1,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day11_220513_095958,1,1,1,1,1,1,1,1,1,1,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day12_220514_144542,1,1,0,0,0,0,0,0,0,1,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day13_220515_150105,1,1,0,0,0,0,0,0,0,1,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day14_220516_130204,1,1,1,1,1,0,0,1,0,1,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day15_220517_125646,1,1,1,1,1,0,0,1,0,1,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day16_220518_101128,1,1,1,1,1,1,1,1,1,1,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day17_220520_100539,1,1,0,0,0,1,0,0,0,0,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day18_220523_100542,0,0,1,1,1,1,0,1,0,0,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day19_220524_093304,1,1,1,1,1,1,1,1,1,1,1,1
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day20_220525_115604,1,1,0,0,0,1,1,0,1,1,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day21_220526_092204,1,1,1,0,0,0,0,1,0,0,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day22_220527_112747,1,1,1,1,1,0,0,1,0,0,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day23_220528_1105,1,1,1,1,1,1,1,1,1,1,1,1
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day24_220529_153136,1,1,0,0,0,1,1,0,1,1,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day25_220531_125150,1,1,1,1,1,1,1,1,0,0,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day26_220601_102938,1,1,1,1,1,0,0,1,0,0,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day27_220602_120600,1,0,1,0,0,0,0,0,0,0,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day28_220604_103918,1,1,0,0,0,0,0,0,0,0,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day29_220606_085359,1,1,1,1,1,1,1,1,1,1,1,1
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day30_220607_120154,1,1,1,1,1,1,1,1,1,1,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day31_220608_095940,1,1,1,0,0,1,1,0,0,0,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day32_220609_085949,0,0,1,0,0,0,0,0,0,0,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day33_220610_101437,1,1,1,1,1,1,1,1,1,1,1,1
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day34_220613_095101,0,0,1,0,0,0,0,0,0,0,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day35_220614_100545,1,1,1,1,1,1,1,1,1,1,1,1
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day36_220615_123134,1,1,1,1,1,1,1,1,1,1,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day37_220616_100529,0,0,0,0,0,0,0,0,0,0,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day38_220620_094419,0,0,1,0,0,0,0,0,0,0,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day39_220622_085917,1,1,1,1,1,1,1,1,1,1,1,1
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day40_220624_100710,0,0,0,0,0,0,0,0,0,0,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day41_220706_120851,0,0,0,0,0,0,0,0,0,0,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day42_220707_140624,0,0,1,0,0,0,0,0,0,0,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day43_220711_093702,0,0,0,0,0,0,0,0,0,0,1,0
-hpc09,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc09/hpc09_day44_220712_094047,1,1,1,1,1,1,1,1,1,1,1,1
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day00_220425_100010,1,1,1,1,1,1,1,1,1,1,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day01_220426_104417,1,1,1,1,1,0,0,1,0,1,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day02_220427_102034,1,1,1,1,1,1,1,1,0,0,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day04_220429_075518,1,1,0,0,0,0,0,0,0,0,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day05_220430_091203,1,1,0,0,0,0,0,0,0,0,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day06_220501_094841,1,1,1,1,1,0,0,1,0,1,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day07_220502_101004,1,1,0,0,0,0,0,0,0,1,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day08_220503_082347,1,1,1,1,1,1,1,1,1,1,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day09_220504_080057,1,1,0,0,0,0,0,0,0,1,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day10_220505_054652,1,1,1,1,1,1,1,1,1,1,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day11_220507_111833,1,1,1,1,1,1,1,1,1,1,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day12_220508_104051,1,1,0,0,0,0,0,0,0,1,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day13_220510_103311,1,1,0,0,0,0,0,0,0,1,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day14_220511_100658,1,1,0,0,0,0,0,0,0,1,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day15_220512_084716,1,1,1,1,1,0,0,1,0,1,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day16_220513_095958,1,1,0,0,0,1,1,0,1,1,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day17_220514_144542,1,1,0,0,0,1,1,0,1,1,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day18_220515_150105,1,1,0,0,0,1,1,0,1,1,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day19_220516_130204,1,1,0,0,0,1,1,0,1,1,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day20_220517_125646,1,1,0,0,0,0,0,0,0,1,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day21_220518_101128,1,1,0,0,0,0,0,0,0,1,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day22_220520_100539,1,1,0,0,0,0,0,0,0,0,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day23_220523_100542,1,1,0,0,0,1,1,0,0,0,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day24_220524_093304,1,1,0,0,0,1,1,0,1,1,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day25_220525_115604,1,1,0,0,0,1,1,0,1,1,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day26_220526_092204,1,1,0,0,0,1,1,0,1,1,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day27_220527_112747,1,1,0,0,0,1,1,0,0,0,0,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day28_220528_1105,0,0,0,0,0,0,0,0,0,0,0,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day29_220529_153136,0,0,0,0,0,0,0,0,0,0,0,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day30_220531_125150,0,0,0,0,0,0,0,0,0,0,0,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day31_220601_102938,0,0,1,0,0,0,0,0,0,0,0,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day32_220602_120600,1,1,1,1,1,1,1,1,1,1,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day33_220604_103918,0,0,0,0,0,0,0,0,0,0,0,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day34_220606_085359,1,1,1,0,0,0,0,0,0,0,0,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day35_220607_120154,1,1,1,1,1,1,1,1,0,0,0,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day36_220608_095940,1,1,1,1,1,1,1,1,1,1,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day37_220609_085949,0,0,1,0,0,0,0,0,0,0,0,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day38_220610_101437,1,1,1,1,1,1,1,1,1,1,1,1
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day39_220613_095101,0,0,1,0,0,0,0,0,0,0,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day40_220614_100545,1,1,1,1,1,1,1,1,1,1,1,1
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day41_220615_123134,1,1,0,0,0,1,1,0,1,1,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day42_220616_100529,0,0,0,0,0,0,0,0,0,0,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day43_220620_094419,0,0,1,0,0,0,0,0,0,0,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day44_220622_085917,1,1,1,1,1,1,1,1,1,1,1,1
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day45_220624_100710,1,1,0,0,0,1,1,0,0,0,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day46_220706_120851,0,0,0,0,0,0,0,0,0,0,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day47_220707_140624,0,0,1,0,0,0,0,0,0,0,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day48_220711_093702,0,0,1,0,0,0,0,0,0,0,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day49_220712_094047,1,1,1,1,1,1,1,1,1,1,1,1
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day50_220718_095343,0,0,1,0,0,0,0,0,0,0,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day51_220719_125658,1,1,1,1,1,1,1,1,1,1,1,0
-hpc10,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc10/hpc10_day52_220720_085700,1,1,1,1,1,1,1,1,1,1,1,1
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day00_221004_170156,1,1,0,0,0,1,1,0,0,0,0,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day01_221005_151833,1,1,0,0,0,1,1,0,0,0,0,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day02_221007_125408,1,1,1,1,1,1,1,1,0,0,0,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day03_221010_100017,1,1,1,1,1,1,1,1,1,1,1,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day04_221011_142658,1,1,1,0,0,1,1,0,0,0,0,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day05_221012_092344,1,1,1,0,0,1,1,0,0,0,0,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day06_221013_091728,1,1,1,1,1,1,1,1,1,1,1,1
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day07_221014_091431,1,1,1,1,1,1,1,1,1,1,1,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day08_221017_091310,1,1,1,1,1,1,1,1,1,1,1,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day09_221018_094018,1,1,0,0,0,1,1,0,0,0,0,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day10_221019_094334,1,1,1,1,1,1,1,1,1,1,1,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day11_221020_094745,1,1,1,1,1,1,1,1,1,1,1,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day12_221021_093052,1,1,1,0,0,0,0,0,0,0,0,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day13_221024_141314,1,1,1,1,1,1,1,1,1,1,1,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day14_221025_100013,1,1,1,1,1,1,1,1,1,1,1,1
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day15_221026_122041,1,1,1,1,1,1,1,1,1,1,1,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day16_221027_100515,0,0,0,0,0,0,0,0,0,0,0,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day17_221028_100641,1,1,1,1,1,1,1,1,1,1,1,1
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day18_221031_115022,1,1,1,1,1,1,1,1,0,0,0,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day19_221101_130218,0,0,0,0,0,0,0,0,0,0,0,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day20_221103_104043,0,0,0,0,0,0,0,0,0,0,0,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day21_221104_101218,1,1,1,1,1,1,1,1,1,1,1,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day22_221107_091059,1,1,1,1,1,1,1,1,0,0,0,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day23_221123_174650,0,0,0,0,0,0,0,0,0,0,0,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day24_221128_094515,0,0,1,0,0,0,0,0,0,0,0,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day25_221129_101529,1,1,1,1,1,0,0,1,0,0,0,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day26_221130_143642,0,0,0,0,0,0,0,0,0,0,0,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day27_221202_112725,0,0,1,0,0,0,0,0,0,0,0,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day28_221205_093423,0,0,0,0,0,0,0,0,0,0,0,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day29_221206_101111,1,1,1,1,1,1,1,1,1,1,1,1
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day30_221207_124643,1,1,1,1,1,1,1,1,1,1,1,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day31_221219_095535,1,1,0,0,0,0,0,0,0,0,0,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day32_221220_113156,1,1,0,0,0,0,0,0,0,0,0,0
-hpc11,/Volumes/sn data server 3/laura_berkowitz/app_ps1_ephys/data/hpc11/hpc11_day33_221221_094742,0,0,0,0,0,0,0,0,0,0,0,0
-beta,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/beta/beta_day00_230623_110054,0,0,0,0,0,0,0,0,0,0,0,0
-beta,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/beta/beta_day01,0,0,0,0,0,0,0,0,0,0,0,0
-beta,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/beta/beta_day02,0,0,0,0,0,0,0,0,0,0,0,0
-beta,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/beta/beta_day03,1,1,0,0,0,1,1,0,0,0,0,0
-beta,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/beta/beta_day04_230713_113346,1,1,0,0,0,1,1,0,0,0,0,0
-beta,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/beta/beta_day05_230717_123958,0,0,0,0,0,0,0,0,0,0,0,0
-beta,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/beta/beta_day06_230724_121943,0,0,0,0,0,0,0,0,0,0,0,0
-beta,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/beta/beta_day07_230726_102440,1,1,0,0,0,1,1,0,1,1,1,0
-beta,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/beta/beta_day08_230807_160422,0,0,0,0,0,0,0,0,0,0,0,0
-beta,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/beta/beta_day09_230808_112208,0,0,0,0,0,0,0,0,0,0,0,0
-beta,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/beta/beta_day10_230810_124537,0,0,0,0,0,0,0,0,0,0,0,0
-beta,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/beta/beta_day11_230811_123319,0,0,0,0,0,0,0,0,0,0,0,0
-beta,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/beta/beta_day12_230814_122807,0,0,0,0,0,0,0,0,0,0,0,0
-beta,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/beta/beta_day13,1,1,0,0,0,1,0,0,0,0,0,0
-beta,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/beta/beta_day14_230816_120120,0,0,0,0,0,0,0,0,0,0,0,0
-beta,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/beta/beta_day15_230911_155427,0,0,1,0,0,0,0,0,0,0,0,0
-beta,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/beta/beta_day16_230912_091502,1,1,1,0,0,1,1,0,0,0,0,0
-beta,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/beta/beta_day17_230914_094735,1,1,0,0,0,1,1,0,0,0,0,0
-beta,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/beta/beta_day18_230919_090816,1,1,0,0,0,1,1,0,0,0,0,0
-beta,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/beta/beta_day19_230921_115722,1,1,0,0,0,0,0,0,0,0,0,0
-beta,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/beta/beta_testing,1,1,0,0,0,1,1,0,0,0,0,0
-crimp,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/crimp/crimp_beta_crimp_15Aug2023_230815_113419,0,0,0,0,0,0,0,0,0,0,0,0
-crimp,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/crimp/crimp_beta_crimp_15Aug2023_230815_140314,0,0,0,0,0,0,0,0,0,0,0,0
-crimp,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/crimp/crimp_day00,0,0,0,0,0,0,0,0,0,0,0,0
-crimp,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/crimp/crimp_day01,0,0,0,0,0,0,0,0,0,0,0,0
-crimp,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/crimp/crimp_day02_230810_124537,1,1,0,0,0,0,0,0,0,0,0,0
-dyno,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/dyno/dyno_day00_231101_135226,1,1,0,0,0,0,0,0,0,0,0,0
-dyno,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/dyno/dyno_day01_231102_105225,0,0,0,0,0,0,0,0,0,0,0,0
-dyno,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/dyno/dyno_day02_231103_182439,0,0,0,0,0,0,0,0,0,0,0,0
-dyno,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/dyno/dyno_test_231106_112841,0,0,0,0,0,0,0,0,0,0,0,0
-etrier,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/etrier/etrier_day00_231103_183404,0,0,0,0,0,0,0,0,0,0,0,0
-etrier,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/etrier/etrier_day01_231105_151436,0,0,0,0,0,0,0,0,0,0,0,0
-etrier,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/etrier/etrier_day02_231106_114015,0,0,0,0,0,0,0,0,0,0,0,0
-etrier,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/etrier/etrier_day03_231107_114849,1,1,1,1,1,1,1,1,1,0,1,0
-etrier,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/etrier/etrier_day04_231108_115234,0,0,0,0,0,0,0,0,0,0,0,0
-etrier,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/etrier/etrier_day05_231109_110557,1,1,0,0,0,0,0,0,0,0,0,0
-etrier,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/etrier/etrier_day06_231110_120945,0,0,0,0,0,0,0,0,0,0,0,0
-etrier,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/etrier/etrier_day07_231111_113900,0,0,0,0,0,0,0,0,0,0,0,0
-etrier,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/etrier/etrier_day09_231116_124324,0,0,0,0,0,0,0,0,0,0,0,0
-etrier,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/etrier/etrier_day10_231117_114030,0,0,0,0,0,0,0,0,0,0,0,0
-etrier,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/etrier/etrier_day11_231118_100656,0,0,0,0,0,0,0,0,0,0,0,0
-etrier,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/etrier/etrier_grigri_day09_etrier_day12_231119_104238,0,0,0,0,0,0,0,0,0,0,0,0
-grigri,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/grigri/grigri_day00_231106_183733,0,0,0,0,0,0,0,0,0,0,0,0
-grigri,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/grigri/grigri_day01_231107_114849,1,1,1,1,1,0,0,1,0,0,0,0
-grigri,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/grigri/grigri_day02_231108_115234,0,0,0,0,0,0,0,0,0,0,0,0
-grigri,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/grigri/grigri_day03_231109_110557,0,0,0,0,0,0,0,0,0,0,0,0
-grigri,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/grigri/grigri_day04_231110_120945,0,0,0,0,0,0,0,0,0,0,0,0
-grigri,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/grigri/grigri_day05_231111_113900,0,0,0,0,0,0,0,0,0,0,0,0
-grigri,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/grigri/grigri_day06_231116_124324,0,0,0,0,0,0,0,0,0,0,0,0
-grigri,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/grigri/grigri_day07_231117_114030,0,0,0,0,0,0,0,0,0,0,0,0
-grigri,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/grigri/grigri_day08_231118_100656,0,0,0,0,0,0,0,0,0,0,0,0
-grigri,/Volumes/sn data server 3/laura_berkowitz/alz_stim/data/grigri/grigri_grigri_day09_etrier_day12_231119_104238,0,0,0,0,0,0,0,0,0,0,0,0
+beta,Y:\laura_berkowitz\alz_stim\data\beta\beta_day00_230623_110054,0,0,0,0,0,0,0,0,0,0,0,0
+beta,Y:\laura_berkowitz\alz_stim\data\beta\beta_day01,0,0,0,0,0,0,0,0,0,0,0,0
+beta,Y:\laura_berkowitz\alz_stim\data\beta\beta_day02,0,0,0,0,0,0,0,0,0,0,0,0
+beta,Y:\laura_berkowitz\alz_stim\data\beta\beta_day03,1,1,0,0,0,1,1,0,1,1,1,0
+beta,Y:\laura_berkowitz\alz_stim\data\beta\beta_day04_230713_113346,1,1,1,1,1,1,1,1,1,1,1,0
+beta,Y:\laura_berkowitz\alz_stim\data\beta\beta_day05_230717_123958,0,0,0,0,0,0,0,0,0,0,0,0
+beta,Y:\laura_berkowitz\alz_stim\data\beta\beta_day06_230724_121943,1,1,1,1,1,1,1,1,1,1,1,0
+beta,Y:\laura_berkowitz\alz_stim\data\beta\beta_day07_230726_102440,1,1,1,0,0,1,1,0,1,1,1,0
+beta,Y:\laura_berkowitz\alz_stim\data\beta\beta_day08_230807_160422,0,0,0,0,0,0,0,0,0,0,0,0
+beta,Y:\laura_berkowitz\alz_stim\data\beta\beta_day09_230808_112208,0,0,0,0,0,0,0,0,0,0,0,0
+beta,Y:\laura_berkowitz\alz_stim\data\beta\beta_day10_230810_124537,0,0,1,0,0,0,0,0,0,0,0,0
+beta,Y:\laura_berkowitz\alz_stim\data\beta\beta_day11_230811_123319,0,0,0,0,0,0,0,0,0,0,0,0
+beta,Y:\laura_berkowitz\alz_stim\data\beta\beta_day12_230814_122807,0,0,0,0,0,0,0,0,0,0,0,0
+beta,Y:\laura_berkowitz\alz_stim\data\beta\beta_day13,1,1,0,0,0,1,0,0,0,0,0,0
+beta,Y:\laura_berkowitz\alz_stim\data\beta\beta_day14_230816_120120,0,0,1,0,0,0,0,0,0,0,0,0
+beta,Y:\laura_berkowitz\alz_stim\data\beta\beta_day15_230911_155427,0,0,1,0,0,0,0,0,0,0,0,0
+beta,Y:\laura_berkowitz\alz_stim\data\beta\beta_day16_230912_091502,1,1,1,1,1,1,1,1,1,1,1,0
+beta,Y:\laura_berkowitz\alz_stim\data\beta\beta_day17_230914_094735,1,1,1,0,0,1,1,0,0,0,0,0
+beta,Y:\laura_berkowitz\alz_stim\data\beta\beta_day18_230919_090816,1,1,0,0,0,1,1,0,0,0,0,0
+beta,Y:\laura_berkowitz\alz_stim\data\beta\beta_day19_230921_115722,1,1,0,0,0,1,1,0,0,0,0,0
+beta,Y:\laura_berkowitz\alz_stim\data\beta\beta_testing,1,1,0,0,0,1,1,0,0,0,0,0
+crimp,Y:\laura_berkowitz\alz_stim\data\crimp\crimp_day00_230807_160422,0,0,0,0,0,0,0,0,0,0,0,0
+crimp,Y:\laura_berkowitz\alz_stim\data\crimp\crimp_day01_230808_112208,0,0,0,0,0,0,0,0,0,0,0,0
+crimp,Y:\laura_berkowitz\alz_stim\data\crimp\crimp_day02_230810_124537,1,1,0,0,0,0,0,0,0,0,0,0
+crimp,Y:\laura_berkowitz\alz_stim\data\crimp\crimp_day03_230811_123319,0,0,0,0,0,0,0,0,0,0,0,0
+crimp,Y:\laura_berkowitz\alz_stim\data\crimp\crimp_day04_230814_122807,0,0,0,0,0,0,0,0,0,0,0,0
+crimp,Y:\laura_berkowitz\alz_stim\data\crimp\crimp_day05,0,0,0,0,0,0,0,0,0,0,0,0
+crimp,Y:\laura_berkowitz\alz_stim\data\crimp\crimp_day06_230816_120120,0,0,0,0,0,0,0,0,0,0,0,0
+dyno,Y:\laura_berkowitz\alz_stim\data\dyno\dyno_day00_231101_135226,1,1,0,0,0,0,0,0,0,0,0,0
+dyno,Y:\laura_berkowitz\alz_stim\data\dyno\dyno_day01_231102_105225,0,0,0,0,0,0,0,0,0,0,0,0
+dyno,Y:\laura_berkowitz\alz_stim\data\dyno\dyno_day02_231103_182439,0,0,0,0,0,0,0,0,0,0,0,0
+dyno,Y:\laura_berkowitz\alz_stim\data\dyno\dyno_test_231106_112841,0,0,0,0,0,0,0,0,0,0,0,0
+etrier,Y:\laura_berkowitz\alz_stim\data\etrier\etrier_day00_231103_183404,0,0,0,0,0,0,0,0,0,0,0,0
+etrier,Y:\laura_berkowitz\alz_stim\data\etrier\etrier_day01_231105_151436,0,0,0,0,0,0,0,0,0,0,0,0
+etrier,Y:\laura_berkowitz\alz_stim\data\etrier\etrier_day02_231106_114015,0,0,0,0,0,0,0,0,0,0,0,0
+etrier,Y:\laura_berkowitz\alz_stim\data\etrier\etrier_day03_231107_114849,1,1,1,1,1,1,1,1,1,0,1,0
+etrier,Y:\laura_berkowitz\alz_stim\data\etrier\etrier_day04_231108_115234,0,0,0,0,0,0,0,0,0,0,0,0
+etrier,Y:\laura_berkowitz\alz_stim\data\etrier\etrier_day05_231109_110557,1,1,0,0,0,0,0,0,0,0,0,0
+etrier,Y:\laura_berkowitz\alz_stim\data\etrier\etrier_day06_231110_120945,0,0,0,0,0,0,0,0,0,0,0,0
+etrier,Y:\laura_berkowitz\alz_stim\data\etrier\etrier_day07_231111_113900,0,0,0,0,0,0,0,0,0,0,0,0
+etrier,Y:\laura_berkowitz\alz_stim\data\etrier\etrier_day08_231115_153701,0,0,0,0,0,0,0,0,0,0,0,0
+etrier,Y:\laura_berkowitz\alz_stim\data\etrier\etrier_day09_231116_124324,0,0,0,0,0,0,0,0,0,0,0,0
+etrier,Y:\laura_berkowitz\alz_stim\data\etrier\etrier_day10_231117_114030,0,0,0,0,0,0,0,0,0,0,0,0
+etrier,Y:\laura_berkowitz\alz_stim\data\etrier\etrier_day11_231118_100656,0,0,0,0,0,0,0,0,0,0,0,0
+etrier,Y:\laura_berkowitz\alz_stim\data\etrier\etrier_day12_231119_104238,0,0,0,0,0,0,0,0,0,0,0,0
+etrier,Y:\laura_berkowitz\alz_stim\data\etrier\etrier_day16_231205_112536,0,0,1,0,0,0,0,0,0,0,0,0
+etrier,Y:\laura_berkowitz\alz_stim\data\etrier\etrier_day18_231213_103231,1,1,1,0,0,0,0,0,0,0,0,0
+etrier,Y:\laura_berkowitz\alz_stim\data\etrier\etrier_grigri_day12_etrier_day15_231204_093316,0,0,0,0,0,0,0,0,0,0,0,0
+grigri,Y:\laura_berkowitz\alz_stim\data\grigri\grigri_day00_231106_183733,0,0,0,0,0,0,0,0,0,0,0,0
+grigri,Y:\laura_berkowitz\alz_stim\data\grigri\grigri_day01_231107_114849,1,1,1,1,1,0,0,1,0,1,0,0
+grigri,Y:\laura_berkowitz\alz_stim\data\grigri\grigri_day02_231108_115234,1,1,0,0,0,0,0,0,0,0,0,0
+grigri,Y:\laura_berkowitz\alz_stim\data\grigri\grigri_day03_231109_110557,0,0,0,0,0,0,0,0,0,0,0,0
+grigri,Y:\laura_berkowitz\alz_stim\data\grigri\grigri_day04_231110_120945,0,0,0,0,0,0,0,0,0,0,0,0
+grigri,Y:\laura_berkowitz\alz_stim\data\grigri\grigri_day05_231111_113900,0,0,0,0,0,0,0,0,0,0,0,0
+grigri,Y:\laura_berkowitz\alz_stim\data\grigri\grigri_day06_231116_124324,0,0,0,0,0,0,0,0,0,0,0,0
+grigri,Y:\laura_berkowitz\alz_stim\data\grigri\grigri_day07_231117_114030,0,0,0,0,0,0,0,0,0,0,0,0
+grigri,Y:\laura_berkowitz\alz_stim\data\grigri\grigri_day08_231118_100656,0,0,0,0,0,0,0,0,0,0,0,0
+grigri,Y:\laura_berkowitz\alz_stim\data\grigri\grigri_day09_231119_104238,0,0,0,0,0,0,0,0,0,0,0,0
+grigri,Y:\laura_berkowitz\alz_stim\data\grigri\grigri_day12_231204_093316,0,0,0,0,0,0,0,0,0,0,0,0
+grigri,Y:\laura_berkowitz\alz_stim\data\grigri\grigri_day13_231205_112536,0,0,1,0,0,0,0,0,0,0,0,0
+grigri,Y:\laura_berkowitz\alz_stim\data\grigri\grigri_day15_231213_103231,1,1,1,0,0,0,0,0,0,0,0,0
+hpc01,Y:\laura_berkowitz\app_ps1_ephys\data\hpc01\day00_211026_134000,1,1,0,0,0,1,1,0,1,1,1,0
+hpc01,Y:\laura_berkowitz\app_ps1_ephys\data\hpc01\day01_211027_123548,1,1,0,0,0,1,1,0,1,1,1,0
+hpc01,Y:\laura_berkowitz\app_ps1_ephys\data\hpc01\day02_211028_123848,1,0,0,0,0,1,1,0,1,1,1,0
+hpc01,Y:\laura_berkowitz\app_ps1_ephys\data\hpc01\day03_211029_153139,1,1,0,0,0,1,1,0,1,1,1,0
+hpc01,Y:\laura_berkowitz\app_ps1_ephys\data\hpc01\day04_211030_130255,1,1,0,0,0,1,1,0,1,1,1,0
+hpc01,Y:\laura_berkowitz\app_ps1_ephys\data\hpc01\day05_211101_140116,1,0,0,0,0,1,1,0,0,1,1,0
+hpc01,Y:\laura_berkowitz\app_ps1_ephys\data\hpc01\day06_211102_144909,1,1,0,0,0,1,1,0,1,1,1,0
+hpc01,Y:\laura_berkowitz\app_ps1_ephys\data\hpc01\day07_211103_083457,1,1,0,0,0,1,1,0,1,1,1,0
+hpc01,Y:\laura_berkowitz\app_ps1_ephys\data\hpc01\day08_211104_093612,1,1,0,0,0,1,1,0,1,1,1,0
+hpc01,Y:\laura_berkowitz\app_ps1_ephys\data\hpc01\day09_211105_093814,1,1,0,0,0,1,1,0,1,1,1,0
+hpc01,Y:\laura_berkowitz\app_ps1_ephys\data\hpc01\day10_211108_111237,1,1,0,0,0,1,1,0,0,1,1,0
+hpc01,Y:\laura_berkowitz\app_ps1_ephys\data\hpc01\day11_211109_121437,1,1,0,0,0,1,1,0,0,1,1,0
+hpc01,Y:\laura_berkowitz\app_ps1_ephys\data\hpc01\day12_211110_110332,1,1,0,0,0,1,1,0,1,1,1,0
+hpc01,Y:\laura_berkowitz\app_ps1_ephys\data\hpc01\day13_211112_090227,1,1,0,0,0,1,1,0,1,1,1,0
+hpc01,Y:\laura_berkowitz\app_ps1_ephys\data\hpc01\day14_211113_103545,1,1,0,0,0,1,1,0,0,1,1,0
+hpc01,Y:\laura_berkowitz\app_ps1_ephys\data\hpc01\day15_211114_131201,1,0,0,0,0,1,1,1,0,1,1,1
+hpc01,Y:\laura_berkowitz\app_ps1_ephys\data\hpc01\day16_211115_111612,1,1,0,1,0,1,1,1,1,1,1,0
+hpc01,Y:\laura_berkowitz\app_ps1_ephys\data\hpc01\day17_211117_103141,1,1,0,0,0,1,1,0,1,1,1,0
+hpc01,Y:\laura_berkowitz\app_ps1_ephys\data\hpc01\day18_211118_100756,1,1,0,0,0,1,1,0,1,1,1,0
+hpc01,Y:\laura_berkowitz\app_ps1_ephys\data\hpc01\day19_211119_111607,1,1,0,0,0,1,1,0,1,1,1,0
+hpc01,Y:\laura_berkowitz\app_ps1_ephys\data\hpc01\day21_211122_124408,1,1,0,0,0,1,1,0,1,1,1,0
+hpc01,Y:\laura_berkowitz\app_ps1_ephys\data\hpc01\day22_211123_115045,1,1,0,0,0,1,1,0,1,1,1,0
+hpc01,Y:\laura_berkowitz\app_ps1_ephys\data\hpc01\day23__211129_124432,1,1,0,0,0,1,1,0,1,1,1,0
+hpc01,Y:\laura_berkowitz\app_ps1_ephys\data\hpc01\day24_211130_123545,1,1,0,0,0,1,1,0,1,1,1,0
+hpc01,Y:\laura_berkowitz\app_ps1_ephys\data\hpc01\day25_211201_085422,1,1,0,0,0,1,1,0,1,1,1,0
+hpc01,Y:\laura_berkowitz\app_ps1_ephys\data\hpc01\day26_211202_100114,1,1,0,0,0,1,1,0,1,1,1,0
+hpc01,Y:\laura_berkowitz\app_ps1_ephys\data\hpc01\day27_211203_095713,1,1,0,0,0,1,1,0,1,1,1,0
+hpc04,Y:\laura_berkowitz\app_ps1_ephys\data\hpc04\day00_220211_155904,1,1,0,0,0,1,1,0,1,1,1,0
+hpc04,Y:\laura_berkowitz\app_ps1_ephys\data\hpc04\day01_220212_130538,1,1,0,0,0,1,1,0,1,1,1,0
+hpc04,Y:\laura_berkowitz\app_ps1_ephys\data\hpc04\hpc04_day02_220213_132346,1,1,0,0,0,1,1,0,1,1,1,0
+hpc04,Y:\laura_berkowitz\app_ps1_ephys\data\hpc04\hpc04_day03_220214_115829,1,1,1,1,1,1,1,1,1,1,1,0
+hpc04,Y:\laura_berkowitz\app_ps1_ephys\data\hpc04\hpc04_day04_220215_103627,1,1,1,0,0,1,1,0,1,1,1,0
+hpc04,Y:\laura_berkowitz\app_ps1_ephys\data\hpc04\hpc04_day05_220216_112541,1,1,1,1,1,1,1,1,1,1,1,0
+hpc04,Y:\laura_berkowitz\app_ps1_ephys\data\hpc04\hpc04_day06_220217_085558,1,1,1,1,1,1,1,1,1,1,1,1
+hpc04,Y:\laura_berkowitz\app_ps1_ephys\data\hpc04\hpc04_day07_220218_100553,1,1,0,0,0,1,1,0,1,1,1,0
+hpc04,Y:\laura_berkowitz\app_ps1_ephys\data\hpc04\hpc04_day08_220219_124637,1,1,0,0,0,1,1,0,1,1,1,0
+hpc04,Y:\laura_berkowitz\app_ps1_ephys\data\hpc04\hpc04_day09_220221_094101,1,1,1,1,1,1,1,1,1,1,1,1
+hpc04,Y:\laura_berkowitz\app_ps1_ephys\data\hpc04\hpc04_day10_220222_095721,1,1,0,0,0,1,1,0,1,1,1,0
+hpc04,Y:\laura_berkowitz\app_ps1_ephys\data\hpc04\hpc04_day11_220223_095442,1,1,0,0,0,1,1,0,1,1,1,0
+hpc04,Y:\laura_berkowitz\app_ps1_ephys\data\hpc04\hpc04_day12_220225_115348,1,1,1,1,1,1,1,1,1,1,1,1
+hpc04,Y:\laura_berkowitz\app_ps1_ephys\data\hpc04\hpc04_day13_220226_125913,1,1,0,0,0,1,1,0,1,1,1,0
+hpc04,Y:\laura_berkowitz\app_ps1_ephys\data\hpc04\hpc04_day14_220227_081649,1,1,0,0,0,1,1,0,1,1,1,0
+hpc04,Y:\laura_berkowitz\app_ps1_ephys\data\hpc04\hpc04_day15_220301_094823,1,1,1,1,1,1,1,1,1,1,1,1
+hpc04,Y:\laura_berkowitz\app_ps1_ephys\data\hpc04\hpc04_day16_220302_103144,1,1,0,0,0,1,1,0,1,1,1,0
+hpc04,Y:\laura_berkowitz\app_ps1_ephys\data\hpc04\hpc04_day17_220303_122516,1,1,0,0,0,1,1,0,1,1,1,0
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day00_220303_122516,1,1,0,0,0,1,1,0,1,1,1,0
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day01_220304_103857,1,1,0,0,0,1,1,0,1,1,1,0
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day02_220307_094326,1,1,0,0,0,1,1,0,0,1,1,0
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day03,1,1,0,0,0,1,0,0,0,1,1,0
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day04_220309_085753,1,1,1,1,1,1,0,1,0,1,1,0
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day05_220310_113927,1,1,1,1,1,1,0,1,0,1,1,0
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day06_220311_134342,1,1,1,1,1,1,0,1,0,1,1,0
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day07_220313_140520,1,1,0,0,0,1,0,0,0,1,1,0
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day08_220314_093036,1,1,0,0,0,1,1,0,1,1,1,0
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day09_220315_101140,1,1,0,0,0,1,0,0,0,1,1,0
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day10_220316_095114,1,1,1,1,1,1,1,1,1,1,1,1
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day11_220317_090555,1,1,0,0,0,1,1,0,1,1,1,0
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day12_220318_130744,1,1,0,0,0,1,0,0,0,1,1,0
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day13_220319_101549,1,1,0,0,0,1,0,0,0,1,1,0
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day14_220320_102335,1,1,1,1,1,1,1,1,1,1,1,1
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day15_220321_124146,1,1,0,0,0,1,0,0,0,1,1,0
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day16_220322_095924,1,1,0,0,0,1,0,0,0,1,1,0
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day17_220324_085048,1,1,1,1,1,1,1,1,1,1,1,1
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day18_220325_094521,1,1,0,0,0,1,0,0,0,1,1,0
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day19_220326_134737,1,1,0,0,0,1,0,0,0,1,1,0
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day20_220328_094147,1,1,1,1,1,1,1,1,1,1,1,1
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day21_220329_101843,1,1,0,0,0,1,1,0,1,1,1,0
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day22_220330_102036,1,1,0,0,0,1,0,0,0,1,1,0
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day23_220401_102719,1,1,0,0,0,1,1,0,1,1,1,0
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day24_220402_114358,1,1,1,1,1,1,1,1,1,1,1,0
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day25_220403_125728,1,1,1,0,0,0,0,0,0,1,1,0
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day26_220404_121037,1,1,1,0,0,0,0,0,0,1,1,0
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day27_220405_103420,1,1,1,0,0,0,0,0,0,1,1,0
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day28_220406_101032,1,1,1,1,1,0,0,1,0,1,1,0
+hpc05,Y:\laura_berkowitz\app_ps1_ephys\data\hpc05\hpc05_day29_220407_124118,1,1,1,1,1,1,1,1,1,1,1,0
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day00_220303_122516,1,1,0,0,0,1,0,0,0,0,1,0
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day01_220304_103857,1,1,0,0,0,1,0,0,0,1,1,0
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day02_220307_094326,1,1,0,0,0,1,0,0,0,1,1,0
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day03,1,1,0,0,0,1,0,0,0,0,1,0
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day04_220309_085753,1,1,1,0,1,1,1,1,1,1,1,0
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day05_220310_113927,1,1,1,1,1,1,1,1,0,1,1,0
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day06_220311_134342,1,1,1,1,1,1,1,1,0,1,1,0
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day07_220313_140520,1,1,0,0,0,1,0,0,0,1,1,0
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day08_220314_093036,1,1,0,0,0,1,0,0,0,1,1,0
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day09_220315_101140,1,1,0,0,0,1,0,0,0,1,1,0
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day10_220316_095114,1,1,0,0,0,1,0,0,0,1,1,0
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day11_220317_090555,1,1,0,0,0,1,0,0,0,1,1,0
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day12_220318_130744,1,1,0,0,0,0,0,0,0,1,1,0
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day13_220319_101549,1,1,0,0,0,0,0,0,0,1,1,0
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day14_220320_102335,1,1,1,1,1,1,1,1,1,1,1,1
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day15_220321_124146,1,1,0,0,0,0,0,0,0,1,1,0
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day16_220322_095924,1,1,0,0,0,0,0,0,0,1,1,0
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day17_220324_085048,1,1,1,1,1,1,1,1,1,1,1,1
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day18_220325_094521,1,1,0,0,0,0,0,0,0,1,1,0
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day19_220326_134737,1,1,0,0,0,0,0,0,0,1,1,0
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day20_220328_094147,1,1,1,0,0,0,0,0,0,1,1,0
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day21_220329_101843,1,1,0,0,0,0,0,0,0,1,1,0
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day22_220330_102036,1,1,0,0,0,0,0,0,0,1,1,0
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day23_220401_102719,1,1,1,1,1,1,1,1,1,1,1,1
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day24_220402_114358,1,1,0,0,0,0,0,0,0,1,1,0
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day25_220403_125728,1,1,0,0,0,0,0,0,0,1,1,0
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day26_220404_121037,1,1,0,0,0,0,0,0,0,1,1,0
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day27_220405_103420,1,1,1,1,1,1,1,1,1,1,1,1
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day28_220406_101032,1,1,0,0,0,0,0,0,0,1,1,0
+hpc06,Y:\laura_berkowitz\app_ps1_ephys\data\hpc06\hpc06_day29_220407_124118,1,1,0,0,0,0,0,0,0,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day00_220423_101033,1,1,0,0,0,0,0,0,0,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day01_220424_122746,1,1,0,0,0,0,0,0,0,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day02_220425_100010,1,1,1,1,1,1,1,1,1,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day03_220426_104417,1,1,1,1,1,0,0,1,0,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day04_220427_102034,1,1,1,1,1,1,1,1,0,0,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day06_220429_081606,1,1,1,0,0,1,1,0,1,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day07_220430_091926,1,1,1,1,1,1,1,1,1,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day08_220501_094841,1,1,1,1,1,1,1,1,1,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day09_220502_101004,1,1,0,0,0,0,0,0,0,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day10_220503_082347,1,1,1,1,1,1,1,1,1,1,1,1
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day11_220504_080057,1,1,1,1,1,1,1,1,1,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day12_220505_054652,1,1,1,1,1,1,1,1,1,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day13_220507_111833,1,1,1,0,0,0,0,0,0,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day14_220508_104051,1,1,0,0,0,0,0,0,0,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day15_220510_103311,1,1,0,0,0,0,0,0,0,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day16_220511_100658,1,1,0,0,0,0,0,0,0,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day17_220512_084716,1,1,1,0,0,0,0,0,0,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day18_220513_095958,1,1,1,0,0,0,0,0,0,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day19_220514_144542,1,1,0,0,0,0,0,0,0,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day20_220515_150105,1,1,0,0,0,0,0,0,0,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day21_220516_130204,1,1,1,1,1,0,0,1,0,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day22_220517_125646,1,1,1,0,0,0,0,0,0,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day23_220518_101128,1,1,1,0,0,0,0,0,0,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day24_220520_100539,1,1,0,0,0,0,0,0,0,0,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day25_220524_093304,1,1,1,1,1,1,1,1,1,1,1,1
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day26_220525_115604,1,1,0,0,0,1,1,0,1,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day27_220526_092204,1,1,1,1,1,0,0,1,0,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day28_220527_112747,0,0,1,0,0,0,0,0,0,0,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day29_220528_1105,1,1,1,1,1,1,1,1,1,1,1,1
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day30_220529_153136,1,1,0,0,0,1,1,0,1,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day31_220531_125150,1,1,1,1,1,1,1,1,1,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day32_220601_102938,0,0,1,0,0,0,0,0,0,0,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day33_220602_120600,1,1,1,1,1,0,0,1,0,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day34_220604_103918,0,0,0,0,0,0,0,0,0,0,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day35_220606_085359,1,1,1,1,1,1,1,1,1,1,1,1
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day36_220607_120154,1,1,1,1,1,1,1,1,1,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day37_220608_095940,1,1,1,0,0,1,1,0,0,0,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day38_220609_085949,0,0,1,0,0,0,0,0,0,0,0,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day39_220610_101437,1,1,1,1,1,1,1,1,1,1,1,1
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day40_220613_095101,0,0,1,0,0,0,0,0,0,0,0,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day41_220614_100545,1,1,1,1,1,1,1,1,1,1,1,1
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day42_220615_123134,1,1,1,0,0,1,1,0,1,0,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day43_220616_100529,0,0,0,0,0,0,0,0,0,0,0,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day44_220620_094419,0,0,1,0,0,0,0,0,0,0,0,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day45_220622_085917,1,1,0,0,0,0,0,0,0,0,0,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day46_220624_100710,0,0,0,0,0,0,0,0,0,0,0,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day47_220706_120851,0,0,0,0,0,0,0,0,0,0,0,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day48_220707_140624,0,0,1,0,0,0,0,0,0,0,0,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day49_220711_093702,0,0,1,0,0,0,0,0,0,0,0,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day50_220712_094047,1,1,1,1,1,1,1,1,1,1,1,1
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day51_220718_095343,1,1,1,0,0,1,1,0,0,0,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day52_220719_125658,1,1,1,1,1,1,0,1,0,1,1,0
+hpc07,Y:\laura_berkowitz\app_ps1_ephys\data\hpc07\hpc07_day53_220720_085700,1,1,1,1,1,1,1,1,1,1,1,1
+hpc08,Y:\laura_berkowitz\app_ps1_ephys\data\hpc08\hpc08_day01_220424_120935,0,0,0,0,0,0,0,0,0,0,0,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day00_220430_085919,1,1,0,0,0,0,0,0,0,1,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day01_220501_094841,1,1,1,0,0,0,0,0,0,1,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day02_220502_101004,1,1,0,0,0,0,0,0,0,1,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day03_220503_082347,1,1,1,1,1,0,0,1,0,1,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day04_220504_080057,1,1,1,1,1,0,0,1,0,1,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day05_220505_054652,1,1,1,1,1,1,1,1,1,1,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day06_220507_111833,1,1,1,1,1,1,1,1,1,1,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day07_220508_104051,1,1,0,0,0,0,0,0,0,1,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day08_220510_103311,1,1,0,0,0,1,1,0,1,1,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day09_220511_100658,1,1,0,0,0,0,0,0,0,1,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day10_220512_084716,1,1,1,1,1,1,1,1,1,1,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day11_220513_095958,1,1,1,1,1,1,1,1,1,1,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day12_220514_144542,1,1,0,0,0,0,0,0,0,1,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day13_220515_150105,1,1,0,0,0,0,0,0,0,1,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day14_220516_130204,1,1,1,1,1,0,0,1,0,1,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day15_220517_125646,1,1,1,1,1,0,0,1,0,1,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day16_220518_101128,1,1,1,1,1,1,1,1,1,1,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day17_220520_100539,1,1,0,0,0,1,0,0,0,0,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day18_220523_100542,0,0,1,1,1,1,0,1,0,0,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day19_220524_093304,1,1,1,1,1,1,1,1,1,1,1,1
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day20_220525_115604,1,1,0,0,0,1,1,0,1,1,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day21_220526_092204,1,1,1,0,0,0,0,1,0,0,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day22_220527_112747,1,1,1,1,1,0,0,1,0,0,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day23_220528_1105,1,1,1,1,1,1,1,1,1,1,1,1
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day24_220529_153136,1,1,0,0,0,1,1,0,1,1,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day25_220531_125150,1,1,1,1,1,1,1,1,1,1,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day26_220601_102938,1,1,1,1,1,0,0,1,0,0,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day27_220602_120600,1,0,1,0,0,0,0,0,0,0,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day28_220604_103918,1,1,0,0,0,0,0,0,0,0,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day29_220606_085359,1,1,1,1,1,1,1,1,1,1,1,1
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day30_220607_120154,1,1,1,1,1,1,1,1,1,1,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day31_220608_095940,1,1,1,0,0,1,1,0,0,0,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day32_220609_085949,0,0,1,0,0,0,0,0,0,0,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day33_220610_101437,1,1,1,1,1,1,1,1,1,1,1,1
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day34_220613_095101,0,0,1,0,0,0,0,0,0,0,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day35_220614_100545,1,1,1,1,1,1,1,1,1,1,1,1
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day36_220615_123134,1,1,1,1,1,1,1,1,1,1,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day37_220616_100529,0,0,0,0,0,0,0,0,0,0,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day38_220620_094419,0,0,1,0,0,0,0,0,0,0,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day39_220622_085917,1,1,1,1,1,1,1,1,1,1,1,1
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day40_220624_100710,0,0,0,0,0,0,0,0,0,0,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day41_220706_120851,0,0,0,0,0,0,0,0,0,0,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day42_220707_140624,0,0,1,0,0,0,0,0,0,0,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day43_220711_093702,0,0,0,0,0,0,0,0,0,0,1,0
+hpc09,Y:\laura_berkowitz\app_ps1_ephys\data\hpc09\hpc09_day44_220712_094047,1,1,1,1,1,1,1,1,1,1,1,1
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day00_220425_100010,1,1,1,1,1,1,1,1,1,1,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day01_220426_104417,1,1,1,1,1,0,0,1,0,1,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day02_220427_102034,1,1,1,1,1,1,1,1,0,0,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day04_220429_075518,1,1,0,0,0,0,0,0,0,0,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day05_220430_091203,1,1,0,0,0,0,0,0,0,0,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day06_220501_094841,1,1,1,1,1,0,0,1,0,1,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day07_220502_101004,1,1,0,0,0,0,0,0,0,1,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day08_220503_082347,1,1,1,1,1,1,1,1,1,1,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day09_220504_080057,1,1,0,0,0,0,0,0,0,1,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day10_220505_054652,1,1,1,1,1,1,1,1,1,1,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day11_220507_111833,1,1,1,1,1,1,1,1,1,1,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day12_220508_104051,1,1,0,0,0,0,0,0,0,1,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day13_220510_103311,1,1,0,0,0,0,0,0,0,1,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day14_220511_100658,1,1,0,0,0,0,0,0,0,1,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day15_220512_084716,1,1,1,1,1,0,0,1,0,1,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day16_220513_095958,1,1,0,0,0,1,1,0,1,1,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day17_220514_144542,1,1,0,0,0,1,1,0,1,1,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day18_220515_150105,1,1,0,0,0,1,1,0,1,1,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day19_220516_130204,1,1,0,0,0,1,1,0,1,1,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day20_220517_125646,1,1,0,0,0,0,0,0,0,1,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day21_220518_101128,1,1,0,0,0,0,0,0,0,1,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day22_220520_100539,1,1,0,0,0,0,0,0,0,0,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day23_220523_100542,1,1,0,0,0,1,1,0,0,0,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day24_220524_093304,1,1,0,0,0,1,1,0,1,1,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day25_220525_115604,1,1,0,0,0,1,1,0,1,1,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day26_220526_092204,1,1,0,0,0,1,1,0,1,1,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day27_220527_112747,1,1,0,0,0,1,1,0,0,0,0,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day28_220528_1105,0,0,0,0,0,0,0,0,0,0,0,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day29_220529_153136,0,0,0,0,0,0,0,0,0,0,0,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day30_220531_125150,0,0,0,0,0,0,0,0,0,0,0,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day31_220601_102938,0,0,1,0,0,0,0,0,0,0,0,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day32_220602_120600,1,1,1,1,1,1,1,1,1,1,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day33_220604_103918,0,0,0,0,0,0,0,0,0,0,0,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day34_220606_085359,1,1,1,0,0,0,0,0,0,0,0,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day35_220607_120154,1,1,1,1,1,1,1,1,0,0,0,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day36_220608_095940,1,1,1,1,1,1,1,1,1,1,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day37_220609_085949,0,0,1,0,0,0,0,0,0,0,0,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day38_220610_101437,1,1,1,1,1,1,1,1,1,1,1,1
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day39_220613_095101,0,0,1,0,0,0,0,0,0,0,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day40_220614_100545,1,1,1,1,1,1,1,1,1,1,1,1
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day41_220615_123134,1,1,0,0,0,1,1,0,1,1,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day42_220616_100529,0,0,0,0,0,0,0,0,0,0,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day43_220620_094419,0,0,1,0,0,0,0,0,0,0,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day44_220622_085917,1,1,1,1,1,1,1,1,1,1,1,1
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day45_220624_100710,1,1,0,0,0,1,1,0,0,0,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day46_220706_120851,0,0,0,0,0,0,0,0,0,0,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day47_220707_140624,0,0,1,0,0,0,0,0,0,0,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day48_220711_093702,0,0,1,0,0,0,0,0,0,0,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day49_220712_094047,1,1,1,1,1,1,1,1,1,1,1,1
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day50_220718_095343,0,0,1,0,0,0,0,0,0,0,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day51_220719_125658,1,1,1,1,1,1,1,1,1,1,1,0
+hpc10,Y:\laura_berkowitz\app_ps1_ephys\data\hpc10\hpc10_day52_220720_085700,1,1,1,1,1,1,1,1,1,1,1,1
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day00_221004_170156,1,1,0,0,0,1,1,0,0,0,0,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day01_221005_151833,1,1,0,0,0,1,1,0,0,0,0,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day02_221007_125408,1,1,1,1,1,1,1,1,0,0,0,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day03_221010_100017,1,1,1,1,1,1,1,1,1,1,1,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day04_221011_142658,1,1,1,0,0,1,1,0,0,0,0,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day05_221012_092344,1,1,1,0,0,1,1,0,0,0,0,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day06_221013_091728,1,1,1,1,1,1,1,1,1,1,1,1
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day07_221014_091431,1,1,1,1,1,1,1,1,1,1,1,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day08_221017_091310,1,1,1,1,1,1,1,1,1,1,1,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day09_221018_094018,1,1,0,0,0,1,1,0,0,0,0,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day10_221019_094334,1,1,1,1,1,1,1,1,1,1,1,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day11_221020_094745,1,1,1,1,1,1,1,1,1,1,1,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day12_221021_093052,1,1,1,0,0,0,0,0,0,0,0,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day13_221024_141314,1,1,1,1,1,1,1,1,1,1,1,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day14_221025_100013,1,1,1,1,1,1,1,1,1,1,1,1
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day15_221026_122041,1,1,1,1,1,1,1,1,1,1,1,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day16_221027_100515,0,0,0,0,0,0,0,0,0,0,0,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day17_221028_100641,1,1,1,1,1,1,1,1,1,1,1,1
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day18_221031_115022,1,1,1,1,1,1,1,1,0,0,0,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day19_221101_130218,0,0,0,0,0,0,0,0,0,0,0,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day20_221103_104043,0,0,0,0,0,0,0,0,0,0,0,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day21_221104_101218,1,1,1,1,1,1,1,1,1,1,1,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day22_221107_091059,1,1,1,1,1,1,1,1,0,0,0,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day23_221123_174650,0,0,0,0,0,0,0,0,0,0,0,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day24_221128_094515,0,0,1,0,0,0,0,0,0,0,0,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day25_221129_101529,1,1,1,1,1,0,0,1,0,0,0,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day26_221130_143642,0,0,0,0,0,0,0,0,0,0,0,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day27_221202_112725,0,0,1,0,0,0,0,0,0,0,0,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day28_221205_093423,0,0,0,0,0,0,0,0,0,0,0,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day29_221206_101111,1,1,1,1,1,1,1,1,1,1,1,1
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day30_221207_124643,1,1,1,1,1,1,1,1,1,1,1,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day31_221219_095535,1,1,0,0,0,0,0,0,0,0,0,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day32_221220_113156,1,1,0,0,0,0,0,0,0,0,0,0
+hpc11,Y:\laura_berkowitz\app_ps1_ephys\data\hpc11\hpc11_day33_221221_094742,0,0,0,0,0,0,0,0,0,0,0,0
