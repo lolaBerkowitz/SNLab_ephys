@@ -91,7 +91,7 @@ dlc_files(toss_idx,:) = [];
 dlc_files = sort_files_with_timestamp(dlc_files);
 
 % loop through files and generate digitalIn
-if length(dlc_files) > 1
+if length(dlc_files) >= 1
     % loop through files
     ts = [];
     offset = [];
