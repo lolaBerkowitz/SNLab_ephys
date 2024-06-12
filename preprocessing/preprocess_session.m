@@ -67,7 +67,7 @@ maze_size = p.Results.maze_size;
 % Prepare dat files and prepare metadata
 
 % Set basename from folder
-basename = basenameFromBasepath(basepath);
+[~,basename] = fileparts(basepath);
 
 % If non-contiguous recordings were taken, merge the dat files into one
 % session. Default is false.
