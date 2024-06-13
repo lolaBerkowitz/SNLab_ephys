@@ -23,21 +23,21 @@
 
 %% paths for individual research projects 
 % laura = 'Y:\laura_berkowitz\VR_ephys\data';
-laura = 'Y:\laura_berkowitz\alz_stim\data';
-% laura = 'Y:\laura_berkowitz\app_ps1_ephys\data';
+% laura = 'Y:\laura_berkowitz\alz_stim\data';
+laura = 'Y:\laura_berkowitz\app_ps1_ephys\data';
 
 %% Multi-animal recording session 
 % For sessions that record from multiple headstages from separate animals.
 % For SNLab, assumes one animal per active port (64 channel electrodes) as
 % of 2/22
 % subject folder corresponds to port A, B, C, D, respectively
-subject_order = {'grigri','etrier',[],[]};
+subject_order = {'hpc13','hpc14','flash',[]};
 
 % folder where dat files reside that need to be split
-data_path ='Y:\laura_berkowitz\alz_stim\data\to_split\grigri_day17_etrier_day20_240320_124022';
+data_path ='Y:\laura_berkowitz\app_ps1_ephys\data\to_split\hpc13_hpc14_flash_240608_103126';
 
 % project folder where subjects data should be saved
-save_path = {laura,laura,[],[]}; 
+save_path = {laura,laura,'Y:\laura_berkowitz\alz_stim\data',[]}; 
     
 % split dat files a
 split_dat(data_path,save_path, subject_order,'trim_dat',false)
@@ -55,20 +55,18 @@ split_dat(data_path,save_path, subject_order,'trim_dat',false)
 % to be analyzed. Let them run overnight while split dat runs. 
 
 %% Single Session Preprocess
-basepath = 'Y:\laura_berkowitz\alz_stim\data\etrier\etrier_day17_231130_112605';
+basepath = 'Y:\laura_berkowitz\app_ps1_ephys\data\hpc13\hpc13_day06_240522_104710';
 
-% Check xml/channel mapping: verify channel map, skip bad channels, and save 
-% make_xml(basepath)
+%% Check xml/channel mapping: verify channel map, skip bad channels, and save 
 
+disp('Skip bad channels in Neuroscope')
+%%
 % Preprocess (create lfp, kilosort)
-
-
-% OPTO ONLY - Preprocess (create lfp, kilosort)
-preprocess_session(basepath,'digitalInputs',true,'kilosort',true,'tracking',false)
-
+% Single shank (A164 poly2)
+preprocess_session(basepath,'digitalInputs',false,'kilosort',true,'tracking',false)
 
 % multiple shank 
-preprocess_session(basepath,'digitalInputs',false,'kilosort',true,'tracking',true,'specialChannels',[])
+preprocess_session(basepath,'digitalInputs',false,'kilosort',true,'tracking',false,'specialChannels',[],'multishank',true)
 
 
 %% Batch preprocess (must make sure xml is made/accurate before running)
@@ -91,18 +89,18 @@ disp ('Manually copy the kilosort folder from the ssd_path to the main data fold
 cd(basepath)
 basename = basenameFromBasepath(basepath);
 % update 
-session = loadSession(basepath,basename);
+session = sessionTemplate(basepath,'showGUI',true);
 gui_session
 
 % run channel mapping to update session with 
 channel_mapping('basepath',basepath)
 gui_session
 
-%% find ripples
-% first input [ripple channel, sharp wave channel] using intan channels. 
-ripple_channel = 62%session.brainRegions.CA1sp.channels(end-1);
-sharp_wave_channel = 58%session.brainRegions.CA1sr.channels(end-3);
-noise_channel = 46;
+%% Detect SWRs using DectSWR. 
+% first input [ripple channel, sharp wave channel] using intan channels + 1 (for matlab 1-based indexing). 
+ripple_channel = 39%session.brainRegions.CA1sp.channels(end-1);
+sharp_wave_channel = 35%session.brainRegions.CA1sr.channels(end-3);
+noise_channel = 30;
 ripples = DetectSWR([ripple_channel,...
     sharp_wave_channel,...
     noise_channel],...
@@ -113,8 +111,10 @@ ripples = DetectSWR([ripple_channel,...
     'forceDetect',true);
 
 %% Compute basic cell metrics
+session = loadSession(basepath,basename);
 cell_metrics = ProcessCellMetrics('session',session,'manualAdjustMonoSyn',false);
-% GUI to manually curate cell classification. This is not neccesary at this point.
+
+%% GUI to manually curate cell classification. This is not neccesary at this point.
 % It is more useful when you have multiple sessions
 cell_metrics = CellExplorer('metrics',cell_metrics);
 channel_mapping('basepath',basepath)
@@ -155,19 +155,9 @@ cell_metrics = loadCellMetricsBatch('basepaths',basepath,'basenames',basename);
 cell_metrics = CellExplorer('metrics',cell_metrics);
 
 
-%% find ripples
-%hpc04 =[38,33] 
-%hpc01 = [23,29]
-% epochs = [];
-% for i = 1:length(session.epochs)
-%     epochs = [epochs;session.epochs{i}.startTime session.epochs{i}.stopTime];
-% end
-
-% first input [ripple channel, sharp wave channel] using intan channels. 
-ripples = DetectSWR([33,3],'basepath',basepath);
 
 
-% %%                      Local Function Below
+%%                       Local Function Below
 
 function make_xml(basepath,varargin)
 
