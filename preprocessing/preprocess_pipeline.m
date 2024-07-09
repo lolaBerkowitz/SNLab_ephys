@@ -34,14 +34,16 @@ laura = 'Y:\laura_berkowitz\app_ps1_ephys\data';
 subject_order = {'hpc13','hpc14','flash',[]};
 
 % folder where dat files reside that need to be split
-data_path ='Y:\laura_berkowitz\app_ps1_ephys\data\to_split\hpc13_hpc14_flash_240608_103126';
+data_path ='Y:\laura_berkowitz\app_ps1_ephys\data\to_split\hpc13_hpc14_flash_day15_240613_100721';
 
 % project folder where subjects data should be saved
 save_path = {laura,laura,'Y:\laura_berkowitz\alz_stim\data',[]}; 
     
-% split dat files a
-split_dat(data_path,save_path, subject_order,'trim_dat',false)
-
+run_split=false;
+if  run_split
+    % split dat files a
+    split_dat(data_path,save_path, subject_order,'trim_dat',false)
+end
 %% Process tracking (Done first so tracking can be updated in preprocess_session)
 % Open anaconda prompt and open gui
 % enter commands: 
@@ -64,10 +66,12 @@ disp('Skip bad channels in Neuroscope')
 % Preprocess (create lfp, kilosort)
 % Single shank (A164 poly2)
 preprocess_session(basepath,'digitalInputs',false,'kilosort',true,'tracking',false)
-
+% If running kilosort separately for single shank (A164 poly2)
+process_kilosort(basepath,0)
 % multiple shank 
 preprocess_session(basepath,'digitalInputs',false,'kilosort',true,'tracking',false,'specialChannels',[],'multishank',true)
-
+% If running kilosort separately for multiple shanks
+process_kilosort(basepath,1)
 
 %% Batch preprocess (must make sure xml is made/accurate before running)
 subject_folder = 'Y:\laura_berkowitz\app_ps1_ephys\data\hpc09'; %subject main folder (i.e. ~\data\hpc01)
@@ -97,10 +101,10 @@ channel_mapping('basepath',basepath)
 gui_session
 
 %% Detect SWRs using DectSWR. 
-% first input [ripple channel, sharp wave channel] using intan channels + 1 (for matlab 1-based indexing). 
-ripple_channel = 39%session.brainRegions.CA1sp.channels(end-1);
-sharp_wave_channel = 35%session.brainRegions.CA1sr.channels(end-3);
-noise_channel = 30;
+% first input [ripple channel, sharp wave channel, noise(optional)] using intan channels + 1 (for matlab 1-based indexing). 
+ripple_channel = 2;%session.brainRegions.CA1sp.channels(end-1);
+sharp_wave_channel = 22;%session.brainRegions.CA1sr.channels(end-3);
+noise_channel = 43;
 ripples = DetectSWR([ripple_channel,...
     sharp_wave_channel,...
     noise_channel],...
@@ -111,6 +115,7 @@ ripples = DetectSWR([ripple_channel,...
     'forceDetect',true);
 
 %% Compute basic cell metrics
+basename = basenameFromBasepath(basepath);
 session = loadSession(basepath,basename);
 cell_metrics = ProcessCellMetrics('session',session,'manualAdjustMonoSyn',false);
 
