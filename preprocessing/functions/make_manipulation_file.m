@@ -29,6 +29,6 @@ manipulation.duration = digitalIn.dur{ramp_channel};
 manipulation.detectorinfo = 'SWRDetector v4';
 
 % initialize the structure file 
-save([basepath,filesep,basename,'.opto_stimulation.manipulation.mat'],'manipulation');
+save([basepath,filesep,basename,'.opto_stimulation.events.mat'],'opto_stim');
 end
 
