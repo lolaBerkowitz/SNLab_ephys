@@ -1,4 +1,4 @@
-function make_behavior_directory(basepaths,task_name)
+function make_behavior_directory(subid_csv,data_dir,task_name)
 % make_dataset_directory_from_files takes basepaths containing basepath
 % variable with paths to each subject folder and creates subdirectories for
 % a specified behavior task. 
@@ -11,12 +11,20 @@ function make_behavior_directory(basepaths,task_name)
 % Saves directories for each behavior folder 
 
 % read basepaths 
-df = readtable(basepaths,"Delimiter",'comma');
+df = readtable(subid_csv,"Delimiter",'comma');
 
-for i = 1:length(df.basepath)
+
+for i = 1:length(df.subid)
     
     % iterate within basepath 
-    subject_path = df.basepath{i};
+    subid = num2str(df.subid(i));
+    
+    subject_path = fullfile(data_dir,subid);
+    
+    if isfolder(subject_path)
+        disp(['Subject folder for ',subid, ' already created, moving to next subject'])
+        continue
+    end
     
     switch task_name
         case 'cpp'
@@ -60,22 +68,3 @@ end
 
 end
 
-function initialize_dir_for_CellExplorer(subject_path)
-
-% Use dir to get sessions in subject folder 
-session_list = dir(subject_path);
-session_list = session_list(~ismember({session_list.name},{'.','..'}),:); 
-session_list = session_list(~cellfun(@(x) contains(x,'DS_Store'),{session_list.name})); 
-% loop through session and create a basename.session file
-for i = 1:length(session_list)
-    
-    basepath = fullfile(subject_path,session_list(i).name); 
-    basename = basenameFromBasepath(basepath);
-    session = sessionTemplate(basepath,'basename',basename);
-    save(fullfile(basepath,[basename, '.session.mat']),'session');
-    
-
-end
-
-
-end
