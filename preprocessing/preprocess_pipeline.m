@@ -34,16 +34,14 @@ laura = 'Y:\laura_berkowitz\app_ps1_ephys\data';
 subject_order = {'hpc13','hpc14','flash',[]};
 
 % folder where dat files reside that need to be split
-data_path ='Y:\laura_berkowitz\app_ps1_ephys\data\to_split\hpc13_hpc14_flash_day15_240613_100721';
+data_path ='Y:\laura_berkowitz\app_ps1_ephys\data\to_split\hpc13_hpc14_flash_day22_240625_102924';
 
 % project folder where subjects data should be saved
 save_path = {laura,laura,'Y:\laura_berkowitz\alz_stim\data',[]}; 
     
-run_split=false;
-if  run_split
-    % split dat files a
-    split_dat(data_path,save_path, subject_order,'trim_dat',false)
-end
+% split dat files a
+split_dat(data_path,save_path, subject_order,'trim_dat',false)
+
 %% Process tracking (Done first so tracking can be updated in preprocess_session)
 % Open anaconda prompt and open gui
 % enter commands: 
@@ -101,10 +99,11 @@ channel_mapping('basepath',basepath)
 gui_session
 
 %% Detect SWRs using DectSWR. 
-% first input [ripple channel, sharp wave channel, noise(optional)] using intan channels + 1 (for matlab 1-based indexing). 
-ripple_channel = 2;%session.brainRegions.CA1sp.channels(end-1);
-sharp_wave_channel = 22;%session.brainRegions.CA1sr.channels(end-3);
-noise_channel = 43;
+% first input [ripple channel, sharp wave channel] using intan channels + 1 (for matlab 1-based indexing). 
+ripple_channel = 31%session.brainRegions.CA1sp.channels(end-1);
+sharp_wave_channel = 59%session.brainRegions.CA1sr.channels(end-3);
+noise_channel = 46;
+
 ripples = DetectSWR([ripple_channel,...
     sharp_wave_channel,...
     noise_channel],...
