@@ -128,6 +128,8 @@ for port = find(~cellfun(@isempty,subject_order))
     copyfile([data_path,filesep,'settings.xml'],basepath{port});
     copyfile([data_path,filesep,'info.rhd'],basepath{port});
     copyfile([data_path,filesep,'time.dat'],basepath{port});
+    copyfile([data_path,filesep,'digitalin.dat'],basepath{port});
+
     
     if trim_dat
         % create digitalIn event structure and save to basepath, and reset
