@@ -59,11 +59,11 @@ classdef tracking
                 y_origin{ep} = median(y_min:y_max);
                 
                 if length(behavior.epochs{1, epoch}.maze_size) > 1
-                scale_factor_x{ep} = (x_max - x_min)/behavior.epochs{1, epoch}.maze_size(1); %pixels/cm
-                scale_factor_y{ep} = (y_max - y_min)/behavior.epochs{1, epoch}.maze_size(2); %pixels/cm
+                    scale_factor_x{ep} = (x_max - x_min)/behavior.epochs{1, epoch}.maze_size(1); %pixels/cm
+                    scale_factor_y{ep} = (y_max - y_min)/behavior.epochs{1, epoch}.maze_size(2); %pixels/cm
                 else 
-                scale_factor_x{ep} = (x_max - x_min)/behavior.epochs{1, epoch}.maze_size(1); %pixels/cm
-                scale_factor_y{ep} = (y_max - y_min)/behavior.epochs{1, epoch}.maze_size(1); %pixels/cm
+                    scale_factor_x{ep} = (x_max - x_min)/behavior.epochs{1, epoch}.maze_size(1); %pixels/cm
+                    scale_factor_y{ep} = (y_max - y_min)/behavior.epochs{1, epoch}.maze_size(1); %pixels/cm
                 end
                 % add scaled parameters to maze_coord_df
                 maze_coords_df.x_scaled = tracking.scale_transform(maze_coords_df.x,x_origin{ep},scale_factor_x{ep});
