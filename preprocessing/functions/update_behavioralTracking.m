@@ -165,14 +165,23 @@ function filenames = sort_by_trailing_ts(filenames)
 
 
 % Extract the timestamps from the filenames
-timestamps = regexp(filenames, '-\d+', 'match');
-timestamps = cellfun(@(x) extractAfter(x,'-'),timestamps,'UniformOutput',false);
-timestamps = cellfun(@(x) str2double(x),timestamps,'UniformOutput',false);
+if any(contains(filenames,'-0000'))
+    timestamps = regexp(filenames, '-\d+-', 'match');
+    timestamps = cellfun(@(x) extractAfter(x,'-'),timestamps,'UniformOutput',false);
+    timestamps = cellfun(@(x) extractBefore(x,'-'),timestamps,'UniformOutput',false);
+else 
+    timestamps = regexp(filenames, '-\d+', 'match');
+    timestamps = cellfun(@(x) extractAfter(x,'-'),timestamps,'UniformOutput',false);
+end
 
-% Convert the timestamps to numeric values
+timestamps = cellfun(@(x) str2double(x),timestamps,'UniformOutput',false);
 
 % Sort the file list based on the timestamps
 [~, sortedIdx] = sort( [timestamps{:}]);
 
+
+
 filenames = filenames(sortedIdx);
 end
+
+
