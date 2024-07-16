@@ -52,6 +52,7 @@ else
     basepaths = unique([df.basepath{:}]);
 end
 
+
 % initialize session_status.csv as table
 col_names = {'group','basepath','lfp','lfp_date',...
     'sleep_states','sleep_states_date',...
@@ -85,11 +86,11 @@ session_status = table('Size',[length(basepaths), length(col_names)],'VariableNa
 for i = 1:length(basepaths)
     basepath = basepaths{i};
     basename = basenameFromBasepath(basepath);
+    basedir = fileparts(basepath);
+    subid = basenameFromBasepath(basedir);
     session_status.basepath{i} = basepath;
     folder_contents = dir(basepath);
-    strList=strsplit(basepath,'/');
-    indexName=find(strcmp(strList, 'data'),1)+1;
-    session_status.group{i} = char(strList(indexName));  
+    session_status.group{i} = char(subid);  
 
     if check_lfp
         nameExt=fullfile(basepath,[basename,'.lfp']);
