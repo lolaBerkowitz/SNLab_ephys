@@ -109,7 +109,7 @@ if length(dlc_files) >= 1
     digitalIn.timestampsOn{1,1} = ts';
     digitalIn.timestampsOff{1,1} = ts';
     
-else isempty(dlc_files)
+elseif isempty(dlc_files)
     digitalIn.timestampsOn{1,1} = nan;
     digitalIn.timestampsOff{1,1} = nan;
     digitalIn.timestampsOn{1,2} = nan;
