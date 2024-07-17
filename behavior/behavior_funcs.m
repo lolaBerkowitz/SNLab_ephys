@@ -491,7 +491,7 @@ classdef behavior_funcs
             fig = p.Results.fig;
 
             
-            basename = basenameFromBasepath(basepath);
+            [~, basename] = fileparts(basepath);
             
             % load animal behavior and session files
             session = loadSession(basepath);
@@ -516,7 +516,6 @@ classdef behavior_funcs
             
             HD = behavior_funcs.load_HD(basepath);
   
-            
             % determine which object moved
             moved_object_id =  behavior_funcs.find_moved_object(basepath);
             % for each behavior epoch, get exploration of objects within
@@ -903,6 +902,8 @@ classdef behavior_funcs
         %             disp('NOT FUNCTIONTIONAL LB 12/2022')
         %         end
         %
+        
+        
         %%  behavior utils
         
         function DR = discrimination_ratio(object_A_explore,object_B_explore)
