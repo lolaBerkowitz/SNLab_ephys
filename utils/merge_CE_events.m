@@ -50,9 +50,6 @@ function event_struct = remove_flags(event_struct)
 if any(contains(fieldnames(event_struct),'flagged'))   
     event_struct.timestamps(event_struct.flagged,:) = [];
     event_struct.peaks(event_struct.flagged) = [];
-    event_struct.duration(event_struct.flagged) = [];
-    event_struct.center(event_struct.flagged) = [];
-    event_struct.time(event_struct.flagged) = [];
 end
 end
 
