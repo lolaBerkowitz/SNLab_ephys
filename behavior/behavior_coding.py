@@ -41,11 +41,12 @@ def on_keypress(key, viewer):
     frame = viewer.dims.current_step[0]
     layer = viewer.layers.selection.active or viewer.layers[-1]
 
-    show_info('object :'+object+' '+action+' Frame: '+str(frame))  # if you want some visual feedback
+    # show_info('object :'+object+' '+action+' Frame: '+str(frame))  # if you want some visual feedback
     with open(CSV_OUT, 'a') as f:
         csv.writer(f).writerow([layer.source.path, frame, object, action])
 
+# for key in KEYMAP:
+#     viewer.bind_key(key, partial(on_keypress, key))
 for key in KEYMAP:
-    viewer.bind_key(key, partial(on_keypress, key))
-
+    viewer.bind_key(key, lambda key=key: on_keypress(key,viewer))
 napari.run()
