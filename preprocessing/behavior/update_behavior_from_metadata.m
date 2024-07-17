@@ -155,12 +155,9 @@ for ii = 1:length(session.behavioralTracking)
     % determine which columns have trial info
     frames = table2array(temp_df(row_idx,col_idx));
     
-    % keep columns that contain data
-    col_idx = col_idx(~isnan(frames));
-    
     % identify start and end frame columns
-    start_idx = find(contains(vars(col_idx),'start'));
-    stop_idx = find(contains(vars(col_idx),'stop'));
+    start_idx = find(contains(vars(col_idx(~isnan(frames))),'start'));
+    stop_idx = find(contains(vars(col_idx(~isnan(frames))),'stop'));
     
     % convert frames to seconds via behavior.timestamps for epoch
     start_ts = behavior.epochs{1, epoch}.startTime;
