@@ -133,3 +133,4 @@ dmypy.json
 MyAppInstaller_mcr.exe
 preprocessing/.DS_Store
 .DS_Store
+startup.m
