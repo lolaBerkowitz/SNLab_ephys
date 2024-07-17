@@ -15,9 +15,9 @@ ramp_channel = p.Results.ramp_channel;
 % load event file with stim 
 load(fullfile(basepath,'digitalIn.events.mat'))
 
-basename = basenameFromBasepath(basepath);
+[~,basename] = fileparts(basepath);
 manipulation = struct;
-manipulation.timestamps = [digitalIn.timestampsOn{ramp_channel}, digitalIn.timestampsOff{ramp_channel}];
+manipulation.timestamps = [digitalIn.timestampsOn{stim_channel}, digitalIn.timestampsOff{stim_channel}];
 manipulation.peaks = median(manipulation.timestamps,2);
 manipulation.amplitude = zeros(length(manipulation.peaks),1);
 manipulation.amplitudeUnits = 'AU';
@@ -25,7 +25,7 @@ manipulation.eventID = 1:length(manipulation.peaks);
 manipulation.eventIDlabels = repmat({event_label},length(manipulation.peaks),1);
 manipulation.eventIDbinary = false;
 manipulation.center = median(manipulation.timestamps);
-manipulation.duration = digitalIn.dur{ramp_channel};
+manipulation.duration = digitalIn.dur{stim_channel};
 manipulation.detectorinfo = 'SWRDetector v4';
 
 % initialize the structure file 
