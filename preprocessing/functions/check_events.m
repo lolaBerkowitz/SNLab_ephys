@@ -31,6 +31,11 @@ end
 % if edited, delete ints, dur, and intsPeriods and remake belo
 %%
 
+digitalIn.timestampsOff{1,2} = [];
+digitalIn.timestampsOff{1,3} = [];
+digitalIn.timestampsOff{1,4} = [];
+
+
 digitalIn.timestampsOff{1,2} = digitalIn.timestampsOn{1,2} + .3;
 digitalIn.timestampsOff{1,3} = digitalIn.timestampsOn{1,3} + .3;
 digitalIn.timestampsOff{1,4} = digitalIn.timestampsOn{1,4} + .3;
