@@ -52,7 +52,7 @@ if ismember(experiment_type,'ephys')
     end
 
     % run main function
-    general_behavior_file_SNlab('basepath',basepath,'force_overwrite',overwrite_behavior)
+    general_behavior_file_SNlab('basepath',basepath,'force_overwrite',overwrite_behavior,'primary_coords_dlc', 5)
 
     % update trials from metadata csv
     update_behavior_from_metadata(metadata_path,'basepath',basepath)
@@ -67,7 +67,7 @@ if ismember(experiment_type,'ephys')
     
 else
     
-     general_behavior_file_SNlab('basepath',basepath,'force_overwrite',overwrite_behavior)
+     general_behavior_file_SNlab('basepath',basepath,'force_overwrite',overwrite_behavior,'primary_coords_dlc', 5)
 
 end
 

@@ -34,7 +34,7 @@ laura = 'Y:\laura_berkowitz\app_ps1_ephys\data';
 subject_order = {'hpc13','hpc14','flash',[]};
 
 % folder where dat files reside that need to be split
-data_path ='Y:\laura_berkowitz\app_ps1_ephys\data\to_split\hpc13_hpc14_flash_day22_240625_102924';
+data_path ='Y:\laura_berkowitz\app_ps1_ephys\data\to_split\day18';
 
 % project folder where subjects data should be saved
 save_path = {laura,laura,'Y:\laura_berkowitz\alz_stim\data',[]}; 
@@ -65,11 +65,11 @@ disp('Skip bad channels in Neuroscope')
 % Single shank (A164 poly2)
 preprocess_session(basepath,'digitalInputs',false,'kilosort',true,'tracking',false)
 % If running kilosort separately for single shank (A164 poly2)
-process_kilosort(basepath,0)
+process_kilosort(basepath)
 % multiple shank 
-preprocess_session(basepath,'digitalInputs',false,'kilosort',true,'tracking',false,'specialChannels',[],'multishank',true)
+preprocess_session(basepath,'digitalInputs',false,'kilosort',false,'tracking',false,'specialChannels',[],'multishank',true)
 % If running kilosort separately for multiple shanks
-process_kilosort(basepath,1)
+process_kilosort(basepath,'multishank',true)
 
 %% Batch preprocess (must make sure xml is made/accurate before running)
 subject_folder = 'Y:\laura_berkowitz\app_ps1_ephys\data\hpc09'; %subject main folder (i.e. ~\data\hpc01)
@@ -100,9 +100,9 @@ gui_session
 
 %% Detect SWRs using DectSWR. 
 % first input [ripple channel, sharp wave channel] using intan channels + 1 (for matlab 1-based indexing). 
-ripple_channel = 31%session.brainRegions.CA1sp.channels(end-1);
-sharp_wave_channel = 59%session.brainRegions.CA1sr.channels(end-3);
-noise_channel = 46;
+ripple_channel =32%session.brainRegions.CA1sp.channels(end-1);
+sharp_wave_channel = 62%session.brainRegions.CA1sr.channels(end-3);
+noise_channel = 30;
 
 ripples = DetectSWR([ripple_channel,...
     sharp_wave_channel,...
@@ -114,6 +114,7 @@ ripples = DetectSWR([ripple_channel,...
     'forceDetect',true);
 
 %% Compute basic cell metrics
+basepath=pwd
 basename = basenameFromBasepath(basepath);
 session = loadSession(basepath,basename);
 cell_metrics = ProcessCellMetrics('session',session,'manualAdjustMonoSyn',false);
