@@ -45,9 +45,7 @@ parse(p,varargin{:});
 
 analogInputs = p.Results.analogInputs;
 multishank = p.Results.multishank;
-analogChannels = p.Results.analogChannels;
 digitalInputs = p.Results.digitalInputs;
-digitalChannels = p.Results.digitalChannels;
 getAcceleration = p.Results.getAcceleration;
 getLFP = p.Results.getLFP;
 getEMG = p.Results.getEMG;
@@ -57,13 +55,11 @@ kilosort = p.Results.kilosort;
 % cleanArtifacts = p.Results.cleanArtifacts;
 stateScore = p.Results.stateScore;
 tracking = p.Results.tracking;
-removeNoise = p.Results.removeNoise;
 ssd_path = p.Results.ssd_path;
 lfp_fs = p.Results.lfp_fs;
 specialChannels = p.Results.specialChannels;
-acquisition_event_flag = p.Results.acquisition_event_flag;
 check_epochs = p.Results.check_epochs;
-maze_size = p.Results.maze_size;
+
 % Prepare dat files and prepare metadata
 
 % Set basename from folder
@@ -72,7 +68,7 @@ maze_size = p.Results.maze_size;
 % If non-contiguous recordings were taken, merge the dat files into one
 % session. Default is false.
 if concatenateDat
-    concatenateDats(basepath,0,1);
+    concatenate_dats(basepath);
 end
 
 
@@ -99,23 +95,14 @@ save([basepath,filesep,[basename,'.session.mat']],'session')
 
 % Load rhd file 
 % Load info.rhd for recording parameters
-[amplifier_channels, ~, aux_input_channels, ~,...
-    ~, ~, frequency_parameters,board_adc_channels] = ...
-    read_Intan_RHD2000_file_snlab(basepath);
+[~, ~, ~, ~,~, ~, frequency_parameters,~] = read_Intan_RHD2000_file_snlab(basepath);
 
 % Process additional inputs
-
 % Analog inputs
 % check the two different fucntions for delaing with analog inputs and proably rename them
 if analogInputs
-%     if  ~isempty(analogChannels)
-%         analogInp = computeAnalogInputs('analogCh',analogChannels,'saveMat',true);
-%     else
-%         analogInp = computeAnalogInputs('analogCh',[],'saveMat',true);
-%     end
-%     
     % analog pulses ...
-    [pulses] = getAnalogPulses('samplingRate',session.extracellular.sr);
+    [pulses] = getAnalogPulses('samplingRate',frequency_parameters.board_adc_sample_rate);
 end
 
 % Digital inputs
@@ -133,11 +120,7 @@ if getAcceleration
     accel = computeIntanAccel('saveMat',true);
 end
 
-% remove noise from data for cleaner spike sorting
-if removeNoise
-    NoiseRemoval(basepath); % not very well tested yet
-end
-
+% get lfp
 if getLFP
     % create downsampled lfp low-pass filtered lfp file
     LFPfromDat(basepath,'outFs',lfp_fs);
@@ -162,6 +145,7 @@ if stateScore
     SleepScoreMaster(basepath,'rejectChannels',session.channelTags.Bad.channels); % takes lfp in base 0
     
 end
+
 
 if kilosort
 
