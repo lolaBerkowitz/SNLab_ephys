@@ -3,8 +3,7 @@
 % errors that may arise during acquisition. 
 %
 % Load info.rhd for recording parameters
-[amplifier_channels, ~, aux_input_channels, ~,...
-    ~, ~, frequency_parameters,board_adc_channels ] = ...
+[~, ~, ~, ~,~, ~, frequency_parameters,~ ] = ...
     read_Intan_RHD2000_file_snlab(basepath);
 
 % load exsisting events
@@ -39,6 +38,7 @@ digitalIn.timestampsOff{1,4} = [];
 digitalIn.timestampsOff{1,2} = digitalIn.timestampsOn{1,2} + .3;
 digitalIn.timestampsOff{1,3} = digitalIn.timestampsOn{1,3} + .3;
 digitalIn.timestampsOff{1,4} = digitalIn.timestampsOn{1,4} + .3;
+digitalIn.timestampsOff{1,5} = digitalIn.timestampsOn{1,5} + .3;
 
 
 
