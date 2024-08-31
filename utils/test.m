@@ -23,12 +23,12 @@ for i = 1:length(folders)
         session = loadSession(basepath,basename);
         
         try
-            ripple_channel = session.brainRegions.CA1sp.channels(end-1);
-            
+            ripple_channel = 6;
+            noise = 46; 
             ripples = FindRipples('basepath',basepath,...
-                'channel',ripple_channel,...
-                'thresholds',[0.5 1.5],...
-                'durations',[50 500]);
+                'channel',6,...
+                'noise',46,... 
+                'thresholds', [.5 2.5]);
             
             save(fullfile(basepath,[basename '.ripples.events.mat']),'ripples')
         catch
