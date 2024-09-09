@@ -23,7 +23,7 @@
 
 %% paths for individual research projects 
 % laura = 'Y:\laura_berkowitz\VR_ephys\data';
-% laura = 'Y:\laura_berkowitz\alz_stim\data';
+laura_stim = 'Y:\laura_berkowitz\alz_stim\data';
 laura = 'Y:\laura_berkowitz\app_ps1_ephys\data';
 
 %% Multi-animal recording session 
@@ -31,13 +31,13 @@ laura = 'Y:\laura_berkowitz\app_ps1_ephys\data';
 % For SNLab, assumes one animal per active port (64 channel electrodes) as
 % of 2/22
 % subject folder corresponds to port A, B, C, D, respectively
-subject_order = {'hpc13','hpc14','flash',[]};
+subject_order = {'hpc13','hpc15','hpc16','hpc17'};
 
 % folder where dat files reside that need to be split
-data_path ='Y:\laura_berkowitz\app_ps1_ephys\data\to_split\day18';
+data_path ='Y:\laura_berkowitz\app_ps1_ephys\data\to_split\hpc13_hpc15_hpc16_hpc17_240905_103951';
 
 % project folder where subjects data should be saved
-save_path = {laura,laura,'Y:\laura_berkowitz\alz_stim\data',[]}; 
+save_path = {laura,laura,laura,laura}; 
     
 % split dat files a
 split_dat(data_path,save_path, subject_order,'trim_dat',false)
@@ -55,7 +55,7 @@ split_dat(data_path,save_path, subject_order,'trim_dat',false)
 % to be analyzed. Let them run overnight while split dat runs. 
 
 %% Single Session Preprocess
-basepath = 'Y:\laura_berkowitz\app_ps1_ephys\data\hpc13\hpc13_day06_240522_104710';
+basepath = 'Y:\laura_berkowitz\app_ps1_ephys\data\hpc13\hpc13_day41_240824_080253';
 
 %% Check xml/channel mapping: verify channel map, skip bad channels, and save 
 
@@ -67,14 +67,14 @@ preprocess_session(basepath,'digitalInputs',false,'kilosort',true,'tracking',fal
 % If running kilosort separately for single shank (A164 poly2)
 process_kilosort(basepath)
 % multiple shank 
-preprocess_session(basepath,'digitalInputs',false,'kilosort',false,'tracking',false,'specialChannels',[],'multishank',true)
+preprocess_session(basepath,'digitalInputs',true,'kilosort',true,'tracking',true,'specialChannels',[],'multishank',true)
 % If running kilosort separately for multiple shanks
 process_kilosort(basepath,'multishank',true)
 
 %% Batch preprocess (must make sure xml is made/accurate before running)
-subject_folder = 'Y:\laura_berkowitz\app_ps1_ephys\data\hpc09'; %subject main folder (i.e. ~\data\hpc01)
+subject_folder = 'Y:\laura_berkowitz\app_ps1_ephys\data\hpc17'; %subject main folder (i.e. ~\data\hpc01)
 
-preprocess_batch(subject_folder)
+preprocess_batch(subject_folder,true)
 
 %% Clean up kilo results in Phy
 disp ('Curate the kilosort results in Phy ')
@@ -96,13 +96,13 @@ gui_session
 
 % run channel mapping to update session with 
 channel_mapping('basepath',basepath)
-gui_session
+
 
 %% Detect SWRs using DectSWR. 
 % first input [ripple channel, sharp wave channel] using intan channels + 1 (for matlab 1-based indexing). 
-ripple_channel =32%session.brainRegions.CA1sp.channels(end-1);
-sharp_wave_channel = 62%session.brainRegions.CA1sr.channels(end-3);
-noise_channel = 30;
+ripple_channel = 57%session.brainRegions.CA1sp.channels(end-1);
+sharp_wave_channel = 11%session.brainRegions.CA1sr.channels(end-3);
+noise_channel = 46;
 
 ripples = DetectSWR([ripple_channel,...
     sharp_wave_channel,...
@@ -206,28 +206,23 @@ rmpath(genpath(fullfile('external_packages','buzcode')))
 
 end
 
-function preprocess_batch(data_folder)
+function preprocess_batch(data_folder, multishank)
 % checks for evidence of preprocessing in data_folder subfolds and runs
 % preprocess_session.m for unprocessed sessions
 
-
 df = compile_sessions(data_folder);
-
 % loop through basepaths in df and process those that don't have evidence of
 % processing (in this case chanMap.mat)
 for i = 1:length(df.basepath)
     try
     basepath = df.basepath{i}{:};
     basename = basenameFromBasepath(basepath);
-    % Check xml/channel mapping: verify channel map, skip bad channels, and save 
-%     if ~exist([basepath,filesep,'amplifier.xml'],'file')
-%         make_xml(basepath)
-%     end
-     
-        if isempty(dir(fullfile(basepath,[basename,'.lfp'])))
+        if isempty(dir(fullfile(basepath,[basename,'.lfp']))) & ~multishank
             preprocess_session(basepath,'digitalInputs',false,'check_epochs',false,'kilosort',false,'overwrite',false)
             channel_mapping('basepath',basepath)
-        else
+        elseif isempty(dir(fullfile(basepath,[basename,'.lfp']))) & multishank
+            preprocess_session(basepath,'digitalInputs',false,'kilosort',false,'tracking',false,'specialChannels',[],'multishank',true,'check_epochs',false)
+        else 
             channel_mapping('basepath',basepath)
             continue
         end
