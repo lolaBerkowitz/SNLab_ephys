@@ -34,7 +34,7 @@ laura = 'Y:\laura_berkowitz\app_ps1_ephys\data';
 subject_order = {'hpc13','hpc15','hpc16','hpc17'};
 
 % folder where dat files reside that need to be split
-data_path ='Y:\laura_berkowitz\app_ps1_ephys\data\to_split\hpc13_hpc15_hpc16_hpc17_240905_103951';
+data_path ='Y:\laura_berkowitz\app_ps1_ephys\data\to_split\hpc13_hpc15_hpc16_hpc17_240910_103432';
 
 % project folder where subjects data should be saved
 save_path = {laura,laura,laura,laura}; 
@@ -55,7 +55,7 @@ split_dat(data_path,save_path, subject_order,'trim_dat',false)
 % to be analyzed. Let them run overnight while split dat runs. 
 
 %% Single Session Preprocess
-basepath = 'Y:\laura_berkowitz\app_ps1_ephys\data\hpc13\hpc13_day41_240824_080253';
+basepath = 'Y:\laura_berkowitz\app_ps1_ephys\data\hpc17\hpc17_day11_240903_103353';
 
 %% Check xml/channel mapping: verify channel map, skip bad channels, and save 
 
@@ -67,12 +67,12 @@ preprocess_session(basepath,'digitalInputs',false,'kilosort',true,'tracking',fal
 % If running kilosort separately for single shank (A164 poly2)
 process_kilosort(basepath)
 % multiple shank 
-preprocess_session(basepath,'digitalInputs',true,'kilosort',true,'tracking',true,'specialChannels',[],'multishank',true)
+preprocess_session(basepath,'digitalInputs',false,'kilosort',true,'tracking',false,'specialChannels',[],'multishank',true)
 % If running kilosort separately for multiple shanks
 process_kilosort(basepath,'multishank',true)
 
 %% Batch preprocess (must make sure xml is made/accurate before running)
-subject_folder = 'Y:\laura_berkowitz\app_ps1_ephys\data\hpc17'; %subject main folder (i.e. ~\data\hpc01)
+subject_folder = 'Y:\laura_berkowitz\app_ps1_ephys\data\hpc16'; %subject main folder (i.e. ~\data\hpc01)
 
 preprocess_batch(subject_folder,true)
 
@@ -100,8 +100,8 @@ channel_mapping('basepath',basepath)
 
 %% Detect SWRs using DectSWR. 
 % first input [ripple channel, sharp wave channel] using intan channels + 1 (for matlab 1-based indexing). 
-ripple_channel = 57%session.brainRegions.CA1sp.channels(end-1);
-sharp_wave_channel = 11%session.brainRegions.CA1sr.channels(end-3);
+ripple_channel = %session.brainRegions.CA1sp.channels(end-1);
+sharp_wave_channel = 8%session.brainRegions.CA1sr.channels(end-3);
 noise_channel = 46;
 
 ripples = DetectSWR([ripple_channel,...
@@ -121,8 +121,7 @@ cell_metrics = ProcessCellMetrics('session',session,'manualAdjustMonoSyn',false)
 
 %% GUI to manually curate cell classification. This is not neccesary at this point.
 % It is more useful when you have multiple sessions
-cell_metrics = CellExplorer('metrics',cell_metrics);
-channel_mapping('basepath',basepath)
+CellExplorer
 
 
 %% To load multiple sessions into CellExplorer
