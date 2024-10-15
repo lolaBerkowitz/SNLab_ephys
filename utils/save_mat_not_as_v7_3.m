@@ -20,15 +20,12 @@ for i = 1:length(folders)
         
         %load ripples and events 
         try
-        load(fullfile(basepath, [basename,'.ripples.events.mat']));
-        load(fullfile(basepath, [basename,'.SleepState.states.mat']));
+        load(fullfile(basepath, [basename,'.EMGFromLFP.LFP.mat']));
         catch
             disp(['Error loading file for: ',basepath, ' skipping for now'])
             continue
         end
-        save(fullfile(basepath, [basename,'.ripples.events.mat']),'ripples');
-        save(fullfile(basepath, [basename,'.SleepState.states.mat']),'SleepState');
-
+        save(fullfile(basepath, [basename,'.EMGFromLFP.LFP.mat']),'EMGFromLFP');
     end
 end
 
