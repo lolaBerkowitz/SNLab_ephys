@@ -130,7 +130,7 @@ load([basepath,filesep,[basename,'.session.mat']],'session');
 
 % package results
 behavior.sr = fs;
-behavior.timestamps = t;
+behavior.timestamps = t';
 behavior.position.x = x';
 behavior.position.y = y';
 behavior.position.z = []; % no z coords LB 06/22

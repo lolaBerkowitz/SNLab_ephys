@@ -249,7 +249,6 @@ classdef tracking
         
             % below are many methods on locating tracking data from many formats
             [tracking_struct,field_names] = tracking.process_and_sync_dlc_SNLab('basepath',basepath,...
-                'primary_coords',primary_coords_dlc,...
                 'likelihood',likelihood_dlc);
        
             
@@ -439,12 +438,10 @@ classdef tracking
             p = inputParser;
             p.addParameter('basepath',pwd,@isfolder);
             p.addParameter('video_channel_ttl',1,@isnumeric); % digitalin channel that contains video ttl
-            p.addParameter('primary_coords',1:2,@isnumeric); % which tracker point do you want
             p.addParameter('likelihood',.95,@isnumeric); % tracking quality thres [0-1]
             p.addParameter('pulses_delta_range',0.01,@isnumeric); % range for ttls
             
             p.parse(varargin{:});
-            primary_coords = p.Results.primary_coords; % not used currently
             basepath = p.Results.basepath;
             video_channel_ttl = p.Results.video_channel_ttl;
             likelihood = p.Results.likelihood;
