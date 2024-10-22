@@ -60,9 +60,11 @@ subject_idx = ~cellfun(@isempty,subject_order);
     ~, ~, frequency_parameters,~ ] = ...
     read_Intan_RHD2000_file_snlab(data_path);
 
+[~, basename] = fileparts(data_path);
+
 % make the basepath if its not already made
 for port = find(subject_idx)
-    basepath{port} = fullfile(save_path{port},filesep,subject_order{port},[subject_order{port},'_',basenameFromBasepath(data_path)]);
+    basepath{port} = fullfile(save_path{port},filesep,subject_order{port},[subject_order{port},'_',basename]);
     
     if ~isfolder(basepath{port})
         mkdir(basepath{port})
