@@ -35,7 +35,7 @@ overwrite_behavior = p.Results.overwrite_behavior;
 config_path = p.Results.config_path;
 metadata_path = p.Results.metadata_path;
 experiment_type = p.Results.experiment_type; 
-basename = basenameFromBasepath(basepath);
+primary_coords = p.Results.primary_coords_dlc;
 
 % skip if no tracking found
 if isempty(dir([basepath,filesep,'*DLC*.csv'])) && isempty(dir([basepath,filesep,'*godot*.csv']))
@@ -53,7 +53,7 @@ if ismember(experiment_type,'ephys')
     end
 
     % run main function
-    general_behavior_file_SNlab('basepath',basepath,'force_overwrite',overwrite_behavior,'primary_coords_dlc', 3)
+    general_behavior_file_SNlab('basepath',basepath,'force_overwrite',overwrite_behavior,'primary_coords_dlc', primary_coords)
 
     % update trials from metadata csv
     update_behavior_from_metadata(metadata_path,'basepath',basepath)
@@ -68,7 +68,7 @@ if ismember(experiment_type,'ephys')
     
 else
     
-     general_behavior_file_SNlab('basepath',basepath,'force_overwrite',overwrite_behavior,'primary_coords_dlc', 5)
+     general_behavior_file_SNlab('basepath',basepath,'force_overwrite',overwrite_behavior,'primary_coords_dlc', primary_coords)
 
 end
 
