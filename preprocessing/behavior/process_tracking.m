@@ -26,6 +26,7 @@ p.addParameter('overwrite_behavior',true,@islogical)
 p.addParameter('config_path','C:\Users\schafferlab\github\SNLab_ephys\behavior\behavior_configs\')
 p.addParameter('metadata_path','Y:\laura_berkowitz\behavior_metadata.csv')
 p.addParameter('experiment_type','ephys')
+p.addParameter('primary_coords_dlc',3,@isnumeric)
 
 
 p.parse(varargin{:})
