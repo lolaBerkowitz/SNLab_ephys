@@ -34,6 +34,9 @@ update_trials(basepath,df)
 % update maze size
 update_maze_size(basepath,df)
 
+% update behavior.epochs.scale_measurement from maze_size column
+update_pixel_distance(basepath,df)
+
 
 end
 
@@ -64,8 +67,8 @@ for i = 1:length(basenames)
         try
             general_behavior_file_SNlab('basepath',basepath)
             load(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
-        catch
-            disp('Failed - check DLC outputs are present')
+        catch e
+            disp(e)
             continue
         end
         
@@ -73,25 +76,28 @@ for i = 1:length(basenames)
     
     if ~isempty(behavior.trials)
         continue
-    else
-    %% update behavior.trials from trial_start/stop columns
-    update_trials(basepath,df)
+    else 
+        % update behavior.trials from trial_start/stop columns
+        update_trials(basepath,df)
     end
+    
     % update behavior.epochs.maze_size from maze_size column
     update_maze_size(basepath,df)
     
+    % update behavior.epochs.scale_measurement from maze_size column
+    update_pixel_distance(basepath,df)
+    
     
 end
 end
 
-
-function update_maze_size(basepath,df)
+function update_pixel_distance(basepath,df)
 % updates behavior.trials from frames in df
 
 % crate basename from basepath
 basename = basenameFromBasepath(basepath);
 % load session and animal behavior file
-load(fullfile(basepath,[basename,'.animal.behavior.mat']));
+load(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior');
 
 session = loadSession(basepath,basename);
 
@@ -100,7 +106,40 @@ temp_df = df(contains(df.basename,basename),:);
 
 % setup
 vars = fieldnames(temp_df);
-col_idx = find(contains(vars,{'maze_width_cm','maze_length_cm'}));
+col_idx = contains(vars,{'pixel_distance'});
+
+% loop through videos indicated in session.behavioralTracking
+for ii = 1:length(session.behavioralTracking)
+    
+    % load epoch to get start/end for timestamps
+    epoch = session.behavioralTracking{1,ii}.epoch;
+    % grap video so we can find row index for a given video
+    vidname = session.behavioralTracking{1,ii}.notes;
+    row_idx = contains(temp_df.vidname,extractBefore(vidname,'.avi'));
+        
+    behavior.epochs{1, epoch}.pixel_distance = table2array(temp_df(row_idx,col_idx));
+
+end
+% save behavior file
+save(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
+end
+
+function update_maze_size(basepath,df)
+% updates behavior.trials from frames in df
+
+% crate basename from basepath
+basename = basenameFromBasepath(basepath);
+% load session and animal behavior file
+load(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior');
+
+session = loadSession(basepath,basename);
+
+% pull rows from df for this basepath
+temp_df = df(contains(df.basename,basename),:);
+
+% setup
+vars = fieldnames(temp_df);
+col_idx = contains(vars,{'maze_width_cm','maze_length_cm'});
 
 % loop through videos indicated in session.behavioralTracking
 for ii = 1:length(session.behavioralTracking)
