@@ -10,6 +10,12 @@ classdef tracking
             vec_out =(vec - origin)/scale_factor;
         end
         
+        function vec_out = scale(vec,scale_factor)
+            
+            vec_out = vec/scale_factor;
+            
+        end
+        
         function ep_idx = get_epoch_idx(session,behavior)
             % for all behavior epochs, creates logical idx corresponding to epoch
             % boundaries. arrays are nested in cell corresponding to each behavioral
@@ -43,10 +49,12 @@ classdef tracking
                 
                 epoch = session.behavioralTracking{1,ep}.epoch;
                 
+                pixel_distance = maze_distance_gui(video_path,maze_sizes);
+                
                 % load maze coords for given epoch video
                 maze_coords_df = readtable(fullfile(basepath,...
                     [extractBefore(session.behavioralTracking{1,ep}.notes,'.avi'),'_maze_coords.csv']));
-                
+                pixel_distance
                 % get max/min
                 x_max = max(maze_coords_df.x(ismember(maze_coords_df.object,'corner')));
                 x_min = min(maze_coords_df.x(ismember(maze_coords_df.object,'corner')));
@@ -68,6 +76,7 @@ classdef tracking
                 % add scaled parameters to maze_coord_df
                 maze_coords_df.x_scaled = tracking.scale_transform(maze_coords_df.x,x_origin{ep},scale_factor_x{ep});
                 maze_coords_df.y_scaled = tracking.scale_transform(maze_coords_df.y,y_origin{ep},scale_factor_y{ep});
+                
                 % save scaled parameters to behavioralTracking 
                 session.behavioralTracking{1, ep}.maze_coords = maze_coords_df;
            
@@ -228,6 +237,84 @@ classdef tracking
             notes = [];   
         end
         
+
+        function pixel_distance = maze_distance_gui(video_path,maze_sizes,vid_time)
+        % maze_distance_gui: manually get distance between points in pixels
+        %
+        % This fuction was made in order to get the ratio to convert tracking
+        % points from pixels to cm.
+        %
+        % Input: 
+        %   video_path: full path to video
+        %
+        % Output:
+        %   pixel_distance: distance between clicked points in pixels
+        %
+        % Copyright (C) 2022 Ryan Harvey
+
+        % check if video exists
+        if ~exist(video_path,'file')
+           error([video_path,'  video does not exist']) 
+        end
+        
+
+%         % read video
+%         vid_obj = VideoReader(video_path);
+% 
+%         % read first 10 seconds of video frames
+%         frames = read(vid_obj, [1, round(vid_obj.FrameRate*1)]);
+%         
+        basepath = fileparts(video_path);
+        img_path = fullfile(basepath,'temp_img.png');
+        % create image save to current directory
+        sys_cmd = ['ffmpeg -ss ', num2str(vid_time),' -i ',video_path,' -vframes 1 ',img_path];
+        system(sys_cmd)
+        
+        im = imread(img_path); 
+    
+%         % init matrix to store flattened frames
+%         grey_frames = zeros(vid_obj.Height, vid_obj.Width, size(frames,4));
+%         for i = 1:size(frames, 4)
+%             grey_frames(:,:,i) = rgb2gray(frames(:,:,:,i));
+%         end
+%         % take averge of 10 seconds
+%         grey_frames_avg = mean(grey_frames, 3);
+
+        % plot average frame
+        fig = figure;
+        imagesc(im) % display t he first frame        
+        hold on;
+        colormap('gray');
+        axis('image')
+        if nargin>1
+            try
+                title(['click on 2 key points approximately ' num2str(maze_sizes) 'cm apart and hit "enter" '])
+            catch
+                title(['click on 2 key points approximately ' num2str(maze_sizes) 'cm apart and hit "enter" '])
+            end
+        else
+            title('click on 2 key points and hit "enter" ')
+        end
+
+        % let the user click around the coordinates
+        corners = [];
+        i = 1;
+        while true
+            [X,Y]=ginput(1);
+            if isempty(X)
+                break
+            end
+            corners = [corners;[X,Y]];
+            plot(corners(:,1),corners(:,2),'r',X,Y,'*r')
+            i=i+1;
+        end
+        close(fig)
+        delete(img_path)
+
+        % calculate pixel distance
+        pixel_distance = pdist(corners,'euclidean');
+        end
+
 
         
         function [t,x,y,v,a,angle,units,source,fs,notes,extra_points,vidnames] = ...
@@ -616,6 +703,7 @@ classdef tracking
             elseif isempty(video_ttl)
                 video_ttl = t;
             else
+                disp(['N number of frames off: ', num2str(basler_intan_diff)])
                 warning('Unnoticed problem with Camera/Intan... I would go back and check both step by step');
             end
         end
