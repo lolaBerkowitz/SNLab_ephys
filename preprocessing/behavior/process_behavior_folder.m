@@ -62,7 +62,7 @@ update_epochs('basepath',basepath,...
     'ttl_method',[])
 
 % general behavior file
-general_behavior_file_SNlab('basepath',basepath,'force_overwrite',true,'smooth_factor',.2,'primary_coords_dlc',2:3);
+general_behavior_file_SNlab('basepath',basepath,'force_overwrite',true,'smooth_factor',.2,'primary_coords_dlc',5);
 
 % update behavior file from metadata csv
 update_behavior_from_metadata(metadata_path,'basepath',basepath);
