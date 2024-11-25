@@ -208,6 +208,7 @@ multi_idx = contains(configs,'multi');
 object_idx = contains(configs,'object');
 open_field_idx = contains(configs,'open_field');
 place_preference_idx = contains(configs,'conditioned_place'); 
+y_maze_idx = contains(configs,'y_maze');
 
 if contains(name,{'multi'})
     config_name = configs{multi_idx & ~object_idx};
@@ -217,6 +218,8 @@ elseif contains(name,{'context','open_field','morph','circular_track','pairing_A
     config_name = configs{~multi_idx & ~object_idx & open_field_idx};
 elseif contains(name,{'pre_test','post_test','pairing'})
     config_name = configs{place_preference_idx};
+elseif contains(name,{'y_maze'})
+    config_name = configs{y_maze_idx};
 end
 
 config_name = fullfile(config_path,config_name);
