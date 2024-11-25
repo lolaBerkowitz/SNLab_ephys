@@ -34,7 +34,7 @@ laura = 'Y:\laura_berkowitz\app_ps1_ephys\data';
 subject_order = {'hpc13','hpc15','hpc16','hpc17'};
 
 % folder where dat files reside that need to be split
-data_path ='Y:\laura_berkowitz\app_ps1_ephys\data\to_split\hpc13_hpc15_hpc16_hpc17_240910_103432';
+data_path ='Y:\laura_berkowitz\app_ps1_ephys\data\to_split\hpc13_hpc15_hpc16_hpc17_241023_105145';
 
 % project folder where subjects data should be saved
 save_path = {laura,laura,laura,laura}; 
@@ -72,7 +72,7 @@ preprocess_session(basepath,'digitalInputs',false,'kilosort',true,'tracking',fal
 process_kilosort(basepath,'multishank',true)
 
 %% Batch preprocess (must make sure xml is made/accurate before running)
-subject_folder = 'Y:\laura_berkowitz\app_ps1_ephys\data\hpc16'; %subject main folder (i.e. ~\data\hpc01)
+subject_folder = 'Y:\laura_berkowitz\app_ps1_ephys\data\hpc15'; %subject main folder (i.e. ~\data\hpc01)
 
 preprocess_batch(subject_folder,true)
 
@@ -100,8 +100,8 @@ channel_mapping('basepath',basepath)
 
 %% Detect SWRs using DectSWR. 
 % first input [ripple channel, sharp wave channel] using intan channels + 1 (for matlab 1-based indexing). 
-ripple_channel = %session.brainRegions.CA1sp.channels(end-1);
-sharp_wave_channel = 8%session.brainRegions.CA1sr.channels(end-3);
+ripple_channel = 1;%session.brainRegions.CA1sp.channels(end-1)
+sharp_wave_channel = 8;%session.brainRegions.CA1sr.channels(end-3);
 noise_channel = 46;
 
 ripples = DetectSWR([ripple_channel,...
