@@ -1,0 +1,16 @@
+quadrant,object,position
+arm_1,corner,A
+arm_1,corner,B
+arm_1,corner,C
+arm_1,corner,D
+arm_2,corner,A
+arm_2,corner,B
+arm_2,corner,C
+arm_2,corner,D
+arm_3,corner,A
+arm_3,corner,B
+arm_3,corner,C
+arm_3,corner,D
+center_1,corner,A
+center_2,corner,B
+center_3,corner,C
