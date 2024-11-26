@@ -1,4 +1,4 @@
-function update_metadata_pixel_distance(data_path)
+function update_metadata_pixel_distance(data_path,video_time)
 
 df = readtable(data_path,'Delimiter','comma'); 
 
@@ -14,7 +14,7 @@ for i = 1:length(df.basepath)
         video_path = fullfile(df.basepath{i},[df.vidname{i},'.avi']);
         maze_size = df.maze_width_cm(i);
         
-        pixel_distance = tracking.maze_distance_gui(video_path,maze_size,300);
+        pixel_distance = tracking.maze_distance_gui(video_path,maze_size,video_time);
 
         df.pixel_distance(i) = pixel_distance; 
         
