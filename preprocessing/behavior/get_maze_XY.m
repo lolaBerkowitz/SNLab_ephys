@@ -84,7 +84,7 @@ main(session, config_path, vid_time,vid_type)
 
 end
 
-function main(session, config_path, vid_time, vid_type)
+function main_test(session, config_path, vid_time, ~)
 % runs main process of looping through videos in basepath, pulling up
 % image via local grab_coords function which allows user to collect coordinate data
 % and outputs coords for object A center, object A edge, object B center,
