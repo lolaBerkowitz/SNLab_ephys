@@ -4,13 +4,9 @@ function update_behavior_from_metadata(metadata_path,varargin)
 % input parser
 p = inputParser;
 addParameter(p,'basepath',pwd);
-addParameter(p,'batch',false); % flag for batch processing
-addParameter(p,'data_folder',[]); % directory for batch
 
 parse(p,varargin{:});
 basepath = p.Results.basepath;
-batch = p.Results.batch;
-data_folder = p.Results.data_folder; % for batch in progress
 
 % read in metadata csv
 df = readtable(metadata_path);
@@ -22,74 +18,18 @@ catch
     return
 end
 
-if batch
-    disp('batch processing option a work in progress')
-    return
-    
-end
-
-% update trials
+% update trials in behavior file
 update_trials(basepath,df)
 
-% update maze size
+% update maze size in session and in behavior file
 update_maze_size(basepath,df)
 
-% update behavior.epochs.scale_measurement from maze_size column
+% update pixel in session and in behavior file
 update_pixel_distance(basepath,df)
 
 
 end
 
-
-
-% Batch function in progress
-function main_batch(data_folder,df)
-% loop through and update animal behavior file for all subfolders in
-% data_folder
-%
-basenames = unique(df.basename);
-% loop through unique basenamesl
-for i = 1:length(basenames)
-    % obtain subject dir from basename
-    basename = basenames{i};
-    
-    sub = split(basename,'_');
-    sub = sub{1};
-    
-    % create basepath
-    basepath = [data_folder,filesep,sub,filesep,basename];
-    session = loadSession(basepath,basename);
-    
-    % load animal behavior file
-    if exist(fullfile(basepath,[basename,'.animal.behavior.mat']),'file')
-        load(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
-    else
-        try
-            general_behavior_file_SNlab('basepath',basepath)
-            load(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
-        catch e
-            disp(e)
-            continue
-        end
-        
-    end
-    
-    if ~isempty(behavior.trials)
-        continue
-    else 
-        % update behavior.trials from trial_start/stop columns
-        update_trials(basepath,df)
-    end
-    
-    % update behavior.epochs.maze_size from maze_size column
-    update_maze_size(basepath,df)
-    
-    % update behavior.epochs.scale_measurement from maze_size column
-    update_pixel_distance(basepath,df)
-    
-    
-end
-end
 
 function update_pixel_distance(basepath,df)
 % updates behavior.trials from frames in df
@@ -106,7 +46,7 @@ temp_df = df(contains(df.basename,basename),:);
 
 % setup
 vars = fieldnames(temp_df);
-col_idx = contains(vars,{'pixel_distance'});
+col_idx = contains(vars,{'pixel_distance','pixel_dist_reference'});
 
 % loop through videos indicated in session.behavioralTracking
 for ii = 1:length(session.behavioralTracking)
@@ -117,11 +57,19 @@ for ii = 1:length(session.behavioralTracking)
     vidname = session.behavioralTracking{1,ii}.notes;
     row_idx = contains(temp_df.vidname,extractBefore(vidname,'.avi'));
         
-    behavior.epochs{1, epoch}.pixel_distance = table2array(temp_df(row_idx,col_idx));
+    values = table2array(temp_df(row_idx,col_idx));
+    behavior.epochs{1, epoch}.pixel_distance = values(1);
+    behavior.epochs{1, epoch}.pixel_dist_reference = values(2);
+
+    session.behavioralTracking{1,ii}.pixel_distance = values(1);
+    session.behavioralTracking{1,ii}.pixel_dist_reference = values(2);
+
 
 end
 % save behavior file
 save(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
+save(fullfile(basepath,[basename,'.session.mat']),'session')
+
 end
 
 function update_maze_size(basepath,df)
@@ -150,11 +98,14 @@ for ii = 1:length(session.behavioralTracking)
     vidname = session.behavioralTracking{1,ii}.notes;
     row_idx = contains(temp_df.vidname,extractBefore(vidname,'.avi'));
         
+    session.behavioralTracking{1,ii}.maze_size = table2array(temp_df(row_idx,col_idx));
+
     behavior.epochs{1, epoch}.maze_size = table2array(temp_df(row_idx,col_idx));
 
 end
-% save behavior file
+% save behavior and session file
 save(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
+save(fullfile(basepath,[basename,'.session.mat']),'session')
 end
 
 function update_trials(basepath,df)

@@ -21,13 +21,6 @@ smooth_factor = p.Results.smooth_factor;
 basename = basenameFromBasepath(basepath);
 session = loadSession(basepath,basename);
 
-% try
-%     load(fullfile(basepath,'digitalIn.events.mat'))
-% catch
-%     disp('no digitalin.events found. Can''t run general behavior file for ephys')
-%     return
-% end
-
 % check if file was already made
 if force_overwrite
     disp('Overwriting previous runs')
@@ -39,7 +32,7 @@ end
 
 % run update_behavioralTracking to make sure dlc files and associated
 % epochs are indicated in basename.session.behavioralTracking
-update_behavioralTracking('basepath',basepath)
+update_behavioralTracking('basepath',basepath,'force',force_overwrite)
 session = loadSession(basepath,basename);
 
 
@@ -48,11 +41,14 @@ for i = 1:length(session.behavioralTracking)
     tracking_files{i} = session.behavioralTracking{1, i}.filenames;
 end
 
+% extract tracking for godot tracking
 if any(contains({tracking_files{:}},'godot'))
     [t,x,y,v,a,angle,units,source,fs,notes,extra_points,vidnames] = ...
         tracking.extract_godot_tracking(basepath);
 end
 
+
+% extract tracking for Deeplabcut 
 if any(contains({tracking_files{:}},'DLC'))
     [t_dlc,x_dlc,y_dlc,v_dlc,a_dlc,angle_dlc,units_dlc,source_dlc,fs_dlc,notes_dlc,extra_points_dlc,vidnames_dlc] = ...
         tracking.extract_tracking(basepath,primary_coords_dlc,likelihood_dlc,smooth_factor);
@@ -60,22 +56,24 @@ if any(contains({tracking_files{:}},'DLC'))
     % deeplabcut will often have many tracking points, add them here
     if ~isempty(extra_points_dlc)
         for field = fieldnames(extra_points_dlc)'
-            field = field{1};
-            behavior.position.(field) = extra_points_dlc.(field)';
+            behavior.position.(field{1}) = extra_points_dlc.(field{1})';
         end
     end
+    
 end
 
-if exist('t','var') & isrow(t)
+% transpose timestamps
+if exist('t','var') && isrow(t)
     t = t';
 end
 
-if exist('t_dlc','var') & isrow(t_dlc)
+% transpose timestamps from DLC
+if exist('t_dlc','var') && isrow(t_dlc)
     t_dlc = t_dlc';
 end
 
 % combine both
-if exist('t','var') & exist('t_dlc','var')
+if exist('t','var') && exist('t_dlc','var')
     
     if min(t) < min(t_dlc)
         % concatenate
@@ -91,6 +89,7 @@ if exist('t','var') & exist('t_dlc','var')
         notes = {notes; notes_dlc};
         vidnames = {vidnames; vidnames_dlc};
         extra_points = {extra_points; extra_points_dlc};
+        
     else
         % concatenate
         t = [t_dlc; t];
@@ -107,8 +106,9 @@ if exist('t','var') & exist('t_dlc','var')
         extra_points = {extra_points_dlc;extra_points};
     end
 end
-% for dlc 
-if ~exist('t','var') & exist('t_dlc','var')
+
+% for DLC only 
+if ~exist('t','var') && exist('t_dlc','var')
         % rename
     t = t_dlc;
     x = x_dlc;
@@ -149,7 +149,6 @@ behavior.processinginfo.date = date;
 behavior.processinginfo.vidnames = vidnames;
 behavior.processinginfo.function = 'general_behavioral_file_SNlab.mat';
 behavior.processinginfo.source = source;
-
 
 if save_mat
     save([basepath,filesep,[basename,'.animal.behavior.mat']],'behavior');

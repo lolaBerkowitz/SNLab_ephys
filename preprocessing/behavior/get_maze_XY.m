@@ -36,6 +36,7 @@ function get_maze_XY(varargin)
 p = inputParser;
 p.addParameter('basepath',pwd,@isfolder);
 p.addParameter('vid_type','.avi',@ischar);
+p.addParameter('re-do_rescale',false,@islogical);
 p.addParameter('overwrite',false,@islogical);
 p.addParameter('vid_time',300,@isnumeric); % time of video to load in seconds
 p.addParameter('config_path','C:\Users\schafferlab\github\SNLab_ephys\behavior\behavior_configs',@isfolder); % time of video to load in seconds
@@ -44,6 +45,7 @@ p.addParameter('config_path','C:\Users\schafferlab\github\SNLab_ephys\behavior\b
 p.parse(varargin{:})
 basepath = p.Results.basepath; 
 vid_type = p.Results.vid_type; 
+rescale = p.Results.re-do_rescale;
 overwrite = p.Results.overwrite;
 vid_time = p.Results.vid_time; 
 config_path = p.Results.config_path;
@@ -57,6 +59,7 @@ if length(dir(fullfile(basepath,'*maze_coords.csv'))) == length(session.behavior
     return
 end
 
+
 if ~isfield(session,'behavioralTracking')
     warning('No tracking items found. No maze coords to return.')
     return
@@ -64,7 +67,15 @@ end
 
 % check if behavior file exsists and if not make one
 if ~exist([basepath,filesep,[basename,'.animal.behavior.mat']],'file')
-    general_behavior_file_SNlab(basepath)
+    error('Cannot update behavior file as one does not exist.')
+end
+
+% if maze_coords exist, but you want to correct the rescale 
+if length(dir(fullfile(basepath,'*maze_coords.csv'))) == length(session.behavioralTracking) && rescale
+    disp('Maze coords found for each behavioralTracking entry, rescaling coordinates')
+    
+    
+    
 end
 
 % get coords
@@ -85,7 +96,63 @@ basepath = session.general.basePath;
 basename = basenameFromBasepath(basepath);
 
 % load animal behavior file
-load(fullfile(basepath,[basename,'.animal.behavior.mat']))
+load(fullfile(basepath,[basename,'.animal.behavior.mat']),'beahvior')
+
+
+% loop through video
+for file = 1:length(session.behavioralTracking) %loop through folders containing subject videos
+   
+    
+    vid_path = fullfile(basepath,session.behavioralTracking{1,file}.notes);
+    vid_type = extractAfter(session.behavioralTracking{1,file}.notes,'.');
+    coords_table = readtable(fullfile(basepath,[extractBefore(session.behavioralTracking{1,file}.notes,vid_type),'_maze_coords.csv']))
+    
+    % create image save to current directory
+    sys_cmd = ['ffmpeg -ss ', num2str(vid_time),' -i ',vid_path,' -vframes 1 ',img_path];
+    system(sys_cmd)
+
+    epoch = session.behavioralTracking{1,file}.epoch;
+    % choose config based on epoch
+    config = get_behavior_config(session,epoch,config_path);
+    crop_params = session.behavioralTracking{1, file}.crop_params;
+    % pulls up video frame and grabs coords
+    coords_table = grab_coords(img_path,session.behavioralTracking{1,file}.notes,config,crop_params);
+    
+    % load pixel distance and pixel_reference 
+    pixel_distance = session.behavioralTracking{1, file}.pixel_distance;
+    pixel_dist_reference = session.behavioralTracking{1, file}.pixel_dist_reference;
+
+    coords_table.x_scaled = coords_table.x * (pixel_dist_reference/pixel_distance);
+    coords_table.y_scaled = coords_table.y * (pixel_dist_reference/pixel_distance);
+    % save to session 
+    session.behavioralTracking{1,file}.maze_coords = coords_table;
+    
+    % save data to csv 
+    save_file = fullfile(basepath,[extractBefore(session.behavioralTracking{1,file}.notes,vid_type),'_maze_coords.csv']);
+    writetable(coords_table,save_file);
+    
+    % delete the image you created
+    delete(img_path)
+end
+
+% save session back to basepath 
+save(fullfile(basepath,[basename,'.session.mat']),'session');
+
+end
+
+function main(session, config_path, vid_time, vid_type)
+% runs main process of looping through videos in basepath, pulling up
+% image via local grab_coords function which allows user to collect coordinate data
+% and outputs coords for object A center, object A edge, object B center,
+% object B edge, corner center A-D (inner corner of maze).
+%
+
+% LB 2022
+basepath = session.general.basePath;
+basename = basenameFromBasepath(basepath);
+
+% load animal behavior file
+load(fullfile(basepath,[basename,'.animal.behavior.mat']),'beahvior')
 
 
 % loop through video
@@ -98,12 +165,11 @@ for file = 1:length(session.behavioralTracking) %loop through folders containing
     
     vid_path = fullfile(basepath,session.behavioralTracking{1,file}.notes);
     img_path = fullfile(basepath,'temp_img.png');
+    
     % create image save to current directory
     sys_cmd = ['ffmpeg -ss ', num2str(vid_time),' -i ',vid_path,' -vframes 1 ',img_path];
     system(sys_cmd)
-    %Pull up video
-%     videoObj = VideoReader(vid_path,'CurrentTime',vid_time); % load video starting at vid_time
-    
+
     epoch = session.behavioralTracking{1,file}.epoch;
     % choose config based on epoch
     config = get_behavior_config(session,epoch,config_path);
@@ -111,6 +177,12 @@ for file = 1:length(session.behavioralTracking) %loop through folders containing
     % pulls up video frame and grabs coords
     coords_table = grab_coords(img_path,session.behavioralTracking{1,file}.notes,config,crop_params);
     
+    % load pixel distance and pixel_reference 
+    pixel_distance = session.behavioralTracking{1, file}.pixel_distance;
+    pixel_dist_reference = session.behavioralTracking{1, file}.pixel_dist_reference;
+
+    coords_table.x_scaled = coords_table.x * (pixel_dist_reference/pixel_distance);
+    coords_table.y_scaled = coords_table.y * (pixel_dist_reference/pixel_distance);
     % save to session 
     session.behavioralTracking{1,file}.maze_coords = coords_table;
     

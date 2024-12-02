@@ -4,11 +4,9 @@ function restrict_and_transform(basepath,varargin)
 %
 % Assumes general behavior file and *maze_coords.csv is in basepath. 
 p = inputParser;
-p.addParameter('maze_size',[],@isnumeric)
 p.addParameter('overwrite',false,@islogical)
 
 p.parse(varargin{:});
-maze_size = p.Results.maze_size;
 overwrite = p.Results.overwrite;
 
 % session basename to load animal behavior file and sessions file 

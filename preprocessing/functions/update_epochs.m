@@ -79,9 +79,8 @@ if exist(fullfile(basepath,'digitalIn.events.mat'),'file')
         else
             % loop through the other epochs
             for i = start_idx:1:size(digitalIn.timestampsOn{1, 2},1) % by default 2nd column is events
-                session.epochs{i}.name =  char(i);
-                session.epochs{i}.startTime =  digitalIn.timestampsOn{1, 2}(i)
-                session.epochs{i}.stopTime =  digitalIn.timestampsOff{1, 2}(i)
+                session.epochs{i}.startTime =  digitalIn.timestampsOn{1, 2}(i);
+                session.epochs{i}.stopTime =  digitalIn.timestampsOff{1, 2}(i);
             end
         end
         

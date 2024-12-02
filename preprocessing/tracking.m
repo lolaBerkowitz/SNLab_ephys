@@ -4,7 +4,7 @@ classdef tracking
     
     methods(Static)
         
-       
+       % For processing behavior 
         function vec_out = scale_transform(vec,origin,scale_factor)
             % translate coordiante vector relative to origin and scale
             vec_out =(vec - origin)/scale_factor;
@@ -32,11 +32,11 @@ classdef tracking
         end
         
         function [x_origin,y_origin,scale_factor_x,scale_factor_y] = get_scale_params(session,behavior,basepath)
+            
             % get origin and scale_factor from maze_coords.csv for each epoch. Depends on
             % maze_size being populated in session.behavioralTracking.maze_size (in cm)
             %
             % outputs are cell arrays for each behavioral epoch
-            
             basename = basenameFromBasepath(basepath);
             
             % loop through epochs to retrieve start/end used in restrictxy below
@@ -54,7 +54,7 @@ classdef tracking
                 % load maze coords for given epoch video
                 maze_coords_df = readtable(fullfile(basepath,...
                     [extractBefore(session.behavioralTracking{1,ep}.notes,'.avi'),'_maze_coords.csv']));
-                pixel_distance
+                
                 % get max/min
                 x_max = max(maze_coords_df.x(ismember(maze_coords_df.object,'corner')));
                 x_min = min(maze_coords_df.x(ismember(maze_coords_df.object,'corner')));
@@ -88,17 +88,22 @@ classdef tracking
             
         end
         
-        function behavior = scale_coords(session,behavior,basepath)
+        function behavior = scale_coords(basepath,overwrite)
+            
             basename = basenameFromBasepath(basepath);
+            
+            % load session and behavior file 
+            load(fullfile(basepath,[basename,'.session.mat']),'session')
+            load(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
+
+            
             % updates behavior file scale and translate coordinates (centered at 0,0)
-            if contains(behavior.position.units,'cm')
+            if contains(behavior.position.units,'cm') && ~overwrite
                 disp('Coordinates already scaled')
                 return
             end
             
-            % get max/min for maze per epoch from maze_coords.csv. Uses info from
-            % session.behaviorTracking to load relevant maze_coords for each epoch.
-            [x_origin,y_origin,scale_factor_x,scale_factor_y] = tracking.get_scale_params(session,behavior,basepath);
+
             idx = tracking.get_epoch_idx(session,behavior);
             
             % rescale coordinates relative to parameters for each epoch
@@ -113,13 +118,17 @@ classdef tracking
                 
                 idx_ep = idx{ep};
                 
+                % load pixel_distance and pixel_reference 
+                pixel_dist = session.behavioralTracking{1,ep}.pixel_distance;
+                pixel_dist_ref = session.behavioralTracking{1,ep}.pixel_dist_reference;
+                
                 for i = find(contains(coord_names,{'x'}))'
                     x = behavior.position.(coord_names{i});
                     if length(idx_ep) ~= length(x)
                         continue
                     end
-                    behavior.position.(coord_names{i})(idx_ep) = tracking.scale_transform(x(idx_ep),...
-                        x_origin{ep},scale_factor_x{ep});
+                    
+                    behavior.position.(coord_names{i})(idx_ep) = x(idx_ep)*(pixel_dist_ref/pixel_dist);
                 end
                 
                 for i = find(contains(coord_names,{'y'}))'
@@ -127,19 +136,10 @@ classdef tracking
                     if length(idx_ep) ~= length(y)
                         continue
                     end
-                    behavior.position.(coord_names{i})(idx_ep) = tracking.scale_transform(y(idx_ep),...
-                        y_origin{ep},scale_factor_y{ep});
+                    behavior.position.(coord_names{i})(idx_ep) = y(idx_ep)*(pixel_dist_ref/pixel_dist);
+
                 end
-               
-                % BROKEN 
-              % update speed to match new units 
-              % TOO FIX - broken but not
-              % necessarily needed as we just recreate them during analysis
-              
-%             [speed_, accel_,~] = linear_motion(behavior.position.x(idx_ep),...
-%                     behavior.position.y(idx_ep),session.behavioralTracking{1, ep}.framerate,.1);
-%             behavior.speed(idx_ep(2:end)) = speed_;
-%             behavior.acceleration(idx_ep(2:end)) = accel_;
+
             end
             
             behavior.position.units = 'cm';
@@ -147,7 +147,7 @@ classdef tracking
 
         end
         
-        function behavior = restrict(session,behavior,basepath)
+        function behavior = restrict(basepath,overwrite)
             % input:
             %   session: CellExplorer session file with completed epochs,
             %       and behavioralTracking.
@@ -157,6 +157,11 @@ classdef tracking
             %   relative to .restrictxy.mat file (created with
             %   manual_trackerjumps)
             basename = basenameFromBasepath(basepath);
+            
+            % load session and behavior file 
+            load(fullfile(basepath,[basename,'.session.mat']),'session')
+            load(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
+
             
             % get start and stop from session epochs to use for limited
             % coordinates to given epochs
@@ -172,7 +177,7 @@ classdef tracking
             
             % Get good index (coordinates within boundary) from file or
             % made with manual_trackerjumps.
-            if ~isempty(dir(fullfile(basepath,[basename,'.restrictxy.mat'])))
+            if ~isempty(dir(fullfile(basepath,[basename,'.restrictxy.mat']))) & ~overwrite
                 load(fullfile(basepath,[basename,'.restrictxy.mat']))
             else
                 good_idx = manual_trackerjumps(behavior.timestamps,...
@@ -238,7 +243,7 @@ classdef tracking
         end
         
 
-        function pixel_distance = maze_distance_gui(video_path,maze_sizes,vid_time)
+        function pixel_distance = maze_distance_gui(video_path,maze_sizes)
         % maze_distance_gui: manually get distance between points in pixels
         %
         % This fuction was made in order to get the ratio to convert tracking
@@ -256,29 +261,14 @@ classdef tracking
         if ~exist(video_path,'file')
            error([video_path,'  video does not exist']) 
         end
-        
 
-%         % read video
-%         vid_obj = VideoReader(video_path);
-% 
-%         % read first 10 seconds of video frames
-%         frames = read(vid_obj, [1, round(vid_obj.FrameRate*1)]);
-%         
         basepath = fileparts(video_path);
         img_path = fullfile(basepath,'temp_img.png');
         % create image save to current directory
-        sys_cmd = ['ffmpeg -ss ', num2str(vid_time),' -i ',video_path,' -vframes 1 ',img_path];
+        sys_cmd = ['ffmpeg -ss ', num2str(300),' -i ',video_path,' -vframes 1 ',img_path];
         system(sys_cmd)
         
         im = imread(img_path); 
-    
-%         % init matrix to store flattened frames
-%         grey_frames = zeros(vid_obj.Height, vid_obj.Width, size(frames,4));
-%         for i = 1:size(frames, 4)
-%             grey_frames(:,:,i) = rgb2gray(frames(:,:,:,i));
-%         end
-%         % take averge of 10 seconds
-%         grey_frames_avg = mean(grey_frames, 3);
 
         % plot average frame
         fig = figure;
@@ -298,7 +288,6 @@ classdef tracking
 
         % let the user click around the coordinates
         corners = [];
-        i = 1;
         while true
             [X,Y]=ginput(1);
             if isempty(X)
@@ -315,8 +304,6 @@ classdef tracking
         pixel_distance = pdist(corners,'euclidean');
         end
 
-
-        
         function [t,x,y,v,a,angle,units,source,fs,notes,extra_points,vidnames] = ...
                 extract_tracking(basepath,primary_coords_dlc,likelihood_dlc,smooth_factor)
             
@@ -502,6 +489,7 @@ classdef tracking
             tracking_struct.description = description;
             tracking_struct.vidnames = vidnames;
         end
+        
         % Sync dlc to ttl for ephys
         function [tracking_struct,field_names] = process_and_sync_dlc_SNLab(varargin)
             % Unpacks DLC and syncs with digitalin.events.mat timestamps
