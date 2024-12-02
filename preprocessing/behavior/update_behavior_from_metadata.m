@@ -123,7 +123,7 @@ temp_df = df(contains(df.basename,basename),:);
 
 % setup
 vars = fieldnames(temp_df);
-col_idx = find(contains(vars,'trial'));
+col_idx = find(contains(vars,'trial_'));
 trial_ts = [];
 trial_id = [];
 
