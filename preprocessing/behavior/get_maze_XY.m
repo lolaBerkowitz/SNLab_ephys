@@ -71,67 +71,46 @@ if ~exist([basepath,filesep,[basename,'.animal.behavior.mat']],'file')
 end
 
 % if maze_coords exist, but you want to correct the rescale 
-if length(dir(fullfile(basepath,'*maze_coords.csv'))) == length(session.behavioralTracking) && rescale
+if (length(dir(fullfile(basepath,'*maze_coords.csv'))) == length(session.behavioralTracking)) && rescale
     disp('Maze coords found for each behavioralTracking entry, rescaling coordinates')
-    
-   
+    redo_rescale(session)
+else
+    % get coords
+    main(session, config_path, vid_time,vid_type)
 end
 
-% get coords
-main(session, config_path, vid_time,vid_type)
-
-
 end
 
-function main_test(session, config_path, vid_time, ~)
-% runs main process of looping through videos in basepath, pulling up
-% image via local grab_coords function which allows user to collect coordinate data
-% and outputs coords for object A center, object A edge, object B center,
-% object B edge, corner center A-D (inner corner of maze).
+function redo_rescale(session)
+% Loops through session.behavioralTracking, loads associated maze coords
+% from basepath, and rescales the x_scaled and y_scaled coordinates based
+% on the pixel distance. Created in case existing coordinates (maze_coords) need to be
+% rescaled due to data entry error. 
 %
 
 % LB 2022
 basepath = session.general.basePath;
 basename = basenameFromBasepath(basepath);
 
-% load animal behavior file
-load(fullfile(basepath,[basename,'.animal.behavior.mat']),'beahvior')
-
-
 % loop through video
 for file = 1:length(session.behavioralTracking) %loop through folders containing subject videos
    
-    
-    vid_path = fullfile(basepath,session.behavioralTracking{1,file}.notes);
     vid_type = extractAfter(session.behavioralTracking{1,file}.notes,'.');
-    coords_table = readtable(fullfile(basepath,[extractBefore(session.behavioralTracking{1,file}.notes,vid_type),'_maze_coords.csv']))
-    
-    % create image save to current directory
-    sys_cmd = ['ffmpeg -ss ', num2str(vid_time),' -i ',vid_path,' -vframes 1 ',img_path];
-    system(sys_cmd)
+    coords_table = readtable(fullfile(basepath,[extractBefore(session.behavioralTracking{1,file}.notes,vid_type),'_maze_coords.csv']));
 
-    epoch = session.behavioralTracking{1,file}.epoch;
-    % choose config based on epoch
-    config = get_behavior_config(session,epoch,config_path);
-    crop_params = session.behavioralTracking{1, file}.crop_params;
-    % pulls up video frame and grabs coords
-    coords_table = grab_coords(img_path,session.behavioralTracking{1,file}.notes,config,crop_params);
-    
     % load pixel distance and pixel_reference 
     pixel_distance = session.behavioralTracking{1, file}.pixel_distance;
     pixel_dist_reference = session.behavioralTracking{1, file}.pixel_dist_reference;
 
     coords_table.x_scaled = coords_table.x * (pixel_dist_reference/pixel_distance);
     coords_table.y_scaled = coords_table.y * (pixel_dist_reference/pixel_distance);
+    
     % save to session 
     session.behavioralTracking{1,file}.maze_coords = coords_table;
     
     % save data to csv 
     save_file = fullfile(basepath,[extractBefore(session.behavioralTracking{1,file}.notes,vid_type),'_maze_coords.csv']);
     writetable(coords_table,save_file);
-    
-    % delete the image you created
-    delete(img_path)
 end
 
 % save session back to basepath 
