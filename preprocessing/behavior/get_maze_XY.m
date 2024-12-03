@@ -95,8 +95,7 @@ basename = basenameFromBasepath(basepath);
 % loop through video
 for file = 1:length(session.behavioralTracking) %loop through folders containing subject videos
    
-    vid_type = extractAfter(session.behavioralTracking{1,file}.notes,'.');
-    coords_table = readtable(fullfile(basepath,[extractBefore(session.behavioralTracking{1,file}.notes,vid_type),'_maze_coords.csv']));
+    coords_table = readtable(fullfile(basepath,[extractBefore(session.behavioralTracking{1,file}.notes,'.'),'_maze_coords.csv']));
 
     % load pixel distance and pixel_reference 
     pixel_distance = session.behavioralTracking{1, file}.pixel_distance;
@@ -109,7 +108,7 @@ for file = 1:length(session.behavioralTracking) %loop through folders containing
     session.behavioralTracking{1,file}.maze_coords = coords_table;
     
     % save data to csv 
-    save_file = fullfile(basepath,[extractBefore(session.behavioralTracking{1,file}.notes,vid_type),'_maze_coords.csv']);
+    save_file = fullfile(basepath,[extractBefore(session.behavioralTracking{1,file}.notes,'.'),'_maze_coords.csv']);
     writetable(coords_table,save_file);
 end
 
