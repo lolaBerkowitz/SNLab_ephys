@@ -29,6 +29,11 @@ switch event_type
         
         % initialize
         eventsfilename = fullfile([basepath,filesep,'digitalin.events.mat']);
+        
+        if exist(eventsfilename,'file')
+            disp('Event file already created')
+            return 
+        end
         % create
         digitalIn = make_digitalIn_from_dlc(files);
         % save
