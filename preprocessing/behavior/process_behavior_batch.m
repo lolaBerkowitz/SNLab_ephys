@@ -4,11 +4,12 @@ function process_behavior_batch(data_path,metadata_path,varargin)
 
 % Assumes general behavior file and *maze_coords.csv is in basepath.
 p = inputParser;
-p.addParameter('overwrite',false,@islogical)
+p.addParameter('overwrite',true,@islogical)
+p.addParameter('redo_rescale',true,@islogical)
 
 p.parse(varargin{:});
 overwrite = p.Results.overwrite;
-
+redo_rescale = p.Results.redo_rescale;
 
 % loop through basepaths and run main function
 df = compile_sessions(data_path);
@@ -26,7 +27,7 @@ for i = 1:length(df.basepath)
             if exist(fullfile(basepath,[basename,'.animal.behavior.mat'])) & ~overwrite
                 continue
             else
-                main(basepath,metadata_path)
+                main(basepath,metadata_path,overwrite,redo_rescale)
             end
         else
             disp('Missing DLC for a video')
@@ -39,7 +40,7 @@ end
 end
 
 
-function main(basepath,metadata_path)
+function main(basepath,metadata_path,overwrite,redo_rescale)
 
 basename = basenameFromBasepath(basepath);
 % check is session file exists, if not make one 
@@ -51,13 +52,17 @@ if  ~exist([basepath,filesep,[basename,'.session.mat']],'file')
 end
 
 % Make events from DLC
-make_events('basepath',basepath);
+if ~exist(fullfile(basepath,'digitalin.events.mat'),'file')
+    make_events('basepath',basepath);
+end
 
 % update epochs from digitalIn.events.mat
 update_epochs('basepath',basepath,...
     'annotate',true,...
-    'overwrite',true,...
+    'overwrite',false,...
     'ttl_method',[])
+
+
 
 % general behavior file
 general_behavior_file_SNlab('basepath',basepath,'force_overwrite',true,'smooth_factor',.2,'primary_coords_dlc',4);
@@ -65,9 +70,14 @@ general_behavior_file_SNlab('basepath',basepath,'force_overwrite',true,'smooth_f
 % update behavior file from metadata csv
 update_behavior_from_metadata(metadata_path,'basepath',basepath);
 
-get_maze_XY('basepath',basepath,'config_path', 'C:\Users\schafferlab\github\SNLab_ephys\behavior\behavior_configs\');
+get_maze_XY('basepath',basepath,'config_path', 'C:\Users\schafferlab\github\SNLab_ephys\behavior\behavior_configs\',...
+    'overwrite',overwrite,'redo_rescale',redo_rescale);
 
-restrict_and_transform(basepath,'overwrite',true);
+% sacle coordinates to cm 
+tracking.scale_coords(basepath,overwrite);
+
+% restrict coordintes to remove extramaze tracking points 
+tracking.restrict(basepath,overwrite);
 
 end
 
