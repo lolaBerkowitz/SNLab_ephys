@@ -28,11 +28,14 @@ function process_behavior_folder(basepath,varargin)
 % input parser
 p = inputParser;
 p.addParameter('metadata_path','Y:\laura_berkowitz\behavior_validation\appps1_cpp\metadata.csv',@ischar)
-p.addParameter('overwrite',false,@islogical)
+p.addParameter('overwrite',true,@islogical)
+p.addParameter('redo_rescale',true,@islogical)
+
 
 p.parse(varargin{:});
 metadata_path = p.Results.metadata_path;
 overwrite = p.Results.overwrite;
+redo_rescale = p.Results.redo_rescale;
 
 basename = basenameFromBasepath(basepath);
 
@@ -57,18 +60,23 @@ make_events('basepath',basepath);
 
 % update epochs from digitalIn.events.mat
 update_epochs('basepath',basepath,...
-    'annotate',true,...
-    'overwrite',true,...
+    'annotate',false,...
+    'overwrite',false,...
     'ttl_method',[])
 
 % general behavior file
-general_behavior_file_SNlab('basepath',basepath,'force_overwrite',true,'smooth_factor',.2,'primary_coords_dlc',5);
+general_behavior_file_SNlab('basepath',basepath,'force_overwrite',overwrite,'smooth_factor',.2,'primary_coords_dlc',5);
 
 % update behavior file from metadata csv
 update_behavior_from_metadata(metadata_path,'basepath',basepath);
 
-get_maze_XY('basepath',basepath,'config_path', 'C:\Users\schafferlab\github\SNLab_ephys\behavior\behavior_configs\');
+get_maze_XY('basepath',basepath,'config_path', 'C:\Users\schafferlab\github\SNLab_ephys\behavior\behavior_configs\','redo_rescale',redo_rescale,'overwrite',overwrite);
 
-restrict_and_transform(basepath,'overwrite',true);
+% sacle coordinates to cm 
+tracking.scale_coords(basepath,overwrite);
+
+% restrict coordintes to remove extramaze tracking points 
+tracking.restrict(basepath,overwrite);
+    
 
 end
