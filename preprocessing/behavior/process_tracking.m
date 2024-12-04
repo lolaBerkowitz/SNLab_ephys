@@ -24,7 +24,7 @@ p = inputParser;
 p.addParameter('overwrite_behavior',true,@islogical)
 p.addParameter('config_path','C:\Users\schafferlab\github\SNLab_ephys\behavior\behavior_configs\')
 p.addParameter('metadata_path','Y:\laura_berkowitz\behavior_metadata.csv')
-p.addParameter('primary_coords_dlc',4,@isnumeric)
+p.addParameter('primary_coords_dlc',1:2,@isnumeric)
 
 
 p.parse(varargin{:})
@@ -53,7 +53,7 @@ general_behavior_file_SNlab('basepath',basepath,'force_overwrite',overwrite_beha
 update_behavior_from_metadata(metadata_path,'basepath',basepath)
 
 % get maze coords
-get_maze_XY('basepath',basepath,'config_path', config_path,'overwrite',overwrite_behavior)
+get_maze_XY('basepath',basepath,'config_path', config_path,'redo_rescale',true)
 
 % sacle coordinates to cm 
 tracking.scale_coords(basepath,overwrite_behavior);
