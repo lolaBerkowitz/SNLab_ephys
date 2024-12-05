@@ -77,10 +77,19 @@ if exist(fullfile(basepath,'digitalIn.events.mat'),'file')
                 ii = ii+1;
             end
         else
+            if contains([session.epochs{1}.name],basename)
             % loop through the other epochs
-            for i = start_idx:1:size(digitalIn.timestampsOn{1, 2},1) % by default 2nd column is events
-                session.epochs{i}.startTime =  digitalIn.timestampsOn{1, 2}(i);
-                session.epochs{i}.stopTime =  digitalIn.timestampsOff{1, 2}(i);
+                for i = start_idx:1:size(digitalIn.timestampsOn{1, 2},1) % by default 2nd column is events
+                    session.epochs{i}.name =  char(i);
+                    session.epochs{i}.startTime =  digitalIn.timestampsOn{1, 2}(i);
+                    session.epochs{i}.stopTime =  digitalIn.timestampsOff{1, 2}(i);
+                end
+            else
+                                % loop through the other epochs
+                for i = start_idx:1:size(digitalIn.timestampsOn{1, 2},1) % by default 2nd column is events
+                    session.epochs{i}.startTime =  digitalIn.timestampsOn{1, 2}(i);
+                    session.epochs{i}.stopTime =  digitalIn.timestampsOff{1, 2}(i);
+                end
             end
         end
         
