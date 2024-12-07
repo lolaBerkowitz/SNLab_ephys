@@ -48,12 +48,11 @@ connected   = true(Nchannels, 1);
 %spike group, so make sure it is if you want to skip channels correctly
 aux_skip      = cell2mat({par.AnatGrps.Skip});
 aux_ch        = cell2mat({par.AnatGrps.Channels});
-disconnect_ch = aux_ch(logical(aux_skip))+1;
 
 chanMap   = aux_ch + 1;
 chanMap0ind = chanMap - 1;
 
-connected(disconnect_ch) = false;
+connected(logical(aux_skip)) = false;
 
 save(fullfile(basepath,'chanMap.mat'), ...
     'chanMap','connected', 'xcoords', 'ycoords', 'kcoords', 'chanMap0ind', 'fs')
