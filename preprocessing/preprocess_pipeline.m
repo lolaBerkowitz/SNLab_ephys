@@ -100,13 +100,15 @@ channel_mapping('basepath',basepath)
 
 %% Detect SWRs using DectSWR. 
 % first input [ripple channel, sharp wave channel] using intan channels + 1 (for matlab 1-based indexing). 
-ripple_channel = 1;%session.brainRegions.CA1sp.channels(end-1)
-sharp_wave_channel = 8;%session.brainRegions.CA1sr.channels(end-3);
-noise_channel = 46;
+session.channelTags.Ripple = 25;
+session.channelTags.SharpWave = 11;
+session.channelTags.RippleNoise = 32;
 
-ripples = DetectSWR([ripple_channel,...
-    sharp_wave_channel,...
-    noise_channel],...
+save([basepath,filesep,[basename,'.session.mat']],'session');
+
+ripples = DetectSWR([session.channelTags.Ripple,...
+    session.channelTags.SharpWave,...
+    session.channelTags.RippleNoise],...
     'thresSDrip',[.25,.5],...
     'thresSDswD',[.25,.5],...
     'saveMat',true,...
@@ -216,10 +218,10 @@ for i = 1:length(df.basepath)
     try
     basepath = df.basepath{i}{:};
     basename = basenameFromBasepath(basepath);
-        if isempty(dir(fullfile(basepath,[basename,'.lfp']))) & ~multishank
+        if isempty(dir(fullfile(basepath,[basename,'.lfp']))) && ~multishank
             preprocess_session(basepath,'digitalInputs',false,'check_epochs',false,'kilosort',false,'overwrite',false)
             channel_mapping('basepath',basepath)
-        elseif isempty(dir(fullfile(basepath,[basename,'.lfp']))) & multishank
+        elseif isempty(dir(fullfile(basepath,[basename,'.lfp']))) && multishank
             preprocess_session(basepath,'digitalInputs',false,'kilosort',false,'tracking',false,'specialChannels',[],'multishank',true,'check_epochs',false)
         else 
             channel_mapping('basepath',basepath)
