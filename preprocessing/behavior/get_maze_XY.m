@@ -36,8 +36,8 @@ function get_maze_XY(varargin)
 p = inputParser;
 p.addParameter('basepath',pwd,@isfolder);
 p.addParameter('vid_type','.avi',@ischar);
-p.addParameter('redo_rescale',false,@islogical);
-p.addParameter('overwrite',false,@islogical);
+p.addParameter('redo_rescale',true,@islogical);
+p.addParameter('overwrite',true,@islogical);
 p.addParameter('vid_time',300,@isnumeric); % time of video to load in seconds
 p.addParameter('config_path','C:\Users\schafferlab\github\SNLab_ephys\behavior\behavior_configs',@isfolder); % time of video to load in seconds
 
