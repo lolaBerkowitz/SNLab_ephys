@@ -14,7 +14,7 @@ function create_channelmap(basepath,varargin)
 %  Modified by Laura Berkowitz, 08/11/2021
 
 p = inputParser; 
-p.addParameter('xcoords',[6,19,repmat([0,30],1,31)]');
+p.addParameter('xcoords',[0,30,repmat([0,30],1,31)]');
 p.addParameter('ycoords', [linspace(-1449.0,0,64)]');
 p.parse(varargin{:});
 
