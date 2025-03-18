@@ -55,7 +55,7 @@ split_dat(data_path,save_path, subject_order,'trim_dat',false)
 % to be analyzed. Let them run overnight while split dat runs. 
 
 %% Single Session Preprocess
-basepath = 'Y:\laura_berkowitz\app_ps1_ephys\data\hpc17\hpc17_day11_240903_103353';
+basepath = 'Y:\laura_berkowitz\alz_stim\data\hpstim01\hpstim01_day04_250221_110535';
 
 %% Check xml/channel mapping: verify channel map, skip bad channels, and save 
 
@@ -63,11 +63,15 @@ disp('Skip bad channels in Neuroscope')
 %%
 % Preprocess (create lfp, kilosort)
 % Single shank (A164 poly2)
-preprocess_session(basepath,'digitalInputs',false,'kilosort',true,'tracking',false)
+preprocess_session(basepath,'digitalInputs',true,'kilosort',false,'tracking',false)
+
+% Tungsten 7 channel
+preprocess_session(basepath,'digitalInputs',true,'kilosort',false,'tracking',false,'specialChannels',[])
+
 % If running kilosort separately for single shank (A164 poly2)
 process_kilosort(basepath)
 % multiple shank 
-preprocess_session(basepath,'digitalInputs',false,'kilosort',true,'tracking',false,'specialChannels',[],'multishank',true)
+preprocess_session(basepath,'digitalInputs',false,'kilosort',true,'tracking',true,'specialChannels',[],'multishank',true)
 % If running kilosort separately for multiple shanks
 process_kilosort(basepath,'multishank',true)
 
@@ -100,15 +104,19 @@ channel_mapping('basepath',basepath)
 
 %% Detect SWRs using DectSWR. 
 % first input [ripple channel, sharp wave channel] using intan channels + 1 (for matlab 1-based indexing). 
-session.channelTags.Ripple = 25;
-session.channelTags.SharpWave = 11;
-session.channelTags.RippleNoise = 32;
+% load session 
+basename = basenameFromBasepath(basepath);
+session = loadSession(basepath,basename);
 
-save([basepath,filesep,[basename,'.session.mat']],'session');
+% session.channelTags.Ripple.channels = 62;
+% session.channelTags.SharpWave.channels = 57;
+% session.channelTags.RippleNoise.channels = 46;
 
-ripples = DetectSWR([session.channelTags.Ripple,...
-    session.channelTags.SharpWave,...
-    session.channelTags.RippleNoise],...
+% save([basepath,filesep,[basename,'.session.mat']],'session');
+
+ripples = DetectSWR([session.channelTags.Ripple.channels ,...
+    session.channelTags.SharpWave.channels ,...
+    session.channelTags.RippleNoise.channels ],...
     'thresSDrip',[.25,.5],...
     'thresSDswD',[.25,.5],...
     'saveMat',true,...
@@ -116,7 +124,7 @@ ripples = DetectSWR([session.channelTags.Ripple,...
     'forceDetect',true);
 
 %% Compute basic cell metrics
-basepath=pwd
+basepath=pwd;
 basename = basenameFromBasepath(basepath);
 session = loadSession(basepath,basename);
 cell_metrics = ProcessCellMetrics('session',session,'manualAdjustMonoSyn',false);
