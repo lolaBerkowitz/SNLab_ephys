@@ -71,7 +71,7 @@ function plot_object_explore_results(basepath,explore_vectors,results)
         b(2).FaceColor = [1 1 1];
         b(1).FaceColor = [.25 .25 .25];
     end
-    xlabel('Time bin (5 min/bin)')
+    xlabel('Time bin')
     ylabel('Exploration time (s)')
     title(['Baseline DR: ',num2str(results.DR_overall(1))])
     axis square
