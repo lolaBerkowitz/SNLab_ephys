@@ -312,15 +312,12 @@ classdef behavior_funcs
             
         end
         
-        function ED = egocentric_direction(pos, object_center)
-            ED = mod(atan2d(pos.data(:,2)-object_center(2),pos.data(:,1)-object_center(1)),rad2deg(2*pi));
-      
-            % get xy as analog signal array for easy epoching
-            ED = analogSignalArray(...
-                'data',ED,...
-                'timestamps',pos.timestamps,...
-                'sampling_rate',pos.sampling_rate);
+        function ED = egocentric_direction(x,y, object_center_x,object_center_y)
+            
+            ED = mod(atan2d(y-object_center_y,x-object_center_x),rad2deg(2*pi));
+
         end
+        
         
         function CD = cue_direction(ED, HD)
             % takes in egocentric direction and head direction
@@ -457,7 +454,7 @@ classdef behavior_funcs
         
         %% Object exploration functions
         
-        function [results,results_as_cell,explore_vectors] = score_object_exploration(basepath,varargin)
+        function [results,results_binned,explore_vectors] = score_object_exploration(basepath,varargin)
             % within basepath, scores epochs with 'object' indicated in
             % session.epoch.name. Determines the time spent exploring
             % objects by positions listed in
@@ -469,7 +466,7 @@ classdef behavior_funcs
             
             % Output:
             %   structure containing,
-            %   point statistics: first object explored (string),
+            %   results: first object explored (string),
             %   time to object exploration (s), discrimination ratio for
             %   first 180 and 300 seconds after first object is explored.
             
@@ -477,11 +474,11 @@ classdef behavior_funcs
             
             % Assumes general behavior file and *maze_coords.csv is in basepath.
             p = inputParser;
-            p.addParameter('distance_threshold',6,@isnumeric) %6cm as tracking is of back of electrode cage for ephys experiments
-            p.addParameter('duration_in_seconds',300,@isnumeric)
-            p.addParameter('heading_thresh',45,@isnumeric)
-            p.addParameter('bin_width',5,@isnumeric)% in minutes
-            p.addParameter('fig',false,@islogical)
+            p.addParameter('distance_threshold',6,@isnumeric) %4cm as tracking is of back of electrode cage for ephys experiments
+            p.addParameter('duration_in_seconds',90,@isnumeric)
+            p.addParameter('heading_thresh',360,@isnumeric)
+            p.addParameter('bin_width',90,@isnumeric)% in seconds
+            p.addParameter('fig',true,@islogical)
             
             p.parse(varargin{:});
             distance_threshold = p.Results.distance_threshold;
@@ -490,7 +487,8 @@ classdef behavior_funcs
             bin_width = p.Results.bin_width;
             fig = p.Results.fig;
 
-            
+           
+          
             [~, basename] = fileparts(basepath);
             
             % load animal behavior and session files
@@ -503,9 +501,9 @@ classdef behavior_funcs
                 explore_vectors = NaN;
                 return
             end
-            % load behavior epochs
+            
+            % load epochs
             behave_ep = behavior_funcs.load_epochs(basepath);
-            % load trials epochs
             trial_ep = behavior_funcs.load_trials(basepath);
             
             % get xy as analog signal array for easy epoching
@@ -514,21 +512,22 @@ classdef behavior_funcs
                 'timestamps',behavior.timestamps,...
                 'sampling_rate',behavior.sr);
             
+            % load animal head direction
             HD = behavior_funcs.load_HD(basepath);
   
-            % determine which object moved
+            % determine which object moved between the two epochs 
             moved_object_id =  behavior_funcs.find_moved_object(basepath);
-            % for each behavior epoch, get exploration of objects within
-            % epoch
+            
+            % initialize output 
             results = table;
             results.basepath = repmat(basepath,behave_ep.n_intervals,1);
-            
+            results_binned = cell2table(cell(1, 7), 'VariableNames', {'bin_n','bin_center_second','object_id','object_explore','epoch_name','basepath','object_identity'});
+            % for each behavior epoch, get exploration of objects within
+            % epoch
             for ep = 1:behave_ep.n_intervals
                 
                 epoch_name{ep} = session.epochs{1,session.behavioralTracking{1, ep}.epoch}.name;
-                % get maze coords for object coordinates
-                [object_center,object_edge,object_id] = behavior_funcs.load_object_coords_for_epoch(session,behavior,ep);
-                obj_idx = contains(object_id,'A');
+                
                 % get intervalArray of current epoch
                 cur_ep = behave_ep(ep) & trial_ep;
                 
@@ -536,9 +535,18 @@ classdef behavior_funcs
                 cur_pos = positions(cur_ep);
                 cur_HD = HD(cur_ep);
                 
+                            % get maze coords for object coordinates
+                [object_center,object_edge,object_id] = behavior_funcs.load_object_coords_for_epoch(session,behavior,ep);
+                
                 % compute cue angle for each object 
                 for obj = 1:size(object_center,1)
-                    cur_ED = behavior_funcs.egocentric_direction(cur_pos, object_center(obj,:));
+                    center_temp = object_center(obj,:);
+                    cur_ED = behavior_funcs.egocentric_direction(cur_pos.data(:,1),cur_pos.data(:,2), center_temp(1),center_temp(2));
+                                        % get xy as analog signal array for easy epoching
+                    cur_ED = analogSignalArray(...
+                        'data',cur_ED,...
+                        'timestamps',cur_pos.timestamps,...
+                        'sampling_rate',cur_pos.sampling_rate);
                     cue_angle(obj,:) = behavior_funcs.cue_direction(cur_ED, cur_HD);
                 end
 
@@ -551,49 +559,114 @@ classdef behavior_funcs
                     ,cur_pos.data(:,2)...
                     ,bound_x,bound_y);
                 
+                obj_idx = contains(object_id,'A');
+
                 % get exploration time for each object 
                 [explore_time,explore_vec] =  behavior_funcs.object_explore(cur_pos,...
                         cue_angle,...
                         heading_thresh,...
                         object_distances,...
                         distance_threshold);
-                % compute discrimination_ratio
                 
                 
-                % exploration over time
-                bin_explore = behavior_funcs.object_explore_over_time(cur_pos,...
-                    bin_width,... % time in min
-                    cue_angle,... %xy for each object center
-                    heading_thresh,...% instantaneous distance from objects
-                    object_distances,...% threshold for close enought
-                    distance_threshold); % threashold for heading 
-                
-               
-                % time to first object explored
+                % get the time for first object exploration 
                  [start_explore, idx] = min([min(explore_vec{obj_idx}), min(explore_vec{~obj_idx})]);
                  
-                 for obj = 1:length(object_id)
-                    object_explore_restrict(obj,:) = behavior_funcs.limit_explore_to_segment(start_explore,...
-                        duration_in_seconds,explore_vec{obj});
-                    
-                 end
-                 
-                 % if they didn't explore any objects
+                % Get the object they first visited, and time it took to
+                % visit it
                 if ~isempty(idx) 
                     first_object_explored{ep} = object_id{idx};
                     time_2_object_explore(ep) = start_explore - cur_pos.timestamps(1); % first object explore ts minus start timestamps
 
-                else
+                else % if they didn't explore any objects, initalize all the output variables with nan
+                    
                     first_object_explored{ep} = 'None';
                     time_2_object_explore(ep) = NaN;
-                end
-                                
+                    object_explore_restrict(1,:) = NaN;
+                    object_explore_restrict(2,:) = NaN;
+                    
+                    obj_A_explore(ep) = NaN;
+                    obj_B_explore(ep) = NaN;
+                    obj_A_explore_restrict(ep) = NaN;
+                    obj_B_explore_restrict(ep) = oNaN;
+
+                   % store vectors for each epoch 
+                   explore_vectors{ep}.task_id = session.epochs{1,session.behavioralTracking{1, ep}.epoch}.name;
+                   explore_vectors{ep}.object_id = object_id;
+                   explore_vectors{ep}.bin_explore = NaN;
+                   explore_vectors{ep}.bin_explore_table = NaN;
+                   explore_vectors{ep}.explore_vec = NaN;
+                   explore_vectors{ep}.cue_angle = NaN;
+                   explore_vectors{ep}.object_distances = NaN;
+                   explore_vectors{ep}.start_explore = NaN;
                
-                % Discrimination ratio for entire session
-                if ismember(moved_object_id,'A')
+                    bin_explore_table = cell2table(cell(1, 7), 'VariableNames', {'bin_n','bin_center_second','object_id','object_explore','epoch_name','basepath','object_identity'}); 
+                    bin_explore_table.epoch_name =  repmat(epoch_name(ep),size(bin_explore_table,1),1);
+                    bin_explore_table.basepath =  repmat(basepath,size(bin_explore_table,1),1);
+                    bin_explore_table.object_identity =  repmat('fixed',size(bin_explore_table,1),1);
+                    bin_explore_table(ismember(bin_explore_table.object_id, moved_object_id),:).object_identity = repmat('moved',sum(ismember(bin_explore_table.object_id, moved_object_id)),1);
+                    
+                    clear cue_angle object_distances bin_explore explore_vec
+                    
+                    continue
+
+                end
+                  
+                
+                for obj = 1:length(object_id)
+                    object_explore_restrict(obj,:) = behavior_funcs.limit_explore_to_segment(start_explore,...
+                        duration_in_seconds,explore_vec{obj});
+                end
+                 
+                
+                % limit position for binned data to include only time after
+                % animal started exploring objects 
+                explore_epoch = IntervalArray([start_explore,cur_pos.timestamps(end)]);
+                
+                % put object distances and cue angle in array 
+                 cue_angle = analogSignalArray(...
+                'data',cue_angle,...
+                'timestamps',cur_pos.timestamps,...
+                'sampling_rate',cur_pos.sampling_rate);
+            
+                 object_distances = analogSignalArray(...
+                'data',object_distances,...
+                'timestamps',cur_pos.timestamps,...
+                'sampling_rate',cur_pos.sampling_rate);
+            
+% %                 exploration over time
+%                 [bin_explore, bin_explore_table] = behavior_funcs.object_explore_over_time(cur_pos(explore_epoch),...
+%                     bin_width,... % time in seconds
+%                     cue_angle(explore_epoch),... % instantaneous egocentric angle from objects
+%                     heading_thresh,...% threashold for heading 
+%                     object_distances(explore_epoch),...% instantaneous distance from objects
+%                     distance_threshold,... % threshold for close enought 
+%                     object_id); % ID for each object 
+%                 
+%                bin_explore_table.epoch_name =  repmat(epoch_name(ep),size(bin_explore_table,1),1);
+%                bin_explore_table.basepath =  repmat(basepath,size(bin_explore_table,1),1);
+%                bin_explore_table.object_identity =  repmat('fixed',size(bin_explore_table,1),1);
+%                bin_explore_table(ismember(bin_explore_table.object_id, moved_object_id),:).object_identity = repmat('moved',sum(ismember(bin_explore_table.object_id, moved_object_id)),1);
+
+
+%                results_binned = [results_binned; bin_explore_table];
+
+                % Discrimination ratio for entire session, and restricted
+                % session. Note - restriction is only applied to object
+                % test. 
+                if ismember(moved_object_id,'A') && (contains(epoch_name{ep},'object_learning'))
+                    DR_overall(ep) = behavior_funcs.discrimination_ratio(explore_time(~obj_idx),explore_time(obj_idx));
+                    DR_restrict(ep) = DR_overall(ep);
+                    
+                elseif ismember(moved_object_id,'A') && (contains(epoch_name{ep},'object_test'))
                     DR_overall(ep) = behavior_funcs.discrimination_ratio(explore_time(~obj_idx),explore_time(obj_idx));
                     DR_restrict(ep) = behavior_funcs.discrimination_ratio(object_explore_restrict(~obj_idx),object_explore_restrict(obj_idx));
-                else
+                    
+                elseif ismember(moved_object_id,'B') && (contains(epoch_name{ep},'object_learning'))
+                    DR_overall(ep) = behavior_funcs.discrimination_ratio(explore_time(obj_idx),explore_time(~obj_idx));
+                    DR_restrict(ep) = DR_overall(ep);
+                    
+                 elseif ismember(moved_object_id,'B') && (contains(epoch_name{ep},'object_test'))
                     DR_overall(ep) = behavior_funcs.discrimination_ratio(explore_time(obj_idx),explore_time(~obj_idx));
                     DR_restrict(ep) = behavior_funcs.discrimination_ratio(object_explore_restrict(obj_idx),object_explore_restrict(~obj_idx));
                 end
@@ -603,17 +676,22 @@ classdef behavior_funcs
                 obj_B_explore(ep) = explore_time(~obj_idx);
                 obj_A_explore_restrict(ep) = object_explore_restrict(obj_idx);
                 obj_B_explore_restrict(ep) = object_explore_restrict(~obj_idx);
-                
+
                % store vectors for each epoch 
-               explore_vectors{ep}.task_id = session.epochs{1,session.behavioralTracking{1, 1}.epoch}.name;
+               explore_vectors{ep}.task_id = session.epochs{1,session.behavioralTracking{1, ep}.epoch}.name;
                explore_vectors{ep}.object_id = object_id;
-               explore_vectors{ep}.bin_explore = bin_explore;
+%                explore_vectors{ep}.bin_explore = bin_explore;
+%                explore_vectors{ep}.bin_explore_table = bin_explore_table;
                explore_vectors{ep}.explore_vec = explore_vec;
-               explore_vectors{ep}.cue_angle = cue_angle;
-               explore_vectors{ep}.object_distances = object_distances;
+               explore_vectors{ep}.cue_angle = cue_angle.data;
+               explore_vectors{ep}.object_distances = object_distances.data;
+               explore_vectors{ep}.start_explore = start_explore;
+               
+               
                
                clear cue_angle object_distances bin_explore explore_vec
             end
+
             
             % store results
             results.epoch = epoch_name';
@@ -626,14 +704,17 @@ classdef behavior_funcs
             results.object_B_explore = obj_B_explore';
             results.object_A_explore_restrict = obj_A_explore_restrict';
             results.object_B_explore_restrict = obj_B_explore_restrict';
+            
             if fig
                 plot_object_explore_results(basepath,explore_vectors,results)
             end
             
-            results_as_cell = table2cell(results); 
         end
         
+
+        
         function [explore_time_obj,explore_vec_obj] =  object_explore(cur_pos,cue_angle,heading_thresh,object_distances,distance_threshold)
+            
             
             for i = 1:size(object_distances,1)
                 % gather point statitics
@@ -650,22 +731,96 @@ classdef behavior_funcs
             end
         end
         
-        function bin_explore = object_explore_over_time(pos, bin_width,cue_angle,heading_thresh,object_distances,distance_threshold)
+        function [bin_explore, out_table] = object_explore_over_time(ts, bin_width,cue_angle,heading_thresh,object_distances,distance_threshold,object_id)
+        % FUNCTION: object_explore_over_time
+        %
+        % DESCRIPTION:
+        % This function computes and bins object exploration within time bins, based on
+        % spatial proximity and heading angle constraints. It generates a time-binned
+        % summary of exploration data for multiple objects, outputting the binned
+        % exploration times and a formatted table summarizing the results.
+        %
+        % INPUTS:
+        % - ts: timestamps in seconds, vector or analouge signal array (`pos.timestamps`).
+        % - bin_width: A scalar specifying the width of each time bin (in seconds).
+        % - cue_angle: A matrix of cue angles (in degrees) for each object over time.
+        % - heading_thresh: A scalar threshold for acceptable heading angles (in degrees).
+        % - object_distances: A matrix of distances between the subject and each object over time.
+        % - distance_threshold: A scalar specifying the maximum distance (in the same units as `object_distances`) 
+        %                       to consider exploration of an object.
+        % - object_id: A cell array of strings specifying the IDs of the objects being analyzed.
+        %
+        % OUTPUTS:
+        % - bin_explore: A matrix where each row corresponds to an object and each column 
+        %                contains the total exploration time (in seconds) within a time bin.
+        % - out_table: A MATLAB table summarizing the results, containing the following columns:
+        %   * `bin_n`: The bin number for each time bin.
+        %   * `bin_center_second`: The center of each time bin (in seconds).
+        %   * `object_id`: The ID of the object corresponding to each bin.
+        %   * `object_explore`: The exploration time (in seconds) for each object in each bin.
+        %
+        % USAGE:
+        % [bin_explore, out_table] = object_explore_over_time(pos, bin_width, cue_angle, heading_thresh, object_distances, distance_threshold, object_id);
+        %
+        % NOTES:
+        % - The function assumes `object_distances` and `cue_angle` have the same number of rows, 
+        %   corresponding to the number of objects being analyzed.
+        % - Exploration times are computed using the `behavior_funcs.explore_time` function, 
+        %   which should return the total exploration time for timestamps within each bin.
+        %
+        % EXAMPLE:
+        % pos.timestamps = 0:0.1:100; % Example timestamps
+        % bin_width = 10; % 10-second bins
+        % cue_angle = rand(2, length(pos.timestamps)) * 180 - 90; % Random cue angles between -90 and 90 degrees
+        % heading_thresh = 30; % Heading angle threshold of 30 degrees
+        % object_distances = rand(2, length(pos.timestamps)) * 10; % Random distances between 0 and 10 units
+        % distance_threshold = 5; % Distance threshold of 5 units
+        % object_id = {'ObjectA', 'ObjectB'}; % Object IDs
+        %
+        % [bin_explore, out_table] = object_explore_over_time(pos, bin_width, cue_angle, heading_thresh, object_distances, distance_threshold, object_id);
 
+        
+            if (ismember(class(ts),'analogSignalArray'))
+
+                ts = ts.timestamps;
+
+            end 
+
+            if (ismember(class(cue_angle),'analogSignalArray'))
+
+                cue_angle = cue_angle.data';
+
+            end 
+
+            if (ismember(class(object_distances),'analogSignalArray'))
+
+                object_distances = object_distances.data';
+
+            end 
+        
+     
            
            for obj = 1:size(object_distances,1) 
                
             % create bins with
-            edges = pos.timestamps(1):bin_width*pos.sampling_rate:pos.timestamps(end);
+            edges = ts(1):bin_width:ts(end); % edges for binning data
+            bin_centers = ((edges(1:end-1) + diff(edges)/2) - min(edges)); % bin centers in seconds 
             angle_idx = cue_angle(obj,:) >= -heading_thresh & cue_angle(obj,:) <= heading_thresh;
 
-            explore_ts = pos.timestamps(object_distances(obj,:) <= distance_threshold & angle_idx);
-              
+            explore_ts = ts((object_distances(obj,:) <= distance_threshold) & angle_idx);
+             
             for i = 1:length(edges)-1
                 idx = explore_ts >= edges(i) & explore_ts <= edges(i+1);
                 bin_explore(obj,i) = behavior_funcs.explore_time(explore_ts(idx));
             end
            end
+           
+            out_table = table; 
+            out_table.bin_n = [1:size(bin_explore,2), 1:size(bin_explore,2)]';
+            out_table.bin_center_second = [bin_centers'; bin_centers'];
+            out_table.object_id = [repmat(object_id{1},size(bin_explore,2),1); repmat(object_id{2},size(bin_explore,2),1)];
+            out_table.object_explore = [bin_explore(1,:)'; bin_explore(2,:)']; 
+
         end
         
         function moved_object_id =  find_moved_object(basepath)
@@ -766,12 +921,13 @@ classdef behavior_funcs
             
             p = inputParser;
             p.addParameter('near_obj_dist',3,@isnumeric) % perimeter around object in units as coordinates (default cm)
-            p.addParameter('run_thres',5,@isnumeric)
+            p.addParameter('run_thres',4,@isnumeric) % (cm/s)
+            p.addParameter('near_object_thresh',0.5,@isnumeric) % minimum time by object to count (seconds)
             
             p.parse(varargin{:})
             near_obj_dist = p.Results.near_obj_dist;
             run_thres = p.Results.run_thres;
-            
+            near_object_thresh = p.Results.near_object_thresh;
             % get behavior epoch
             
             % grab xy coordinates
@@ -797,8 +953,8 @@ classdef behavior_funcs
             % time moving slow for at least 1 second
             stopIdx = contiguousframes(velocity < run_thres,behavior.sr);
             
-            % coordinates for frames inside home base for at least 0.5 seconds
-            out_home = contiguousframes(in_home,behavior.sr/2); %has to be inside of hb for at least 1 sec to count as entryd
+            % coordinates for frames inside the object area for at least near_object_thresh seconds
+            out_home = contiguousframes(in_home,behavior.sr*near_object_thresh); %has to be inside of hb for at least 1 sec to count as entryd
             
             % This finds stops that occur in the home base boundary
             [startStop,~,~] = find_groups(stopIdx);
@@ -807,13 +963,13 @@ classdef behavior_funcs
             [~,~,metrics.entries] = find_groups(out_home);
             
             % total time near object
-            metrics.obj_Occ = nansum(out_home)/fr;
+            metrics.obj_Occ = nansum(out_home)/behavior.sr;
             
             % average velocity near object
             metrics.obj_Vel = nanmean(velocity(out_home(1:end-1,1),1)); %remove last tempIn idx to accomodate velocity length
             
             % time moving slow near object in seconds
-            metrics.obj_slow = nansum(out_home(1:end-1) & stopIdx)/fr; % time being slow in homebase
+            metrics.obj_slow = nansum(out_home(1:end-1) & stopIdx)/behavior.sr; % time being slow in homebase
             
             % proportion of time being slow near object
             metrics.obj_class= slowInHB/obj_Occ; % proportion of time being slow in hb
@@ -872,6 +1028,13 @@ classdef behavior_funcs
             % (either 'A' or 'B')
             
             % get maze coords for object coordinates
+            maze_coords = table;
+            for i = 1:length(session.behavioralTracking)
+                ep_coords = session.behavioralTracking{1, i}.maze_coords;
+                ep_coords.behave_epoch = repmat(session.behavioralTracking{1, i}.epoch,size(ep_coords,1),1);
+                
+                maze_coords = [maze_coords; ep_coords];
+            end
             maze_coords = session.behavioralTracking{1, idx}.maze_coords;
             obj_idx = contains(maze_coords.object,{'A','B'});
             obj_center = contains(maze_coords.position,{'center'});
@@ -886,6 +1049,7 @@ classdef behavior_funcs
                 object_edge = [maze_coords.x_scaled(obj_idx & ~obj_center), ...
                     maze_coords.y_scaled(obj_idx & ~obj_center)];
             else
+                warning('WARNING Behavior units are in pixels')
                 %load raw coords (in pixels)
                 object_center = [maze_coords.x(obj_idx & obj_center), ...
                     maze_coords.y(obj_idx & obj_center)];
