@@ -10,7 +10,7 @@ fig = figure;
 for i = 1:length(behavior.trialsID)
     idx = behavior.timestamps > behavior.trials(i,1)...
         & behavior.timestamps < behavior.trials(i,2);
-    [occ,~] = behavior_funcs.occ_map(behavior.position.x(idx),behavior.position.y(idx),2,behavior.sr);
+    [occ,~] = behavior_funcs.occ_map(behavior.position.x(idx),behavior.position.y(idx),3,behavior.sr);
     axs(1) = subplot(2,length(behavior.trialsID),i,'align');
     b = imagesc(flipud(occ));
     axis image
