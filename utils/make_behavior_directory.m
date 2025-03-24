@@ -6,6 +6,10 @@ function make_behavior_directory(subid_csv,data_dir,task_name)
 % LB 06/30/2023
 
 % Input: 
+%    subid_csv (String): csv with subject id as a column variable named 'subid' 
+%    data_dir (Char): path to main dataset where subject folders can be
+%    stored
+%    task_name (Char): name of behavioral experiment 
 %    basepaths: path to cohort metadata csv containing paths to each subject folder
 % 
 % Saves directories for each behavior folder 
@@ -17,7 +21,11 @@ df = readtable(subid_csv,"Delimiter",'comma');
 for i = 1:length(df.subid)
     
     % iterate within basepath 
-    subid = num2str(df.subid(i));
+    if isa(df.subid(i),'cell')
+        subid = df.subid{i};
+    elseif isa(df.subid(i),'double')
+        subid = num2str(df.subid(i));
+    end
     
     subject_path = fullfile(data_dir,subid);
     
@@ -29,6 +37,8 @@ for i = 1:length(df.subid)
     switch task_name
         case 'cpp'
             task_phases = {'habituation_day01','habituation_day02','habituation_day03','cpptask_day04'};
+        case 'open_field'
+            task_phases = {'open_field_day01','open_field_day02','open_field_day03'};
         case 'object-location'
             task_phases = {'hab_day01','hab_day02','hab_day03','object_location_day04'};
         case 'novel-object'
