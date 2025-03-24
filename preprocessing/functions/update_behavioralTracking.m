@@ -63,9 +63,9 @@ dlc_files = {dlc_files.name};
 
 % if there are videos, but no dlc, we'll save vid_files in
 % behavioralTracking field for now.
-if isempty(dlc_files) & ~isempty(vid_files)
+if isempty(dlc_files) && ~isempty(vid_files)
     warning('No DLC output found. Adding videos without tracking for now')
-    dlc_files = vid_files;
+    dlc_files = {vid_files.name};
 end
 
 % update behavioralTracking field
@@ -109,8 +109,13 @@ function session = add_dlc_files(session,dlc_files,video_name,epoch,idx)
 disp('Adding DLC tracking now')
 
 % Associate a video file for a specific video
-dlc_file = dlc_files(contains(extractBefore(dlc_files,'DLC'),extractBefore(video_name,'.avi')));
-dlc_file = dlc_file{:};
+
+if any(contains(dlc_files,'.avi'))
+    dlc_file = video_name;
+else
+    dlc_file = dlc_files(contains(extractBefore(dlc_files,'DLC'),extractBefore(video_name,'.avi')));
+    dlc_file = dlc_file{:};
+end
 %Pull up video
 videoObj = VideoReader(fullfile(session.general.basePath,video_name{1}));
 
