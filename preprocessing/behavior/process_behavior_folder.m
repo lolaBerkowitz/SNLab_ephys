@@ -28,8 +28,8 @@ function process_behavior_folder(basepath,varargin)
 % input parser
 p = inputParser;
 p.addParameter('metadata_path','Y:\laura_berkowitz\behavior_validation\appps1_cpp\metadata.csv',@ischar)
-p.addParameter('overwrite',true,@islogical)
-p.addParameter('redo_rescale',true,@islogical)
+p.addParameter('overwrite',false,@islogical)
+p.addParameter('redo_rescale',false,@islogical)
 
 
 p.parse(varargin{:});
@@ -38,7 +38,7 @@ overwrite = p.Results.overwrite;
 redo_rescale = p.Results.redo_rescale;
 
 basename = basenameFromBasepath(basepath);
-
+cd(basepath)
 % skip if all files exist and overwrite is not equal to true
 if exist([basepath,filesep,[basename,'.animal.behavior.mat']],'file')...
         & exist([basepath,filesep,[basename,'.restrictxy.mat']],'file')...
@@ -61,7 +61,7 @@ make_events('basepath',basepath);
 % update epochs from digitalIn.events.mat
 update_epochs('basepath',basepath,...
     'annotate',true,...
-    'overwrite',overwrite,...
+    'overwrite',true,...
     'ttl_method',[])
 
 % general behavior file
