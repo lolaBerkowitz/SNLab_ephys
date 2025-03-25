@@ -66,6 +66,7 @@ update_epochs('basepath',basepath,...
 
 % general behavior file
 general_behavior_file_SNlab('basepath',basepath,'force_overwrite',true,'smooth_factor',.2,'primary_coords_dlc',4);
+general_behavior_file_SNlab('basepath',basepath,'force_overwrite',true,'primary_coords_dlc',1:2);
 
 % update behavior file from metadata csv
 update_behavior_from_metadata(metadata_path,'basepath',basepath);
