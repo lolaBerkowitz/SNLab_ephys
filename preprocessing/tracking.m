@@ -288,6 +288,7 @@ classdef tracking
 
         % let the user click around the coordinates
         corners = [];
+        i = 1;
         while true
             [X,Y]=ginput(1);
             if isempty(X)
@@ -305,7 +306,7 @@ classdef tracking
         end
 
         function [t,x,y,v,a,angle,units,source,fs,notes,extra_points,vidnames] = ...
-                extract_tracking(basepath,primary_coords_dlc,likelihood_dlc,smooth_factor)
+                extract_tracking(basepath,primary_coords_dlc,likelihood_dlc)
             
             % initalize variables to pull
             t = [];
@@ -338,9 +339,9 @@ classdef tracking
                 % compute average point between two coords
                 x = nanmedian(x,2);
                 y = nanmedian(y,2);
-                [v, a,~] = linear_motion(x,y,fs,smooth_factor);
+                [v, a,~] = linear_motion(x,y,t,fs);
             else
-                [v, a,~] = linear_motion(x,y,fs,smooth_factor);
+                [v, a,~] = linear_motion(x,y,t,fs);
             end
             
             % multiple tracking points will likely exist, extract here
