@@ -8,7 +8,6 @@ addParameter(p,'force_overwrite',false); % overwrite previously saved data (will
 addParameter(p,'save_mat',true); % save animal.behavior.mat
 addParameter(p,'primary_coords_dlc',3); % deeplabcut tracking point to extract (extracts all, but main x and y will be this)
 addParameter(p,'likelihood_dlc',.80); % deeplabcut likelihood threshold
-addParameter(p,'smooth_factor',.2); % time in seconds to smooth over (default .1 or 100ms)
 
 parse(p,varargin{:});
 basepath = p.Results.basepath;
@@ -16,7 +15,6 @@ force_overwrite = p.Results.force_overwrite;
 save_mat = p.Results.save_mat;
 primary_coords_dlc = p.Results.primary_coords_dlc;
 likelihood_dlc = p.Results.likelihood_dlc;
-smooth_factor = p.Results.smooth_factor;
 
 basename = basenameFromBasepath(basepath);
 session = loadSession(basepath,basename);
@@ -51,7 +49,7 @@ end
 % extract tracking for Deeplabcut 
 if any(contains({tracking_files{:}},'DLC'))
     [t_dlc,x_dlc,y_dlc,v_dlc,a_dlc,angle_dlc,units_dlc,source_dlc,fs_dlc,notes_dlc,extra_points_dlc,vidnames_dlc] = ...
-        tracking.extract_tracking(basepath,primary_coords_dlc,likelihood_dlc,smooth_factor);
+        tracking.extract_tracking(basepath,primary_coords_dlc,likelihood_dlc);
     
     % deeplabcut will often have many tracking points, add them here
     if ~isempty(extra_points_dlc)
