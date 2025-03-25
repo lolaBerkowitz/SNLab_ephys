@@ -33,7 +33,7 @@ classdef behavior_funcs
             distance_vector = sqrt((diff(x)).^2 + (diff(y)).^2);
             
             % length of path when animal is running
-            length = sum(distance_vector(velocity >= run_threshold,1));%Total Path length for points greater than 3cm/s
+            length = nansum(distance_vector(velocity >= run_threshold,1));%Total Path length for points greater than 3cm/s
             
         end
         
@@ -78,7 +78,7 @@ classdef behavior_funcs
             end
         end
         
-        function stop_measures = stops(x,y,ts,velocity,fr,epoch,varargin)
+        function stop_measures = stops(x,y,ts,velocity,fr,varargin)
             % Finds when animal stop ( < 3cm/s velocity for at least 1
             % second) and computes stop features.
             % inputs:
@@ -87,7 +87,8 @@ classdef behavior_funcs
             %       ts: timestamps of length n
             %       fr: frame rate
             %       velocity: instantaneous velocity of length n-1
-            %       epoch: length of minimum stop epoch in frames
+            %       epoch (optional) : length of minimum stop epoch in
+            %       frames (default is 1 second (frame rate in Hz))
             % outputs:
             %       stop_measures: structure containing outcome measures.
             %           stopIdx: logical index of points where rat is
@@ -99,29 +100,37 @@ classdef behavior_funcs
             %
             p = inputParser;
             addParameter(p,'run_threshold',3,@isnumeric);
+            addParameter(p,'epoch',[],@isnumeric);
+
             
             parse(p,varargin{:});
             run_threshold = p.Results.run_threshold;
+            epoch = p.Results.epoch;
             
-            [stop_measures.stopIdx,startStop,endStop] = behavior_funcs.stop_epochs(velocity,epoch,'run_threshold',run_threshold);
+            if isempty(epoch)
+                epoch = fr;
+            end
+
+            [stop_measures.stopIdx,startStop,endStop] = behavior_funcs.stop_epochs(velocity,'epoch',epoch,'run_threshold',run_threshold);
             
             %     This finds coordinates associated with stop
             for ii=1:length(startStop)
                 motionless{ii} = [x(startStop(ii):endStop(ii)),y(startStop(ii):endStop(ii))];
                 timeMotionless{ii} = size(motionless{ii},1)/fr;
                 tsStop{ii} = ts(startStop(ii):endStop(ii));
+                meanTsStop(ii) = mean(ts(startStop(ii):endStop(ii)));
             end
             
             stop_measures.stops = motionless;
             stop_measures.timeStopped = timeMotionless;
             stop_measures.tsStop = tsStop;
-            
+            stop_measures.meanTsStop = meanTsStop; 
             %Create Number of Stops
             stop_measures.NumStops = size(stop_measures.stops,2);
             
             %Find center of mass for stops.
             for ii=1:size(stop_measures.stops,2)
-                center(ii) = center_of_mass(stop_measures.stops{1,ii}(:,1),stop_measures.stops{1,ii}(:,2));
+                center(ii,:) = behavior_funcs.center_of_mass(stop_measures.stops{1,ii}(:,1),stop_measures.stops{1,ii}(:,2));
             end
             
             stop_measures.stopCenter = center;
@@ -251,7 +260,16 @@ classdef behavior_funcs
             map(map==0) = nan;
         end
         
-        function [out] = thigmotaxis(x,y,fr,diameter,varargin)
+        function [out] = thigmotaxis_square(x,y,fr, basepath, epoch)
+            
+            [xOuter, yOuter, xInner, yInner] = generateNestedSquares(basepath, epoch); 
+             %Calculate dwell time for outter edge
+            [in,~] = inpolygon(x,y,xInner,yInner);
+            out = sum(~in)/fr;
+            
+        end
+        
+        function [out] = thigmotaxis_circle(x,y,fr,diameter,varargin)
             % NOT FUNCTION YET NEED TO ADJUST CREATEZONES FOR SQUARE
             % ENVIORNMENT LB 12/2022
             
@@ -307,8 +325,8 @@ classdef behavior_funcs
             
             clear rowsInImage columnsInImage
             
-            
-            sa = sum(sum(map>0))/sum(sum(~isnan(map))); %Calculate the proportion of bins occupied by animal.
+            [length, width] = size(map);
+            sa = sum(sum(map>.100))/(length*width); %Calculate the proportion of bins occupied by animal.
             
         end
         
