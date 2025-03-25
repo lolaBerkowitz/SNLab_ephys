@@ -144,7 +144,8 @@ for file = 1:length(session.behavioralTracking) %loop through folders containing
     img_path = fullfile(basepath,'temp_img.png');
     
     % create image save to current directory
-    sys_cmd = ['ffmpeg -ss ', num2str(vid_time),' -i ',vid_path,' -vframes 1 ',img_path];
+    sys_cmd = ['ffmpeg -ss ', num2str(vid_time),' -i ','"',vid_path,'"',' -vframes 1 ','"',img_path,'"'];
+
     system(sys_cmd)
 
     epoch = session.behavioralTracking{1,file}.epoch;
