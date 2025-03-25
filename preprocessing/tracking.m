@@ -265,7 +265,7 @@ classdef tracking
         basepath = fileparts(video_path);
         img_path = fullfile(basepath,'temp_img.png');
         % create image save to current directory
-        sys_cmd = ['ffmpeg -ss ', num2str(300),' -i ',video_path,' -vframes 1 ',img_path];
+        sys_cmd = ['ffmpeg -ss ', num2str(150),' -i ','"',video_path,'"',' -vframes 1 ','"',img_path,'"'];
         system(sys_cmd)
         
         im = imread(img_path); 
