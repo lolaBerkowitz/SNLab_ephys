@@ -7,7 +7,7 @@ addParameter(p,'basepath',pwd); % single or many basepaths in cell array or uses
 addParameter(p,'force_overwrite',false); % overwrite previously saved data (will remove custom fields)
 addParameter(p,'save_mat',true); % save animal.behavior.mat
 addParameter(p,'primary_coords_dlc',3); % deeplabcut tracking point to extract (extracts all, but main x and y will be this)
-addParameter(p,'likelihood_dlc',.80); % deeplabcut likelihood threshold
+addParameter(p,'likelihood_dlc',.90); % deeplabcut likelihood threshold
 
 parse(p,varargin{:});
 basepath = p.Results.basepath;
