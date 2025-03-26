@@ -70,7 +70,7 @@ general_behavior_file_SNlab('basepath',basepath,'force_overwrite',overwrite,'pri
 % update behavior file from metadata csv
 update_behavior_from_metadata(metadata_path,'basepath',basepath);
 
-get_maze_XY('basepath',basepath,'config_path', 'C:\Users\schafferlab\github\SNLab_ephys\behavior\behavior_configs\','redo_rescale',redo_rescale,'overwrite',overwrite);
+get_maze_XY('basepath',basepath,'config_path', 'C:\Users\schafferlab\github\SNLab_ephys\behavior\behavior_configs\','redo_rescale',true,'overwrite',overwrite);
 
 % sacle coordinates to cm 
 tracking.scale_coords(basepath,overwrite);
