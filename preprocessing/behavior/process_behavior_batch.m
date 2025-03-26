@@ -4,7 +4,7 @@ function process_behavior_batch(data_path,metadata_path,varargin)
 
 % Assumes general behavior file and *maze_coords.csv is in basepath.
 p = inputParser;
-p.addParameter('overwrite',true,@islogical)
+p.addParameter('overwrite',false,@islogical)
 p.addParameter('redo_rescale',true,@islogical)
 
 p.parse(varargin{:});
@@ -59,7 +59,7 @@ end
 % update epochs from digitalIn.events.mat
 update_epochs('basepath',basepath,...
     'annotate',true,...
-    'overwrite',false,...
+    'overwrite',true,...
     'ttl_method',[])
 
 
@@ -71,7 +71,7 @@ general_behavior_file_SNlab('basepath',basepath,'force_overwrite',true,'primary_
 update_behavior_from_metadata(metadata_path,'basepath',basepath);
 
 get_maze_XY('basepath',basepath,'config_path', 'C:\Users\schafferlab\github\SNLab_ephys\behavior\behavior_configs\',...
-    'overwrite',overwrite,'redo_rescale',redo_rescale);
+    'overwrite',overwrite,'redo_rescale',true);
 
 % sacle coordinates to cm 
 tracking.scale_coords(basepath,overwrite);
@@ -91,6 +91,12 @@ video_files = extractBefore({video_files.name},'.avi');
 
 dlc_files = get_dlc_files_in_basepath(basepath);
 dlc_files = extractBefore({dlc_files.name},'DLC');
+
+% no video files, not need to check dlc
+if isempty(video_files)
+    check = false;
+    return
+end
 
 % see if each video has a DLC file
 if sum(contains(video_files,dlc_files)) == length(video_files)
