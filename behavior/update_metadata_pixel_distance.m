@@ -1,6 +1,6 @@
-function update_metadata_pixel_distance(data_path)
+function update_metadata_pixel_distance(metadata_path)
 
-df = readtable(data_path,'Delimiter','comma'); 
+df = readtable(metadata_path,'Delimiter','comma'); 
 for i = 1:length(df.basepath)
     
     if ~isnan(df.pixel_distance(i))
@@ -18,7 +18,7 @@ for i = 1:length(df.basepath)
         df.pixel_distance(i) = pixel_distance; 
         
         
-        writetable(df,data_path)
+        writetable(df,metadata_path)
     end
       
 end
