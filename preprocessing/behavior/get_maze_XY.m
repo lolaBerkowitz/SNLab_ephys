@@ -151,9 +151,8 @@ for file = 1:length(session.behavioralTracking) %loop through folders containing
     epoch = session.behavioralTracking{1,file}.epoch;
     % choose config based on epoch
     config = get_behavior_config(session,epoch,config_path);
-    crop_params = session.behavioralTracking{1, file}.crop_params;
     % pulls up video frame and grabs coords
-    coords_table = grab_coords(img_path,session.behavioralTracking{1,file}.notes,config,crop_params);
+    coords_table = grab_coords(img_path,session.behavioralTracking{1,file}.notes,config);
     
     % load pixel distance and pixel_reference 
     pixel_distance = session.behavioralTracking{1, file}.pixel_distance;
