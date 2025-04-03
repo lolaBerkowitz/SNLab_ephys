@@ -566,6 +566,7 @@ classdef tracking
             vidnames = vidnames(file_idx);
             ep_idx = ep_idx(file_idx);
             frame_rate = frame_rate(file_idx);
+            
             % grab video ttls
             behav = 1;
             for epoch = ep_idx
@@ -670,6 +671,9 @@ classdef tracking
             if (length(video_ttl) == size(x,1)) || abs(basler_intan_diff)<=2 %assumes 1 frame could be cut at 0 and 1 frame at end
                 disp('N of frames match!!');
             elseif basler_intan_diff>0 && abs(basler_intan_diff)<fs
+                disp([num2str(abs(length(video_ttl) - size(x,1))) ' of frames dont match, probably at the end of the recording']);
+                video_ttl = video_ttl(1:size(x,1));
+            elseif basler_intan_diff>0 && abs(basler_intan_diff) <= 36 % reliabily get 34-36 frames dropped with fireflyS at end
                 disp([num2str(abs(length(video_ttl) - size(x,1))) ' of frames dont match, probably at the end of the recording']);
                 video_ttl = video_ttl(1:size(x,1));
             elseif basler_intan_diff<0 && abs(basler_intan_diff)<fs
