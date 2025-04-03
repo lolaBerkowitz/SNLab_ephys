@@ -194,7 +194,6 @@ prompt = join(prompt);
 
 end
 
-function config_file = grab_coords(img_path,vidname,config_path, crop_params)
 function config_file = grab_coords(img_path,vidname,config_path)
 % Uses config to prompt users to define xy coordinates of an image
 % (videoObj). Outputs xy coordinates in form of a table. 
