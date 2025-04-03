@@ -53,7 +53,7 @@ general_behavior_file_SNlab('basepath',basepath,'force_overwrite',overwrite_beha
 update_behavior_from_metadata(metadata_path,'basepath',basepath)
 
 % get maze coords
-get_maze_XY('basepath',basepath,'config_path', config_path,'redo_rescale',true)
+get_maze_XY('basepath',basepath,'config_path', config_path,'redo_rescale',false)
 
 % sacle coordinates to cm 
 tracking.scale_coords(basepath,overwrite_behavior);
