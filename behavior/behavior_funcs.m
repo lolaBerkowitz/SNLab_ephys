@@ -113,6 +113,12 @@ classdef behavior_funcs
 
             [stop_measures.stopIdx,startStop,endStop] = behavior_funcs.stop_epochs(velocity,'epoch',epoch,'run_threshold',run_threshold);
             
+            if isempty(startStop)
+                disp('No stops detected, check speed threshold')
+                stop_measures.NumStops = 0;
+                return
+            end
+            
             %     This finds coordinates associated with stop
             for ii=1:length(startStop)
                 motionless{ii} = [x(startStop(ii):endStop(ii)),y(startStop(ii):endStop(ii))];
@@ -120,7 +126,7 @@ classdef behavior_funcs
                 tsStop{ii} = ts(startStop(ii):endStop(ii));
                 meanTsStop(ii) = mean(ts(startStop(ii):endStop(ii)));
             end
-            
+                        
             stop_measures.stops = motionless;
             stop_measures.timeStopped = timeMotionless;
             stop_measures.tsStop = tsStop;
