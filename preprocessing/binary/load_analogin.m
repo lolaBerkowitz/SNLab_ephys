@@ -15,7 +15,6 @@ num_samples = fileinfo.bytes/(num_channels * 2); % uint16 = 2 bytes
 fid = fopen(fullfile(basepath,'analogin.dat'), 'r');
 v = fread(fid, [num_channels, num_samples], 'uint16');
 fclose(fid);
-v = v * 0.000050354; % convert to volts
 
 % 
 end
