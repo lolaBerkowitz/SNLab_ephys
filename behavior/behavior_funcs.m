@@ -213,11 +213,6 @@ classdef behavior_funcs
             
             clear stop
             
-            HD = wrapTo360(fixNLXangle(rad2deg(atan2(head(:,2)-nose(:,2),...
-                head(:,1)-nose(:,1))),round(0.1667*30)));
-            angVel = insta_angvel(HD',fr);
-            
-            
             %calculate verticies for quadrants
             quadrants = createZones([0,0],params.dia{j},'numQuad',n_quadrants,'fig',0); %16 pie shaped segments
             
