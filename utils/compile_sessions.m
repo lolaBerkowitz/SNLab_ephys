@@ -3,8 +3,8 @@ function df = compile_sessions(data_folder,varargin)
 % each basepath
 %
 % input: 
-%  data_folder: path to parent directory containing sessions or csv to
-%  already compiled sessions.
+%  data_folder: path to parent directory containing sessions or csv that
+%  contains column variable "basepath".
 %  save_path (optional): path to save df as csv (default, none)
 % ouput: 
 %  table of basepaths,basename from data_folder
