@@ -668,7 +668,7 @@ classdef tracking
         function [x,y,t,video_ttl] = match_video_frames_to_ttl(video_ttl,basler_intan_diff,x,y,t,fs)
             
             % match basler frames con ttl pulses
-            if (length(video_ttl) == size(x,1)) || abs(basler_intan_diff)<=2 %assumes 1 frame could be cut at 0 and 1 frame at end
+            if (length(video_ttl) == size(x,1)) %assumes 1 frame could be cut at 0 and 1 frame at end
                 disp('N of frames match!!');
             elseif basler_intan_diff>0 && abs(basler_intan_diff)<fs
                 disp([num2str(abs(length(video_ttl) - size(x,1))) ' of frames dont match, probably at the end of the recording']);
