@@ -5,14 +5,23 @@ function process_behavior_batch(data_path,metadata_path,varargin)
 % Assumes general behavior file and *maze_coords.csv is in basepath.
 p = inputParser;
 p.addParameter('overwrite',false,@islogical)
-p.addParameter('redo_rescale',true,@islogical)
+p.addParameter('redo_rescale',false,@islogical)
+p.addParameter('query_tag',[],@ischar)
+p.addParameter('primary_coords_dlc',1:2,@isnumeric)
+
 
 p.parse(varargin{:});
 overwrite = p.Results.overwrite;
 redo_rescale = p.Results.redo_rescale;
+query_tag = p.Results.query_tag;
+primary_coords_dlc = p.Results.primary_coords_dlc;
 
 % loop through basepaths and run main function
 df = compile_sessions(data_path);
+
+if ~isempty(query_tag)
+    df = df(contains(df.basepath,query_tag),:);
+end
 
 for i = 1:length(df.basepath)
     df_sub = compile_sessions(df.basepath{i}{1});
@@ -27,7 +36,7 @@ for i = 1:length(df.basepath)
             if exist(fullfile(basepath,[basename,'.animal.behavior.mat'])) & ~overwrite
                 continue
             else
-                main(basepath,metadata_path,overwrite,redo_rescale)
+                main(basepath,metadata_path,overwrite,redo_rescale,primary_coords_dlc)
             end
         else
             disp('Missing DLC for a video')
@@ -40,7 +49,7 @@ end
 end
 
 
-function main(basepath,metadata_path,overwrite,redo_rescale)
+function main(basepath,metadata_path,overwrite,redo_rescale,primary_coords_dlc)
 
 basename = basenameFromBasepath(basepath);
 % check is session file exists, if not make one 
@@ -63,15 +72,14 @@ update_epochs('basepath',basepath,...
     'ttl_method',[])
 
 
-
 % general behavior file
-general_behavior_file_SNlab('basepath',basepath,'force_overwrite',true,'primary_coords_dlc',1:2);
+general_behavior_file_SNlab('basepath',basepath,'force_overwrite',true,'primary_coords_dlc',primary_coords_dlc);
 
 % update behavior file from metadata csv
 update_behavior_from_metadata(metadata_path,'basepath',basepath);
 
 get_maze_XY('basepath',basepath,'config_path', 'C:\Users\schafferlab\github\SNLab_ephys\behavior\behavior_configs\',...
-    'overwrite',overwrite,'redo_rescale',true);
+    'overwrite',overwrite,'redo_rescale',redo_rescale);
 
 % sacle coordinates to cm 
 tracking.scale_coords(basepath,overwrite);
