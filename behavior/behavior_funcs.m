@@ -1121,11 +1121,16 @@ classdef behavior_funcs
             object_explore = nansum(delta_explore);
         end
         
-        function trial_ep = load_trials(basepath)
+        function trial_ep = load_trials(basepath, truncate_time)
             basename = basenameFromBasepath(basepath);
             load(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior');
             
-            trial_ep = IntervalArray(behavior.trials);
+            if isemtpy(truncate_time)
+            
+                trial_ep = IntervalArray(behavior.trials);
+            else
+                behavior.trials
+            end
         end
         
         function behave_ep = load_epochs(basepath)
