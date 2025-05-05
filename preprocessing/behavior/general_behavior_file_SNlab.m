@@ -30,7 +30,7 @@ end
 
 % run update_behavioralTracking to make sure dlc files and associated
 % epochs are indicated in basename.session.behavioralTracking
-update_behavioralTracking('basepath',basepath,'force',force_overwrite)
+update_behavioralTracking('basepath',basepath,'force',true)
 session = loadSession(basepath,basename);
 
 
