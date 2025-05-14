@@ -24,13 +24,19 @@ if contains(data_folder,'.csv')
 else
     
     % use dir to find subdirs and keep only directories
-    folders = dir(fullfile(data_folder, '**\*.*'));
-    folders = folders(~ismember({folders.name},{'.','..'}),:); % remove ., ..
-    folders = folders([folders.isdir],:);
+    folders = dir(fullfile(data_folder, '**\*'));
+    folders = folders(~ismember({folders.name},{'.','..'}),:); % remove ., .. 
+    folders = folders([folders.isdir],:); % keep only directories
+    folders = folders(~ismember({folders.folder},data_folder),:); % remove main subject folder 
+    
     % create table and save basepaths for each subdirectory
     df = table;
-    df.basepath = cellfun(@(S) fullfile(unique({folders.folder}), S), {folders.name}, 'Uniform', 0)';
-    df.basename = {folders.name}';
+    
+    for i = 1:length(folders)
+        df.basepath{i} = fullfile(folders(i).folder,folders(i).name); 
+        df.basename{i}= folders(i).name;
+    end
+
 end
 
 
