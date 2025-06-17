@@ -31,13 +31,13 @@ laura = 'Y:\laura_berkowitz\app_ps1_ephys\data';
 % For SNLab, assumes one animal per active port (64 channel electrodes) as
 % of 2/22
 % subject folder corresponds to port A, B, C, D, respectively
-subject_order = {'hpc13','hpc15','hpc16','hpc17'};
+subject_order = {'hpstim07','hpstim06',[],'hpstim04'};
 
 % folder where dat files reside that need to be split
-data_path ='Y:\laura_berkowitz\app_ps1_ephys\data\to_split\hpc13_hpc15_hpc16_hpc17_241023_105145';
+data_path ='Y:\laura_berkowitz\alz_stim\data\to_split\hpstim07_hpstim06_hpstim04_250505_082259';
 
 % project folder where subjects data should be saved
-save_path = {laura,laura,laura,laura}; 
+save_path = {laura_stim,laura_stim,[],laura_stim}; 
     
 % split dat files a
 split_dat(data_path,save_path, subject_order,'trim_dat',false)
@@ -55,15 +55,15 @@ split_dat(data_path,save_path, subject_order,'trim_dat',false)
 % to be analyzed. Let them run overnight while split dat runs. 
 
 %% Single Session Preprocess
-basepath = 'Y:\laura_berkowitz\alz_stim\data\hpstim01\hpstim01_day04_250221_110535';
+basepath = 'Y:\laura_berkowitz\alz_stim\data\hpstim06\hpstim06_day07_250610_094123';
 
 %% Check xml/channel mapping: verify channel map, skip bad channels, and save 
 
 disp('Skip bad channels in Neuroscope')
-%%
-% Preprocess (create lfp, kilosort)
+%% Preprocess (create lfp, kilosort)
+
 % Single shank (A164 poly2)
-preprocess_session(basepath,'digitalInputs',true,'kilosort',false,'tracking',false)
+preprocess_session(basepath,'digitalInputs',false,'kilosort',true,'tracking',false)
 
 % Tungsten 7 channel
 preprocess_session(basepath,'digitalInputs',true,'kilosort',false,'tracking',false,'specialChannels',[])
@@ -105,11 +105,12 @@ channel_mapping('basepath',basepath)
 %% Detect SWRs using DectSWR. 
 % first input [ripple channel, sharp wave channel] using intan channels + 1 (for matlab 1-based indexing). 
 % load session 
+basepath = pwd;
 basename = basenameFromBasepath(basepath);
 session = loadSession(basepath,basename);
 
 
-%For SNLAB
+% % For SNLAB
 ripples = DetectSWR([session.channelTags.Ripple.channels ,...
     session.channelTags.SharpWave.channels ,...
     session.channelTags.RippleNoise.channels ],...
@@ -118,12 +119,14 @@ ripples = DetectSWR([session.channelTags.Ripple.channels ,...
     'saveMat',true,...
     'check',true,...
     'forceDetect',true);
+
+
 % For Soula
 % ripples = DetectSWR([session.channelTags.Ripple.channels ,...
 %     session.channelTags.SharpWave.channels ,...
 %     session.channelTags.RippleNoise.channels ],...
-%     'thresSDrip',[1,.5],...
-%     'thresSDswD',[1,.5],...
+%     'thresSDrip',[.5,1],...
+%     'thresSDswD',[.5,1],...
 %     'saveMat',true,...
 %     'check',true,...
 %     'forceDetect',true);
