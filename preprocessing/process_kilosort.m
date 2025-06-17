@@ -20,17 +20,12 @@ function process_kilosort(basepath,varargin)
     ssd_folder = fullfile(ssd_path, basename);
 
     if isempty(dir([ssd_folder+'\Kilosort*'])) || overwrite == true
-        if ~multishank
-            % for single poly2 shank 64channels
-            create_channelmap(basepath)
-        
-        elseif multishank
-            % For Kilosort: create channelmap
-            if ~isempty(session.channelTags.Bad.channels)
-                createChannelMapFile_KSW(basepath,basename,'staggered',session.channelTags.Bad.channels);
-            else
-                 createChannelMapFile_KSW(basepath,basename,'staggered');
-            end
+
+        % For Kilosort: create channelmap
+        if ~isempty(session.channelTags.Bad.channels)
+            createChannelMapFile_KSW(basepath,basename,'staggered',session.channelTags.Bad.channels);
+        else
+             createChannelMapFile_KSW(basepath,basename,'staggered');
         end
         
         % creating a folder on the ssd for chanmap,dat, and xml
@@ -54,8 +49,10 @@ function process_kilosort(basepath,varargin)
         command = ['robocopy "',basepath,'" ',ssd_folder,' chanMap.mat'];
         system(command);
         
-        % Spike sort using kilosort 1 (data on ssd)
-        run_ks1(basepath,'ssd_folder',ssd_folder)
+%         run_ks1(basepath,'ssd_folder',ssd_folder)
+        % single sort
+        kilosortFolder = KiloSortWrapper('SSD_path', ssd_path, ...
+            'rejectchannels', session.channelTags.Bad.channels);
     else
         disp("Kilosort folder already exists. Will not overwrite.")
     end
