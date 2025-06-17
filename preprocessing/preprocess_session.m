@@ -142,26 +142,20 @@ end
 % an automatic way of flaging bad channels is needed
 if stateScore
     
-    SleepScoreMaster(basepath,'rejectChannels',session.channelTags.Bad.channels); % takes lfp in base 0
+    SleepScoreMaster(basepath,'rejectChannels',session.channelTags.Bad.channels,'overwrite',false); % takes lfp in base 0
     
 end
 
 
 if kilosort
 
-    if ~multishank
-        % for single poly2 shank 64channels
-        create_channelmap(basepath)
-    
-    elseif multishank
-        % For Kilosort: create channelmap
-        if ~isempty(session.channelTags.Bad.channels)
-            createChannelMapFile_KSW(basepath,basename,'staggered',session.channelTags.Bad.channels);
-        else
-             createChannelMapFile_KSW(basepath,basename,'staggered');
-        end
+    % For Kilosort: create channelmap
+    if ~isempty(session.channelTags.Bad.channels)
+        createChannelMapFile_KSW(basepath,basename,'staggered',session.channelTags.Bad.channels);
+    else
+         createChannelMapFile_KSW(basepath,basename,'staggered');
     end
-    
+
     % creating a folder on the ssd for chanmap,dat, and xml
     ssd_folder = fullfile(ssd_path, basename);
     mkdir(ssd_folder);
