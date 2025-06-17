@@ -24,26 +24,22 @@ if ~isempty(query_tag)
 end
 
 for i = 1:length(df.basepath)
-    df_sub = compile_sessions(df.basepath{i}{1});
     
-    for ii = 1:length(df_sub.basepath)
-        basepath = df_sub.basepath{ii}{1};
-        cd(basepath)
-        basename = basenameFromBasepath(basepath);
-        disp(['processing basepath: ',basepath])
-        
-        if check_folders(basepath)
-            if exist(fullfile(basepath,[basename,'.animal.behavior.mat'])) & ~overwrite
-                continue
-            else
-                main(basepath,metadata_path,overwrite,redo_rescale,primary_coords_dlc)
-            end
-        else
-            disp('Missing DLC for a video')
+    basepath = df.basepath{i};
+    cd(basepath)
+    basename = basenameFromBasepath(basepath);
+    disp(['processing basepath: ',basepath])
+    
+    if check_folders(basepath)
+        if exist(fullfile(basepath,[basename,'.animal.behavior.mat'])) && ~overwrite
             continue
+        else
+            main(basepath,metadata_path,overwrite,redo_rescale,primary_coords_dlc)
         end
+    else
+        disp('Missing DLC for a video')
+        continue
     end
-    
 end
 
 end
@@ -52,11 +48,11 @@ end
 function main(basepath,metadata_path,overwrite,redo_rescale,primary_coords_dlc)
 
 basename = basenameFromBasepath(basepath);
-% check is session file exists, if not make one 
+% check is session file exists, if not make one
 
 
 if  ~exist([basepath,filesep,[basename,'.session.mat']],'file')
-    session = sessionTemplate(basepath); 
+    session = sessionTemplate(basepath);
     save(fullfile(basepath,[basename,'.session.mat']),'session')
 end
 
@@ -81,10 +77,10 @@ update_behavior_from_metadata(metadata_path,'basepath',basepath);
 get_maze_XY('basepath',basepath,'config_path', 'C:\Users\schafferlab\github\SNLab_ephys\behavior\behavior_configs\',...
     'overwrite',overwrite,'redo_rescale',redo_rescale);
 
-% sacle coordinates to cm 
+% sacle coordinates to cm
 tracking.scale_coords(basepath,overwrite);
 
-% restrict coordintes to remove extramaze tracking points 
+% restrict coordintes to remove extramaze tracking points
 tracking.restrict(basepath,overwrite);
 
 end
