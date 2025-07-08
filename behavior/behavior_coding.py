@@ -31,9 +31,9 @@ viewer = napari.Viewer()
 # this writes the frame, layer source, and action each time you press a key
 def on_keypress(key, viewer):
     if (key == 'd') | (key == 'f'):
-        object = '1'
+        obj_id  = '1'
     elif (key == 'j') | (key == 'k'):
-        object = '2'
+        obj_id  = '2'
     if (key == 'd') | (key == 'j'):
         action = 'start'
     elif (key == 'f') | (key == 'k'):
@@ -41,12 +41,14 @@ def on_keypress(key, viewer):
     frame = viewer.dims.current_step[0]
     layer = viewer.layers.selection.active or viewer.layers[-1]
 
-    # show_info('object :'+object+' '+action+' Frame: '+str(frame))  # if you want some visual feedback
+    show_info('object :'+obj_id+' '+action+' Frame: '+str(frame))  # if you want some visual feedback
     with open(CSV_OUT, 'a') as f:
-        csv.writer(f).writerow([layer.source.path, frame, object, action])
+        source_path = getattr(layer.source, 'path', 'unknown')
+        csv.writer(f).writerow([source_path, frame, obj_id, action])
 
-# for key in KEYMAP:
-#     viewer.bind_key(key, partial(on_keypress, key))
+def make_callback(k):
+    return lambda: on_keypress(k, viewer)
+
 for key in KEYMAP:
-    viewer.bind_key(key, lambda key=key: on_keypress(key,viewer))
+    viewer.bind_key(key, lambda viewer, key=key: on_keypress(key, viewer))
 napari.run()
