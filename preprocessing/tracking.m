@@ -670,7 +670,7 @@ classdef tracking
             % match basler frames con ttl pulses
             if (length(video_ttl) == size(x,1)) %assumes 1 frame could be cut at 0 and 1 frame at end
                 disp('N of frames match!!');
-            elseif basler_intan_diff>0 && abs(basler_intan_diff)<fs
+            elseif basler_intan_diff>0 && abs(basler_intan_diff) <= fs + 2
                 disp([num2str(abs(length(video_ttl) - size(x,1))) ' of frames dont match, probably at the end of the recording']);
                 video_ttl = video_ttl(1:size(x,1));
             elseif basler_intan_diff>0 && abs(basler_intan_diff) <= 36 % reliabily get 34-36 frames dropped with fireflyS at end
