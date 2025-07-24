@@ -151,8 +151,10 @@ for file = 1:length(session.behavioralTracking) %loop through folders containing
     epoch = session.behavioralTracking{1,file}.epoch;
     % choose config based on epoch
     config = get_behavior_config(session,epoch,config_path);
+    crop_params = session.behavioralTracking{1, file}.crop_params;
+
     % pulls up video frame and grabs coords
-    coords_table = grab_coords(img_path,session.behavioralTracking{1,file}.notes,config);
+    coords_table = grab_coords(img_path,session.behavioralTracking{1,file}.notes,config,crop_params);
     
     % load pixel distance and pixel_reference 
     pixel_distance = session.behavioralTracking{1, file}.pixel_distance;
@@ -193,15 +195,16 @@ prompt = join(prompt);
 
 end
 
-function config_file = grab_coords(img_path,vidname,config_path)
+function config_file = grab_coords(img_path,vidname,config_path, crop_params)
+
 % Uses config to prompt users to define xy coordinates of an image
 % (videoObj). Outputs xy coordinates in form of a table. 
 
 % go to folder containing video & image
 figure;
 im = imread(img_path);
-% im2 = im(crop_params.y_min:crop_params.y_max,crop_params.x_min:crop_params.x_max,:);
-imshow(im) % display t he first frame
+im2 = im(crop_params.y_min:crop_params.y_max,crop_params.x_min:crop_params.x_max,:);
+imshow(im2) % display t he first frame
 axis('equal')      
 set(gcf,'CurrentCharacter','@')
 hold on
