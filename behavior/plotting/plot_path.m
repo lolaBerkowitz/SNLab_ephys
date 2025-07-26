@@ -16,9 +16,12 @@ behave_ep = IntervalArray(behave_ep);
 trial_ep = IntervalArray(behavior.trials);
 
 fig = figure;
+fig.Color = [1 1 1];
 for i = 1:behave_ep.n_intervals
     maze_coords = session.behavioralTracking{1, i}.maze_coords;
     obj_idx = contains(maze_coords.object,{'A','B'}) & contains(maze_coords.position,{'center'});
+    boundary_idx = contains(maze_coords.object,{'corner'});
+
     cur_ep = behave_ep(i) & trial_ep;
     idx = InIntervals(behavior.timestamps, cur_ep.intervals);
  
@@ -39,8 +42,10 @@ for i = 1:behave_ep.n_intervals
     axs(2) = subplot(2,behave_ep.n_intervals,i+behave_ep.n_intervals) ;
     plot(x,y,'k'); hold on;
     scatter(maze_coords.x_scaled(obj_idx),maze_coords.y_scaled(obj_idx),'*r');
+    scatter(maze_coords.x_scaled(boundary_idx),maze_coords.y_scaled(boundary_idx),'*b');
     hold off
-    legend({'path','objects'},'Position',[0.25,0.025,0.15,0.075])
+    legend({'path','objects','maze boundaries'},'Position',[0.5,0.01,0.15,0.075])
+    legend('boxoff') 
     axis image
     axis equal
     axis off
