@@ -63,7 +63,7 @@ disp('Skip bad channels in Neuroscope')
 %% Preprocess (create lfp, kilosort)
 
 % Single shank (A164 poly2)
-preprocess_session(basepath,'digitalInputs',false,'kilosort',true,'tracking',false)
+preprocess_session(basepath,'digitalInputs',false,'kilosort',false,'tracking',false)
 
 % Tungsten 7 channel
 preprocess_session(basepath,'digitalInputs',true,'kilosort',false,'tracking',false,'specialChannels',[])
@@ -165,9 +165,11 @@ basename = [];
 
 objectlocationpaths = readtable("Y:\laura_berkowitz\app_ps1_ephys\analysis\object_location_paths.csv");
 
-for i = 1:length(objectlocationpaths.basepath)
-    basepath{i} = objectlocationpaths.basepath{i};
-    basename{i} = basenameFromBasepath(objectlocationpaths.basepath{i});
+df = compile_sessions('Y:\laura_berkowitz\app_ps1_ephys\complete_sessions_07_14_2025.csv');
+
+for i = 1:length(df.basepath)
+    basepath{i} = df.basepath{i};
+    basename{i} = basenameFromBasepath(df.basepath{i});
 end
 
 % load all cell metrics
