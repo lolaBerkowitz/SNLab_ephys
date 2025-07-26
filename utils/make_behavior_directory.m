@@ -51,6 +51,8 @@ for i = 1:length(df.subid)
             task_phases = {'hab_day01','single_arm_day01','single_arm_day02','single_arm_day03',...
                 'alternation_day01','alternation_day02','alternation_day03','alternation_day04',...
                 'alternation_day05','alternation_day06','alternation_day07'};
+        case 'cheeseboard'
+            task_phases = {'hab_day01','hab_day02','reward_day03','reward_day04','reward_day05','task_day06','task_day07'};
     end
     
     % Makes basepaths from names in task_phases
