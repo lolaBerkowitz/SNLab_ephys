@@ -1,13 +1,15 @@
 ﻿model,x_min,x_max,y_min,y_max
-30cm_open_field,230,1080,80,900
+30cm_open_fieldJul14shuffle1_200000,230,1080,80,900
 40cm_open_field,295,1175,56,947
 mouse_cpp,1,1440,1,1080
 linear_track,1,1440,1,1080
 ephys-OL,295,1175,56,947
 ephys1_cpp2024,1,1440,1,1080
 ephys1_linear,1,1440,1,1080
-ephys1_dim,1,1440,1,1080
+ephys1_dim,230,1080,80,900
 dim_cpp,1,1440,1,1080
 aya_poorlight,1,640,1,480
 linear_ephys1,1,1440,1,1080
 40cm_OR,1,1080,1,1080
+30cm_open_fieldJul14shuffle1_250000,325,982,149,829
+ephys1_dimAug22shuffle1_160000,230,1080,80,900
