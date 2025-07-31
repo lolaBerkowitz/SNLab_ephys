@@ -13,6 +13,14 @@ function make_behavior_directory(subid_csv,data_dir,task_name)
 %    basepaths: path to cohort metadata csv containing paths to each subject folder
 % 
 % Saves directories for each behavior folder 
+% subid_csv = 'Y:\laura_berkowitz\behavior_validation\appps1_cheeseboard\subject_list.csv'
+% 
+% data_dir = 'Y:\laura_berkowitz\behavior_validation\appps1_cheeseboard\data'
+% 
+% task_name = 'cheeseboard'
+% 
+% make_behavior_directory(subid_csv,data_dir,task_name)
+%
 
 % read basepaths 
 df = readtable(subid_csv,"Delimiter",'comma');
