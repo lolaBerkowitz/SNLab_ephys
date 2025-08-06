@@ -27,7 +27,7 @@ else
     folders = dir(fullfile(data_folder, '**\*'));
     folders = folders(~ismember({folders.name},{'.','..'}),:); % remove ., .. 
     folders = folders([folders.isdir],:); % keep only directories
-    folders = folders(~ismember({folders.folder},data_folder),:); % remove main subject folder 
+    folders = folders(~ismember({folders.name},data_folder),:); % remove main subject folder 
     
     % create table and save basepaths for each subdirectory
     df = table;
