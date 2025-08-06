@@ -37,11 +37,6 @@ for i = 1:length(df.subid)
     
     subject_path = fullfile(data_dir,subid);
     
-    if isfolder(subject_path)
-        disp(['Subject folder for ',subid, ' already created, moving to next subject'])
-        continue
-    end
-    
     switch task_name
         case 'cpp'
             task_phases = {'habituation_day01','habituation_day02','habituation_day03','cpptask_day04'};
@@ -60,8 +55,9 @@ for i = 1:length(df.subid)
                 'alternation_day01','alternation_day02','alternation_day03','alternation_day04',...
                 'alternation_day05','alternation_day06','alternation_day07'};
         case 'cheeseboard'
-            task_phases = {'hab_day01','hab_day02','reward_day03','reward_day04','reward_day05','task_day06','task_day07'};
+            task_phases = {'hab_day01','hab_day02','hab_day03','reward_day03','reward_day04','reward_day05','task_day06'};
     end
+  
     
     % Makes basepaths from names in task_phases
     make_directories(subject_path,task_phases)
