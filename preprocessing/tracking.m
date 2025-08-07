@@ -63,8 +63,8 @@ classdef tracking
                 
                 
                 % compute parameters required for scaling
-                x_origin{ep} = median(x_min:x_max);
-                y_origin{ep} = median(y_min:y_max);
+                x_origin{ep} = median(x_min:x_max,'includenan');
+                y_origin{ep} = median(y_min:y_max,'includenan');
                 
                 if length(behavior.epochs{1, epoch}.maze_size) > 1
                     scale_factor_x{ep} = (x_max - x_min)/behavior.epochs{1, epoch}.maze_size(1); %pixels/cm
@@ -225,7 +225,7 @@ classdef tracking
             angle = tracking_struct.angle; 
             
             % remove spurious velocities due to end of track
-            v = smooth(v,round((1/median(diff(t)))/2)); 
+            v = smooth(v,round((1/median(diff(t),'includenan'))/2)); 
             % calculate acceleration
             a = gradient(v);
        
@@ -337,8 +337,8 @@ classdef tracking
             if length(primary_coords_dlc) > 1
                 angle = xy_angle(x,y);
                 % compute average point between two coords
-                x = nanmedian(x,2);
-                y = nanmedian(y,2);
+                x = median(x,2,'includenan');
+                y = median(y,2,'includenan');
                 [v, a,~] = linear_motion(x,y,t,fs);
             else
                 [v, a,~] = linear_motion(x,y,t,fs);
