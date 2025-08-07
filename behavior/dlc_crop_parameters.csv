@@ -1,6 +1,7 @@
 ﻿model,x_min,x_max,y_min,y_max
 30cm_open_fieldJul14shuffle1_200000,230,1080,80,900
-40cm_open_field,295,1175,56,947
+40cm_open_fieldJul22shuffle1_200000,295,1175,56,947
+40cm_open_fieldJul22shuffle1_190000,385,977,232,822
 mouse_cpp,1,1440,1,1080
 linear_track,1,1440,1,1080
 ephys-OL,295,1175,56,947
