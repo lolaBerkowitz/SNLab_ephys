@@ -11,9 +11,9 @@ for i = 1:length(df.basepath)
         df.pixel_distance(i) = nan;
     else
         video_path = fullfile(df.basepath{i},[df.vidname{i},'.avi']);
-        maze_size = df.maze_width_cm(i);
+        pixel_reference = df.pixel_dist_reference(i);
         
-        pixel_distance = tracking.maze_distance_gui(video_path,maze_size);
+        pixel_distance = tracking.maze_distance_gui(video_path,pixel_reference);
 
         df.pixel_distance(i) = pixel_distance; 
         
