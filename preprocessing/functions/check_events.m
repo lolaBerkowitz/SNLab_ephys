@@ -40,7 +40,8 @@ digitalIn.timestampsOff{1,3} = digitalIn.timestampsOn{1,3} + .3;
 digitalIn.timestampsOff{1,4} = digitalIn.timestampsOn{1,4} + .3;
 digitalIn.timestampsOff{1,5} = digitalIn.timestampsOn{1,5} + .3;
 
-
+digitalIn.timestampsOn{1,2} = digitalIn.timestampsOn{1,5};
+digitalIn.timestampsOff{1,2} = digitalIn.timestampsOn{1,5} + .3;
 
 
 %% and recalculate other variables
