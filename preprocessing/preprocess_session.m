@@ -175,8 +175,10 @@ if kilosort
     command = ['robocopy "',basepath,'" ',ssd_folder,' chanMap.mat'];
     system(command);
     
-    % Spike sort using kilosort 1 (data on ssd)
-    run_ks1(basepath,'ssd_folder',ssd_folder)
+%         run_ks1(basepath,'ssd_folder',ssd_folder)
+        % single sort
+    kilosortFolder = KiloSortWrapper('SSD_path', ssd_path, ...
+        'rejectchannels', session.channelTags.Bad.channels);
 end
 % Get tracking positions
 
