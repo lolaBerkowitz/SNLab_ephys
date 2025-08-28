@@ -1,34 +1,60 @@
-function opto_stimulation = make_opto_stimulation_file(basepath,varargin)
-%Make manipulation file loads the analogin.dat file and retirieves the
-%channel associated with optogenetic stimulation waveform. 
+function optoStim = make_opto_stimulation_file(basepath,varargin)
+%Make opto event files associated with stimulation and detection file loads 
+% the processed digitalin.events file and retrieves the TTL pulses from
+% the online detector. 
+
+% input: 
+% basepath: path (char/string) to data location of digitalin.events.mat
+% file. 
+% oupput: 
+%  - optoStim and optoDetect mat files. These are CellExplorer formatted
+%  events. 
+%
 p = inputParser;
-addParameter(p,'stim_channel',16,@isnumeric) %snlab rig wiring for opto digitalin events
+addParameter(p,'stim_channel',6,@isnumeric) %snlab rig wiring for opto digitalin events
+addParameter(p,'detect_channel',7,@isnumeric) %snlab rig wiring for opto digitalin events
 addParameter(p,'detector','IED_60-80_Franksboard',@ischar) %snlab rig wiring for opto digitalin events
-addParameter(p,'event_label','LED_ON',@ischar) %snlab rig wiring for events
 
 parse(p,varargin{:});
 
 stim_channel = p.Results.stim_channel;
-event_label = p.Results.event_label;
+detection_channel = p.Results.detect_channel;
 detector = p.Results.detector;
 
 % load event file with stim 
 load(fullfile(basepath,'digitalIn.events.mat'))
 
 [~,basename] = fileparts(basepath);
-opto_stimulation = struct;
-opto_stimulation.timestamps = [digitalIn.timestampsOn{stim_channel}, digitalIn.timestampsOff{stim_channel}];
-opto_stimulation.peaks = median(opto_stimulation.timestamps,2);
-opto_stimulation.amplitude = zeros(length(opto_stimulation.peaks),1);
-opto_stimulation.amplitudeUnits = 'AU';
-opto_stimulation.eventID = 1:length(opto_stimulation.peaks);
-opto_stimulation.eventIDlabels = repmat({event_label},length(opto_stimulation.peaks),1);
-opto_stimulation.eventIDbinary = false;
-opto_stimulation.center = median(opto_stimulation.timestamps);
-opto_stimulation.duration = digitalIn.dur{stim_channel};
-opto_stimulation.detectorinfo = detector;
+
+% make optoStim
+optoStim = struct;
+optoStim.timestamps = [digitalIn.timestampsOn{stim_channel}, digitalIn.timestampsOff{stim_channel}];
+optoStim.peaks = median(optoStim.timestamps,2);
+optoStim.amplitude = zeros(length(optoStim.peaks),1);
+optoStim.amplitudeUnits = 'AU';
+optoStim.eventID = 1:length(optoStim.peaks);
+optoStim.eventIDlabels = repmat({'LED_ON'},length(optoStim.peaks),1);
+optoStim.eventIDbinary = false;
+optoStim.center = median(optoStim.timestamps);
+optoStim.duration = digitalIn.dur{stim_channel};
+optoStim.detectorinfo = detector;
+
+% make optoDetect
+optoDetect = struct;
+optoDetect.timestamps = [digitalIn.timestampsOn{detection_channel}, digitalIn.timestampsOff{detection_channel}];
+optoDetect.peaks = median(optoDetect.timestamps,2);
+optoDetect.amplitude = zeros(length(optoDetect.peaks),1);
+optoDetect.amplitudeUnits = 'AU';
+optoDetect.eventID = 1:length(optoDetect.peaks);
+optoDetect.eventIDlabels = repmat({'Online_Detect'},length(optoDetect.peaks),1);
+optoDetect.eventIDbinary = false;
+optoDetect.center = median(optoDetect.timestamps);
+optoDetect.duration = digitalIn.dur{stim_channel};
+optoDetect.detectorinfo = detector;
 
 % initialize the structure file 
-save([basepath,filesep,basename,'.opto_stimulation.events.mat'],'opto_stimulation');
+save([basepath,filesep,basename,'.optoStim.events.mat'],'optoStim');
+save([basepath,filesep,basename,'.optoDetect.events.mat'],'optoDetect');
+
 end
 
