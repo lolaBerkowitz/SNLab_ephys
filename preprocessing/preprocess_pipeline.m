@@ -71,7 +71,7 @@ preprocess_session(basepath,'digitalInputs',true,'kilosort',false,'tracking',fal
 % If running kilosort separately for single shank (A164 poly2)
 process_kilosort(basepath)
 % multiple shank 
-preprocess_session(basepath,'digitalInputs',false,'kilosort',false,'tracking',false,'specialChannels',[],'multishank',true)
+preprocess_session(basepath,'digitalInputs',true,'kilosort',true,'tracking',false,'specialChannels',[],'multishank',true)
 % If running kilosort separately for multiple shanks
 process_kilosort(basepath,'multishank',true)
 
