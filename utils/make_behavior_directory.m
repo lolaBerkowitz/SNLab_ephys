@@ -25,7 +25,6 @@ function make_behavior_directory(subid_csv,data_dir,task_name)
 % read basepaths 
 df = readtable(subid_csv,"Delimiter",'comma');
 
-
 for i = 1:length(df.subid)
     
     % iterate within basepath 
@@ -55,7 +54,9 @@ for i = 1:length(df.subid)
                 'alternation_day01','alternation_day02','alternation_day03','alternation_day04',...
                 'alternation_day05','alternation_day06','alternation_day07'};
         case 'cheeseboard'
-            task_phases = {'hab_day01','hab_day02','hab_day03','reward_day03','reward_day04','reward_day05','task_day06'};
+            task_phases = {'hab01_phase1','hab02_phase1','hab03_phase1',...
+                'fixed1_phase2','fixed2_phase2','fixed3_phase2','fixed4_phase2','fixed5_phase2',...
+                'exposure1_phase3','exposure2_phase3','exposure3_phase3','exposure4_phase3'};
     end
   
     
