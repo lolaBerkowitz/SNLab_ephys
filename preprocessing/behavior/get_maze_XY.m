@@ -260,6 +260,7 @@ object_idx = contains(configs,'object');
 open_field_idx = contains(configs,'open_field');
 place_preference_idx = contains(configs,'conditioned_place'); 
 y_maze_idx = contains(configs,'y_maze');
+circular_idx = contains(configs,'circular');
 
 if contains(name,{'multi'})
     config_name = configs{multi_idx & ~object_idx};
@@ -271,6 +272,8 @@ elseif contains(name,{'pre_test','post_test','pairing'})
     config_name = configs{place_preference_idx};
 elseif contains(name,{'y_maze'})
     config_name = configs{y_maze_idx};
+elseif contains(name,{'cheeseboard'})
+    config_name = configs{circular_idx};
 end
 
 config_name = fullfile(config_path,config_name);
