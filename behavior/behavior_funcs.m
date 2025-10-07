@@ -336,8 +336,7 @@ classdef behavior_funcs
             ED = mod(atan2d(y-object_center_y,x-object_center_x),rad2deg(2*pi));
 
         end
-        
-        
+
         function CD = cue_direction(ED, HD)
             % takes in egocentric direction and head direction
             % (analogSignalArray objects) and computes direction to cue by
@@ -353,6 +352,192 @@ classdef behavior_funcs
         end
         
         
+        %% Cheeseboard 
+
+        function process_napari_cheeseboard(basepath)
+            %PROCESS_NAPARI_CHEESEBOARD Process and sync Napari-points output for cheeseboard task with SNLAB general behavior file.
+            % Requires that SNLab process_tracking has been completed for
+            % the basepath.
+            %
+            % 
+            % Parameters
+            % ----------
+            % basepath : string
+            %     Path to the base directory containing session files and
+            %     CSV annotations. CSVs must be in basepath and labelled
+            %     *e_rewards.csv, *e_start.csv, *_trials.csv, 
+            %
+            % Description
+            % -----------
+            % This function performs three key operations for cheeseboard behavioral data:
+            % 1. Scales XY coordinates for rewards and start points drawn in Napari.
+            % 2. Updates session struct with scaled coordinates.
+            % 3. Syncs Napari trial annotations to behavior timestamps.
+            % 
+            % Note: Naming convention for filenames is the
+            % video_name_*.csv, i.e.
+            % 4456_learning_10072025-095012_rewards.csv
+            % 
+            % LB 10/2025
+        
+            % Scale XY coordinates of start, save to session and basepath
+            behavior_funcs.scale_napari_coords(basepath, '_rewards')
+            
+            % Scale XY coordinates of rewards, save to session and basepath
+            behavior_funcs.scale_napari_coords(basepath,'_start')
+            
+            % Sync trials to behavior file 
+            behavior_funcs.napari_trials_to_behavior(basepath)
+            
+        end
+
+        function scale_napari_coords(basepath,varargin)
+        %SCALE_NAPARI_COORDS Scale XY coordinates from Napari to behavioral coordinates.
+        %
+        % Parameters
+        % ----------
+        % basepath : string
+        %     Base directory path containing the session and CSV files.
+        %
+        % Optional Parameters
+        % -------------------
+        % 'csv_tag' : string, default = '_rewards'
+        %     Tag used to find the appropriate CSV files (e.g., '_start', '_rewards').
+        %
+        % Description
+        % -----------
+        % This function reads CSV annotations made in Napari, scales the XY pixel
+        % coordinates based on the reference distance from the session struct, and
+        % stores the scaled data back into the session struct and as new CSV files.
+        % LB 10/2025
+
+            % input parser
+            p = inputParser;
+            p.addParameter('csv_tag','_rewards',@isstring);
+            
+            
+            p.parse(varargin{:}) 
+            csv_tag = p.Results.csv_tag; 
+            
+            
+            basename = basenameFromBasepath(basepath);
+            session = loadSession(basepath,basename);
+            csv_files = my_dir(fullfile(basepath,['*',csv_tag,'.csv']));
+            
+            % loop through video
+            for file = 1:length(session.behavioralTracking) %loop through folders containing subject videos
+               
+                vidname = extractBefore(session.behavioralTracking{1,file}.notes,'.'); % default video name and file extension saved in notes for SnLab process tracking 
+                reward_table = readtable(fullfile(basepath,csv_files.name{contains(csv_files.name,vidname)}));
+            
+                % load pixel distance and pixel_reference 
+                pixel_distance = session.behavioralTracking{1, file}.pixel_distance;
+                pixel_dist_reference = session.behavioralTracking{1, file}.pixel_dist_reference;
+            
+                reward_table.x_scaled = reward_table.axis_2 * (pixel_dist_reference/pixel_distance);
+                reward_table.y_scaled = reward_table.axis_1 * (pixel_dist_reference/pixel_distance);
+                
+                % save to session 
+                session.behavioralTracking{1,file}.(['cheeseboard',csv_tag]) = reward_table;
+                
+                % save data to csv 
+                save_file = fullfile(basepath,[vidname,'_rewards.csv']);
+                writetable(reward_table,save_file);
+            end
+            
+            % save session back to basepath 
+            save(fullfile(basepath,[basename,'.session.mat']),'session');
+        
+        end
+        
+        function napari_trials_to_behavior(basepath)
+            %NAPARI_TRIALS_TO_BEHAVIOR Convert Napari trial CSVs (points layer) into CellExplorer animal behavior file format.
+            %
+            % Parameters
+            % ----------
+            % basepath : string
+            %     Path to the session base directory, containing csvs,
+            %     animal.behavior.mat file, session.mat file
+            %
+            % Description
+            % -----------
+            % This function loads trial annotations (e.g., start and stop frames) from Napari-drawn
+            % CSV (*_trials.csv) and syncs them with xy coordinates saved in the animal behavior`.mat` file.
+            % It updates `behavior.trials` and `behavior.trialsID` with synchronized timestamps and epoch_ID_trialN, respectively.
+            %
+            % LB 10/05/2025
+
+
+            % crate basename from basepath
+            basename = basenameFromBasepath(basepath);
+            
+            % load session and animal behavior file
+            load(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior');
+            
+            % load session file for behavioralTracking that contains filenames
+            session = loadSession(basepath,basename);
+            epoch_df = load_epoch('basepath', basepath);
+            
+            % find all csv files that contain *_rewards,*_trials,*_start
+            csv_files = my_dir(fullfile(basepath,'*_*.csv'));
+            csv_files = csv_files(contains(csv_files.name,{'_rewards','_start','_trials'}),:);
+            
+            
+            trials_mat = [];
+            trials_id = {};
+            % loop through videos indicated in session.behavioralTracking
+            for ii = 1:length(session.behavioralTracking)
+            
+                % load epoch to get start/end for timestamps
+                epoch = session.behavioralTracking{1,ii}.epoch;
+                name = session.epochs{1,epoch}.name;
+                % grap video so we can find row index for a given video
+                vidname = session.behavioralTracking{1,ii}.notes;
+                vidname = extractBefore(vidname,'.');
+                
+                trials_idx = contains(csv_files.name,vidname) & contains(csv_files.name,"trials");
+            
+                % load epoch trials
+                trials_df = readtable(fullfile(basepath,csv_files.name{trials_idx}));
+                
+                [~, idx] = sort(trials_df.axis_0);
+                trials_df = trials_df(idx, :);
+                
+                idx = InIntervals(behavior.timestamps, [epoch_df.startTime(epoch), epoch_df.stopTime(epoch)]);
+                current_ts = behavior.timestamps(idx);
+                starts = (trials_df.axis_0(1:2:end) / behavior.sr) + current_ts(1);
+                stops = (trials_df.axis_0(2:2:end) / behavior.sr) + current_ts(1);
+               
+                trials_mat = [trials_mat; starts stops];
+                temp_id = {};
+            
+                for t = 1:length(starts)
+                    temp_id{t} = [name,'_',num2str(t)];
+                end
+            
+                trials_id = [trials_id; temp_id'];
+            
+            end
+    
+            % must be equal dims to add
+            assert(size(trials_mat,1) == length(trials_id))
+            
+            % if trials exist, which they should do if behavior file dose then
+            % concatenate
+            if ~isempty(behavior.trials)
+                % load and add new
+                existing_trials = [behavior.trials; trials_mat];
+                existing_trials_id = [behavior.trialsID; trials_id];
+            else
+                % Add to behavior file
+                behavior.trials = trials_mat;
+                behavior.trialsID = trials_id';
+            end
+            % save behavior file
+            save(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
+        
+        end
+
         %% Home base functions
         
         function metrics = home_base_metics(out_home,x,y,velocity,x_home,y_home,stopIdx,tsStop)
@@ -455,8 +640,7 @@ classdef behavior_funcs
                 HB_min_dist = NaN;
             end
         end
-        
-        
+
         function HBdist2Cue =  homebase_dist_from_cue(cueCM,HBcenter)
             % calculating proximity of high occupancy coordinates center from the
             % cue boundary
@@ -471,8 +655,8 @@ classdef behavior_funcs
             
         end
         
-        %% Object exploration functions
         
+        %% Object exploration function
         function [results,results_binned,explore_vectors] = score_object_exploration(basepath,varargin)
             % within basepath, scores epochs with 'object' indicated in
             % session.epoch.name. Determines the time spent exploring
@@ -729,8 +913,6 @@ classdef behavior_funcs
             end
             
         end
-        
-
         
         function [explore_time_obj,explore_vec_obj] =  object_explore(cur_pos,cue_angle,heading_thresh,object_distances,distance_threshold)
             
@@ -1086,9 +1268,6 @@ classdef behavior_funcs
         %         end
         %
         
-        
-        %%  behavior utils
-        
         function DR = discrimination_ratio(object_A_explore,object_B_explore)
             % returns the discrimination ratio that represents the relative
             % proportion of time spent exploring object B relative to all
@@ -1111,7 +1290,8 @@ classdef behavior_funcs
             
         end
         
-        function object_explore = explore_time(explore_ts)
+        function object_explore = explore_time(explore_ts)        
+
             % for a set of timestamps corresponding to object exploration
             % 'explore_ts', explore time computes the overall time and removes
             % jumps by keeping only frames with frame rates that match the mode.
@@ -1121,6 +1301,9 @@ classdef behavior_funcs
             object_explore = nansum(delta_explore);
         end
         
+        
+        %%  behavior utils
+
         function trial_ep = load_trials(basepath, truncate_time)
             basename = basenameFromBasepath(basepath);
             load(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior');
