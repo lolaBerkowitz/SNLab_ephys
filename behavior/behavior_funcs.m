@@ -381,10 +381,10 @@ classdef behavior_funcs
             % LB 10/2025
         
             % Scale XY coordinates of start, save to session and basepath
-            behavior_funcs.scale_napari_coords(basepath, '_rewards')
+            behavior_funcs.scale_napari_coords(basepath,'csv_tag', '_rewards')
             
             % Scale XY coordinates of rewards, save to session and basepath
-            behavior_funcs.scale_napari_coords(basepath,'_start')
+            behavior_funcs.scale_napari_coords(basepath,'csv_tag','_start')
             
             % Sync trials to behavior file 
             behavior_funcs.napari_trials_to_behavior(basepath)
