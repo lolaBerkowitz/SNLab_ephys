@@ -30,15 +30,19 @@ p = inputParser;
 p.addParameter('metadata_path','Y:\laura_berkowitz\behavior_validation\appps1_cheeseboard\metadata.csv',@ischar)
 p.addParameter('overwrite',true,@islogical)
 p.addParameter('redo_rescale',false,@islogical)
+p.addParameter('process_napari',false,@islogical)
+
 
 
 p.parse(varargin{:});
 metadata_path = p.Results.metadata_path;
 overwrite = p.Results.overwrite;
 redo_rescale = p.Results.redo_rescale;
+process_napari = p.Results.process_napari;
 
 basename = basenameFromBasepath(basepath);
 cd(basepath)
+
 % skip if all files exist and overwrite is not equal to true
 if exist([basepath,filesep,[basename,'.animal.behavior.mat']],'file')...
         & exist([basepath,filesep,[basename,'.restrictxy.mat']],'file')...
@@ -78,5 +82,9 @@ tracking.scale_coords(basepath,overwrite);
 % restrict coordintes to remove extramaze tracking points 
 tracking.restrict(basepath,overwrite);
     
+if process_napari
+
+     behavior_funcs.process_napari_cheeseboard(basepath)
+end
 
 end
