@@ -379,7 +379,10 @@ classdef behavior_funcs
             % 4456_learning_10072025-095012_rewards.csv
             % 
             % LB 10/2025
-        
+
+
+            
+                
             % Scale XY coordinates of start, save to session and basepath
             behavior_funcs.scale_napari_coords(basepath,'csv_tag', '_rewards')
             
@@ -423,6 +426,11 @@ classdef behavior_funcs
             basename = basenameFromBasepath(basepath);
             session = loadSession(basepath,basename);
             csv_files = my_dir(fullfile(basepath,['*',csv_tag,'.csv']));
+
+            if isempty(csv_files)
+                error(['no files found in ', basepath, ': with ',csv_tag,' included in the file extension'])
+            end
+
             
             % loop through video
             for file = 1:length(session.behavioralTracking) %loop through folders containing subject videos
