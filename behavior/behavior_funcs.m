@@ -413,7 +413,7 @@ classdef behavior_funcs
 
             % input parser
             p = inputParser;
-            p.addParameter('csv_tag','_rewards',@isstring);
+            p.addParameter('csv_tag','_rewards',@ischar);
             
             
             p.parse(varargin{:}) 
@@ -512,7 +512,7 @@ classdef behavior_funcs
                 temp_id = {};
             
                 for t = 1:length(starts)
-                    temp_id{t} = [name,'_',num2str(t)];
+                    temp_id{t} = [name,'_trial',num2str(t)];
                 end
             
                 trials_id = [trials_id; temp_id'];
@@ -526,12 +526,16 @@ classdef behavior_funcs
             % concatenate
             if ~isempty(behavior.trials)
                 % load and add new
-                existing_trials = [behavior.trials; trials_mat];
-                existing_trials_id = [behavior.trialsID; trials_id];
+                merged_trial_mat = [behavior.trials; trials_mat];
+                merged_id = [behavior.trialsID; trials_id];
+                
+                % overwrite with added trials
+                behavior.trials = merged_trial_mat;
+                behavior.trialsID = merged_id;
             else
                 % Add to behavior file
                 behavior.trials = trials_mat;
-                behavior.trialsID = trials_id';
+                behavior.trialsID = trials_id;
             end
             % save behavior file
             save(fullfile(basepath,[basename,'.animal.behavior.mat']),'behavior')
