@@ -27,8 +27,8 @@ function process_behavior_folder(basepath,varargin)
 
 % input parser
 p = inputParser;
-p.addParameter('metadata_path','Y:\laura_berkowitz\behavior_validation\appps1_cpp\metadata.csv',@ischar)
-p.addParameter('overwrite',false,@islogical)
+p.addParameter('metadata_path','Y:\laura_berkowitz\behavior_validation\appps1_cheeseboard\metadata.csv',@ischar)
+p.addParameter('overwrite',true,@islogical)
 p.addParameter('redo_rescale',false,@islogical)
 
 
