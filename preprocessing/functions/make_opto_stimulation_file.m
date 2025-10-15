@@ -11,8 +11,9 @@ function optoStim = make_opto_stimulation_file(basepath,varargin)
 %  events. 
 %
 p = inputParser;
-addParameter(p,'stim_channel',6,@isnumeric) %snlab rig wiring for opto digitalin events
-addParameter(p,'detect_channel',7,@isnumeric) %snlab rig wiring for opto digitalin events
+addParameter(p,'stim_channel',7,@isnumeric) %snlab rig wiring for opto digitalin events
+addParameter(p,'detect_channel',6,@isnumeric) %snlab rig wiring for opto digitalin events
+addParameter(p,'write_both',false,@islogical)
 addParameter(p,'detector','IED_60-80_Franksboard',@ischar) %snlab rig wiring for opto digitalin events
 
 parse(p,varargin{:});
@@ -20,24 +21,28 @@ parse(p,varargin{:});
 stim_channel = p.Results.stim_channel;
 detection_channel = p.Results.detect_channel;
 detector = p.Results.detector;
-
+write_both = p.Results.write_both;
 % load event file with stim 
 load(fullfile(basepath,'digitalIn.events.mat'))
 
 [~,basename] = fileparts(basepath);
 
-% make optoStim
-optoStim = struct;
-optoStim.timestamps = [digitalIn.timestampsOn{stim_channel}, digitalIn.timestampsOff{stim_channel}];
-optoStim.peaks = median(optoStim.timestamps,2);
-optoStim.amplitude = zeros(length(optoStim.peaks),1);
-optoStim.amplitudeUnits = 'AU';
-optoStim.eventID = 1:length(optoStim.peaks);
-optoStim.eventIDlabels = repmat({'LED_ON'},length(optoStim.peaks),1);
-optoStim.eventIDbinary = false;
-optoStim.center = median(optoStim.timestamps);
-optoStim.duration = digitalIn.dur{stim_channel};
-optoStim.detectorinfo = detector;
+if write_both
+    % make optoStim
+    optoStim = struct;
+    optoStim.timestamps = [digitalIn.timestampsOn{stim_channel}, digitalIn.timestampsOff{stim_channel}];
+    optoStim.peaks = median(optoStim.timestamps,2);
+    optoStim.amplitude = zeros(length(optoStim.peaks),1);
+    optoStim.amplitudeUnits = 'AU';
+    optoStim.eventID = 1:length(optoStim.peaks);
+    optoStim.eventIDlabels = repmat({'LED_ON'},length(optoStim.peaks),1);
+    optoStim.eventIDbinary = false;
+    optoStim.center = median(optoStim.timestamps);
+    optoStim.duration = digitalIn.dur{stim_channel};
+    optoStim.detectorinfo = detector;
+    save([basepath,filesep,basename,'.optoStim.events.mat'],'optoStim');
+
+end 
 
 % make optoDetect
 optoDetect = struct;
@@ -49,11 +54,10 @@ optoDetect.eventID = 1:length(optoDetect.peaks);
 optoDetect.eventIDlabels = repmat({'Online_Detect'},length(optoDetect.peaks),1);
 optoDetect.eventIDbinary = false;
 optoDetect.center = median(optoDetect.timestamps);
-optoDetect.duration = digitalIn.dur{stim_channel};
+optoDetect.duration = digitalIn.dur{detection_channel};
 optoDetect.detectorinfo = detector;
 
 % initialize the structure file 
-save([basepath,filesep,basename,'.optoStim.events.mat'],'optoStim');
 save([basepath,filesep,basename,'.optoDetect.events.mat'],'optoDetect');
 
 end
