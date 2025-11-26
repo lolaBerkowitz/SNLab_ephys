@@ -1,0 +1,186 @@
+import os
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from neuro_py.io import loading
+
+
+def time_series(basepath):
+    """
+    Generate a time axis relative to the injection start time for a given session.
+
+    Parameters
+    ----------
+    basepath : str or Path
+        Path to the session directory containing epoch data.
+
+    Returns
+    -------
+    np.ndarray or None
+        Array of time points relative to injection start time, or None if
+        no injection found.
+    """
+    df = loading.load_epoch(basepath)
+    print(df)
+
+    if "manipulation" in df.columns:
+        if "no injection" in df["manipulation"].values:
+            print("No injection in this session.")
+            return
+
+    ih_epochs = df[df["name"] == "injection"]
+    if ih_epochs.empty:
+        print("No injection epochs.")
+        return
+
+    injection_start = ih_epochs["startTime"].min()
+    session_start = df["startTime"].min()
+    session_end = df["stopTime"].max()
+
+    time_relative_array = (
+        np.arange(session_start, session_end + 1) - injection_start
+    )
+
+    # Plot for visual inspection (optional)
+    plt.plot(time_relative_array, time_relative_array)
+    plt.axhline(0, color='red', linestyle='--', label='Injection Start (0s)')
+    plt.title("Time series relative to injection start")
+    plt.xlabel("Elapsed seconds since session start (shifted)")
+    plt.ylabel("Time relative to injection start (s)")
+    plt.grid(True)
+    plt.legend()
+    # plt.show()
+
+    print(f"Injection starts at {injection_start:.2f}s (time zero).")
+    return time_relative_array
+
+
+def injection_time(basepath, skip_days, max_days):
+    """
+    Combine time arrays across multiple sessions for one animal, aligned to injection time.
+
+    Parameters
+    ----------
+    basepath : str or Path
+        Path to one session (used to infer the root directory).
+    skip_days : list of int
+        Days to exclude from the final result.
+    max_days : int
+        Maximum number of days to consider (inclusive).
+
+    Returns
+    -------
+    np.ndarray or None
+        2D array of time arrays for each day, padded to equal length,
+        or None if no valid data was found.
+    """
+    path = Path(basepath).parent
+    all_files = os.listdir(path)
+    files = [f for f in all_files if "hpc" in f and "time" not in f]
+    files = [os.path.join(path, f) for f in files]
+
+    print(files)
+
+    combined = [time_series(f) for f in files]
+    day_keys = [i for i in range(max_days + 1) if i not in skip_days]
+
+    combined_dict = {day: val for day, val in zip(day_keys, combined)}
+    print(combined_dict)
+
+    valid_series = [arr for arr in combined_dict.values() if arr is not None]
+    if not valid_series:
+        return
+
+    max_len = max(len(arr) for arr in valid_series)
+
+    padded = []
+    for arr in combined:
+        if arr is None:
+            arr = np.zeros(max_len)
+        else:
+            arr = np.pad(arr, (0, max_len - len(arr)), mode='constant')
+        padded.append(arr)
+
+    combined_padded = np.array(padded)
+    save_path = os.path.join(path, "combined_time_series.csv")
+    np.savetxt(save_path, combined_padded, delimiter=",", fmt="%d")
+
+    return combined
+
+
+def binning_injections(hpc_number, bin_size_sec=600):
+    """
+    Bin the combined time series and mark bins where injections occurred.
+
+    Parameters
+    ----------
+    hpc_number : int
+        HPC animal number used to locate the data.
+    bin_size_sec : int, optional
+        Size of time bins in seconds. Default is 600 (10 minutes).
+
+    Returns
+    -------
+    np.ndarray
+        Boolean matrix where each row corresponds to a time bin and
+        each column corresponds to a day with injection; 1 if injection
+        occurred in that bin, 0 otherwise.
+    """
+    all_days = list(range(34))
+    skip_days = {45, 49}
+    day_headers = [day for day in all_days if day not in skip_days]
+
+    basepath = (
+        f"Y:\\laura_berkowitz\\app_ps1_ephys\\data\\hpc{hpc_number}"
+        "\\combined_time_series.csv"
+    )
+    df = pd.read_csv(basepath, header=None).T
+    df.columns = day_headers
+
+    n_rows = df.shape[0]
+    remainder = n_rows % bin_size_sec
+
+    if remainder != 0:
+        n_to_add = bin_size_sec - remainder
+        padding = pd.DataFrame(0, index=range(n_to_add), columns=df.columns)
+        df_combined = pd.concat([df, padding], ignore_index=True)
+    else:
+        df_combined = df
+
+    n_bins = len(df_combined) // bin_size_sec
+    binned_df = pd.cut(df_combined.index, bins=n_bins, labels=False)
+    df_combined.insert(0, 'Binned Time', binned_df)
+
+    injection_days = [
+        day for day in day_headers if df_combined.at[0, day] != 0
+    ]
+    print(injection_days)
+
+    for day in day_headers:
+        if day in injection_days:
+            for row in range(len(df_combined[day])):
+                if df_combined.at[row, day] == 0:
+                    df_combined.at[row, day] = 1
+                else:
+                    df_combined.at[row, day] = df_combined.at[row, 0]
+
+    injected_bool_bin = []
+    for inject in injection_days:
+        bool_bin = [0] * n_bins
+        counter = 0
+        for bin_idx in range(len(df_combined[inject])):
+            if counter == 0 and df_combined.at[bin_idx, inject] == 1:
+                bin_number = df_combined.at[bin_idx, 'Binned Time']
+                bool_bin[bin_number] = 1
+                counter += 1
+        injected_bool_bin.append(bool_bin)
+
+    injected_bool = pd.DataFrame({
+        d: val for d, val in zip(injection_days, injected_bool_bin)
+    })
+
+    print("Injection Binary Matrix:")
+    print(injected_bool)
+    return np.array(injected_bool)
