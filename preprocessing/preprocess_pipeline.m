@@ -31,13 +31,13 @@ laura = 'Y:\laura_berkowitz\app_ps1_ephys\data';
 % For SNLab, assumes one animal per active port (64 channel electrodes) as
 % of 2/22
 % subject folder corresponds to port A, B, C, D, respectively
-subject_order = {'hpstim07','hpstim06',[],'hpstim04'};
+subject_order = {'hpstim09','hpstim08',[],[]};
 
 % folder where dat files reside that need to be split
-data_path ='Y:\laura_berkowitz\alz_stim\data\to_split\hpstim07_hpstim06_hpstim04_250505_082259';
+data_path ='Y:\laura_berkowitz\alz_stim\data\to_split\hpstim08_hpstim09_day04_251014_114213';
 
 % project folder where subjects data should be saved
-save_path = {laura_stim,laura_stim,[],laura_stim}; 
+save_path = {laura_stim,laura_stim,[],[]}; 
     
 % split dat files a
 split_dat(data_path,save_path, subject_order,'trim_dat',false)
@@ -136,7 +136,7 @@ basepath=pwd;
 basename = basenameFromBasepath(basepath);
 session = loadSession(basepath,basename);
 cell_metrics = ProcessCellMetrics('session',session,'manualAdjustMonoSyn',false);
-
+add_event_psth_cell_explorer(basepath);
 %% GUI to manually curate cell classification. This is not neccesary at this point.
 % It is more useful when you have multiple sessions
 CellExplorer
