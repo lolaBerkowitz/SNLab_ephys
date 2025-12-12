@@ -19,6 +19,11 @@ fig = figure;
 fig.Color = [1 1 1];
 for i = 1:behave_ep.n_intervals
     maze_coords = session.behavioralTracking{1, i}.maze_coords;
+    try
+        reward_coords = session.behavioralTracking{1, i}.cheeseboard_rewards;
+    catch
+    end
+
     obj_idx = contains(maze_coords.object,{'A','B'}) & contains(maze_coords.position,{'center'});
     boundary_idx = contains(maze_coords.object,{'corner'});
 
@@ -34,7 +39,7 @@ for i = 1:behave_ep.n_intervals
     axis equal
     axis off
     set(b,'AlphaData',~isnan(flipud(occ)))
-        title(behavior.trialsID{i})
+        title({behavior.trialsID{i}})
     hcb = colorbar;
     set(get(hcb,'Title'),{'String','Rotation','Position'},{'Seconds',90,[35 50]})
     
@@ -43,8 +48,11 @@ for i = 1:behave_ep.n_intervals
     plot(x,y,'k'); hold on;
     scatter(maze_coords.x_scaled(obj_idx),maze_coords.y_scaled(obj_idx),'*r');
     scatter(maze_coords.x_scaled(boundary_idx),maze_coords.y_scaled(boundary_idx),'*b');
+    if exist('reward_coords','var')
+        scatter(reward_coords.x_scaled,reward_coords.y_scaled,'filled','r');
+    end
     hold off
-    legend({'path','objects','maze boundaries'},'Position',[0.5,0.01,0.15,0.075])
+    legend({'path','','','rewards'},'Position',[0.5,0.01,0.15,0.075])
     legend('boxoff') 
     axis image
     axis equal
