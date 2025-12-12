@@ -449,7 +449,7 @@ classdef behavior_funcs
                 session.behavioralTracking{1,file}.(['cheeseboard',csv_tag]) = reward_table;
                 
                 % save data to csv 
-                save_file = fullfile(basepath,[vidname,'_rewards.csv']);
+                save_file = fullfile(basepath,[vidname,csv_tag,'.csv']);
                 writetable(reward_table,save_file);
             end
             
