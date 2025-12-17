@@ -30,7 +30,6 @@ behavior.trialsID{3, 1}   = 'A';
 behavior.trialsID{4, 1}   = 'B';
 
 %ABBA
-%BABA
 behavior.trialsID{1, 1}   = 'A';
 behavior.trialsID{2, 1}   = 'B';
 behavior.trialsID{3, 1}   = 'B';
