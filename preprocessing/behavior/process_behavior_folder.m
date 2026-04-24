@@ -1,4 +1,4 @@
-function process_behavior_folder(basepath,varargin)
+ function process_behavior_folder(basepath,varargin)
 % process_behavior_folder adds CellExplorer session, event, 
 % and behavior files to folders that only contain behavior (no intan generated digitalin.events.
 
@@ -27,7 +27,7 @@ function process_behavior_folder(basepath,varargin)
 
 % input parser
 p = inputParser;
-p.addParameter('metadata_path','Y:\laura_berkowitz\behavior_validation\appps1_cheeseboard\metadata.csv',@ischar)
+p.addParameter('metadata_path','Y:\laura_berkowitz\behavior_validation\appps1_cpp\metadata.csv',@ischar)
 p.addParameter('overwrite',true,@islogical)
 p.addParameter('redo_rescale',false,@islogical)
 p.addParameter('process_napari',false,@islogical)
@@ -69,12 +69,12 @@ update_epochs('basepath',basepath,...
     'ttl_method',[])
 
 % general behavior file
-general_behavior_file_SNlab('basepath',basepath,'force_overwrite',overwrite,'primary_coords_dlc',2:3);
+general_behavior_file_SNlab('basepath',basepath,'force_overwrite',overwrite,'primary_coords_dlc',4);
 
 % update behavior file from metadata csv
 update_behavior_from_metadata(metadata_path,'basepath',basepath);
 
-get_maze_XY('basepath',basepath,'config_path', 'C:\Users\schafferlab\github\SNLab_ephys\behavior\behavior_configs\','redo_rescale',true,'overwrite',overwrite);
+get_maze_XY('basepath',basepath,'config_path', 'C:\Users\schafferlab\github\SNLab_ephys\behavior\behavior_configs\','redo_rescale',false,'overwrite',overwrite);
 
 % sacle coordinates to cm 
 tracking.scale_coords(basepath,overwrite);
