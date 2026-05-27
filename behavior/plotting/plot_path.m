@@ -1,19 +1,40 @@
-function fig = plot_path(behavior,session)
+function fig = plot_path(behavior,session,varargin)
 % plots path in behavior.position by trial.
 % LB 12/2022
+
+% Input parser
+p = inputParser;
+p.addParameter('exclude_epoch', {'y_maze','sleep'});
+
+p.parse(varargin{:});
+
+exclude_epoch = p.Results.exclude_epoch;
+
 
 if ~isfield(behavior,'trials')
     error('No trials field found in behavior file')
 end
 
+exclude_idx = [];
+for i = 1:length(session.epochs)
+    if contains(session.epochs{1,i}.name,exclude_epoch)
+        exclude_idx = [exclude_idx i];
+    end
+end
+
 % behavior epochs 
 behave_ep = [];
 for ep = 1:length(session.behavioralTracking)
+    % check if the behavior epoch is in the exluded epochs list 
+    if ismember(session.behavioralTracking{1, 1}.epoch, exclude_idx)
+        continue
+    end
+    % 
     behave_ep(ep,:) = [session.epochs{1,session.behavioralTracking{1,ep}.epoch}.startTime, ...
         session.epochs{1,session.behavioralTracking{1,ep}.epoch}.stopTime];
 end
 behave_ep = IntervalArray(behave_ep);
-trial_ep = IntervalArray(behavior.trials);
+trial_ep = IntervalArray(behavior.trials(~contains(behavior.trialsID,exclude_epoch),:));
 
 fig = figure;
 fig.Color = [1 1 1];
@@ -39,7 +60,7 @@ for i = 1:behave_ep.n_intervals
     axis equal
     axis off
     set(b,'AlphaData',~isnan(flipud(occ)))
-        title({behavior.trialsID{i}})
+        title({behavior.epochs{i}.name})
     hcb = colorbar;
     set(get(hcb,'Title'),{'String','Rotation','Position'},{'Seconds',90,[35 50]})
     
