@@ -59,8 +59,9 @@ end
 
 % DLC files may accompany video files, so lets pull them from basepath
 % check basepath for dlc tracking
-dlc_files = get_dlc_files_in_basepath(basepath);
+[dlc_files, pickle_files] = get_dlc_files_in_basepath(basepath);
 dlc_files = {dlc_files.name};
+pickle_files = {pickle_files.name};
 
 % if there are videos, but no dlc, we'll save vid_files in
 % behavioralTracking field for now.
@@ -70,7 +71,7 @@ if isempty(dlc_files) && ~isempty(vid_files)
 end
 
 % update behavioralTracking field
-session = update_field(session,behav_files,dlc_files,tags);
+session = update_field(session,behav_files,dlc_files,pickle_files,tags);
 
 % save data
 save(fullfile(basepath,[basename, '.session.mat']),'session');
@@ -85,7 +86,7 @@ end
 
 %% Local functions below
 
-function session = update_field(session,behav_files,dlc_files,tags)
+function session = update_field(session,behav_files,dlc_files,pickle_files,tags)
 
 
 %% find epoch index with behavior tags
@@ -97,14 +98,14 @@ for i = 1:length(behav_files)
     if contains(behav_files(i),'godot')
         session = add_godot(session,behav_files(i),ep_idx(i),i);
     else
-        session = add_dlc_files(session,dlc_files,behav_files(i),ep_idx(i),i); 
+        session = add_dlc_files(session,dlc_files,pickle_files,behav_files(i),ep_idx(i),i); 
     end
     
 end
 
 end
 
-function session = add_dlc_files(session,dlc_files,video_name,epoch,idx)
+function session = add_dlc_files(session,dlc_files,pickle_files,video_name,epoch,idx)
 
 % if found update behavioralTracking field
 disp('Adding DLC tracking now')
@@ -115,13 +116,16 @@ if any(contains(dlc_files,'.avi'))
     dlc_file = video_name;
 else
     dlc_file = dlc_files(contains(extractBefore(dlc_files,'DLC'),extractBefore(video_name,'.avi')));
+    pickle_file = pickle_files(contains(extractBefore(dlc_files,'DLC'),extractBefore(video_name,'.avi')));
     dlc_file = dlc_file{:};
+    pickle_file = pickle_file{:};
 end
 %Pull up video
 videoObj = VideoReader(fullfile(session.general.basePath,video_name{1}));
 
 % get model parameters for file
-crop_params = tracking.grab_dlc_crop(dlc_file);
+% crop_params = tracking.grab_dlc_crop(dlc_file); 
+crop_params = get_crop_from_pickle(pickle_file);
 
 % save to session file
 session.behavioralTracking{1, idx}.filenames = dlc_file;
