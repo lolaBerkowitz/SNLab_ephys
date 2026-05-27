@@ -31,7 +31,7 @@ p.addParameter('metadata_path','Y:\laura_berkowitz\behavior_validation\appps1_cp
 p.addParameter('overwrite',true,@islogical)
 p.addParameter('redo_rescale',false,@islogical)
 p.addParameter('process_napari',false,@islogical)
-
+p.addParameter('primary_coords', 4, @isnumeric)
 
 
 p.parse(varargin{:});
@@ -39,7 +39,7 @@ metadata_path = p.Results.metadata_path;
 overwrite = p.Results.overwrite;
 redo_rescale = p.Results.redo_rescale;
 process_napari = p.Results.process_napari;
-
+primary_coords = p.Results.primary_coords;
 basename = basenameFromBasepath(basepath);
 cd(basepath)
 
@@ -69,7 +69,7 @@ update_epochs('basepath',basepath,...
     'ttl_method',[])
 
 % general behavior file
-general_behavior_file_SNlab('basepath',basepath,'force_overwrite',overwrite,'primary_coords_dlc',4);
+general_behavior_file_SNlab('basepath',basepath,'force_overwrite',overwrite,'primary_coords_dlc',primary_coords);
 
 % update behavior file from metadata csv
 update_behavior_from_metadata(metadata_path,'basepath',basepath);
