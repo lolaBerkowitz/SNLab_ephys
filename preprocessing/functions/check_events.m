@@ -10,8 +10,8 @@
 digitalIn = process_digitalin(basepath,frequency_parameters.amplifier_sample_rate);
 
 %% remove pulses from electrical noise that is present on all channels 
-unused_channel = [8,9,10,11,12,13];
-used_channel = [2,3,4,5];
+unused_channel = [5];
+used_channel = [2,3,4];
 
 for channel = used_channel
     for unused = unused_channel
