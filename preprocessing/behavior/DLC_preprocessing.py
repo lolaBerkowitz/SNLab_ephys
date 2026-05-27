@@ -6,6 +6,8 @@ import pickle
 import re
 import shutil
 
+import warnings
+
 import cv2
 import numpy as np
 import pandas as pd  # to create data frames
@@ -298,7 +300,7 @@ def plot_all_checks(file_name: str, cutoff: float = 0.80) -> pd.DataFrame:
     good_prop = []
 
     for var in body_parts:
-        fig = plot_dlc(df[var], var, cutoff=cutoff)
+        plot_dlc(df[var], var, cutoff=cutoff)
         plt.title(vidname)
         # fig.savefig(file_name.replace('.csv','')+'_'+var+'.png')
         plt.show()
@@ -669,7 +671,9 @@ def update_pickle_with_video_dimensions(
 
 
 def apply_crop_parameters_to_dlc(
-    basepath: str, backup_folder: str = "dlc_originals"
+    basepath: str,
+    backup_folder: str = "dlc_originals",
+    on_existing_backup: str = "warn_skip",
 ) -> list[dict[str, object]]:
     """
     Apply crop offsets from pickle files to DLC csv/h5 files in-place.
@@ -683,21 +687,46 @@ def apply_crop_parameters_to_dlc(
         Path containing DLC csv, DLC h5, pickle, and video files.
     backup_folder : str, optional
         Backup folder inside basepath. Default is 'dlc_originals'.
+    on_existing_backup : str, optional
+        Policy when crop correction has already been applied (sentinel file
+        exists). One of:
+
+        ``'warn_skip'`` (default)
+            Emit a ``UserWarning`` and return a skip-status record. The batch
+            continues normally.
+        ``'quiet_skip'``
+            Silently return a skip-status record without any warning.
+        ``'raise'``
+            Raise ``RuntimeError`` (original strict behaviour, useful for
+            interactive / debugging runs).
 
     Returns
     -------
     list of dict
-        Per-video summary of corrected files.
+        Per-video summary of corrected files, or a single-element list with
+        ``status='already_processed'`` when the basepath is skipped.
     """
     backup_dir = os.path.join(basepath, backup_folder)
     backup_complete = os.path.join(backup_dir, "_backup_complete")
 
     if os.path.exists(backup_complete):
         msg = (
-            "Crop correction already applied for this basepath. "
-            "Backups exist in 'dlc_originals'. Re-running would double-correct coordinates."
+            f"Crop correction already applied for basepath '{basepath}'. "
+            f"Backups exist in '{backup_folder}'. Skipping to avoid double-correcting coordinates."
         )
-        raise RuntimeError(msg)
+        if on_existing_backup == "raise":
+            raise RuntimeError(msg)
+        if on_existing_backup == "warn_skip":
+            warnings.warn(msg, UserWarning, stacklevel=2)
+        # quiet_skip: fall through with no message
+        return [
+            {
+                "basepath": basepath,
+                "status": "already_processed",
+                "action": "skipped_existing_backup",
+                "reason": msg,
+            }
+        ]
 
     dlc_csv_files = glob.glob(os.path.join(basepath, "*DLC*.csv"))
     dlc_h5_files = glob.glob(os.path.join(basepath, "*DLC*.h5"))
@@ -730,8 +759,23 @@ def apply_crop_parameters_to_dlc(
 
         pkl = pd.read_pickle(pickle_file)
         cropping = pkl["data"]["cropping_parameters"]
-        x_min = cropping[0]
-        y_min = cropping[2]
+        x_min = float(cropping[0])
+        y_min = float(cropping[2])
+
+        # Sanity-check: warn if the parameter ordering looks suspicious.
+        # Expected format: [xmin, xmax, ymin, ymax].  A common mis-ordering is
+        # [xmin, ymin, xmax, ymax], in which case cropping[2] would be xmax
+        # (a large value) rather than ymin — producing a huge spurious y-offset.
+        if len(cropping) >= 4:
+            if not (float(cropping[0]) <= float(cropping[1]) and float(cropping[2]) <= float(cropping[3])):
+                warnings.warn(
+                    f"cropping_parameters for '{video_name}' do not satisfy "
+                    f"[xmin<=xmax, ymin<=ymax]: {list(cropping)}. "
+                    "This may indicate a parameter ordering mismatch "
+                    "([xmin,ymin,xmax,ymax] instead of [xmin,xmax,ymin,ymax]).",
+                    UserWarning,
+                    stacklevel=2,
+                )
 
         h5_keys = inspect_h5_keys(h5_file)
         if len(h5_keys) != 1:
@@ -805,6 +849,118 @@ def infer_applied_offsets_from_csv_pair(
     )
 
     return x_offset, y_offset
+
+
+def apply_crop_correction_single_video(
+    basepath: str,
+    video_name: str,
+    backup_folder: str = "dlc_originals",
+) -> dict[str, object]:
+    """Apply crop offset correction to a single video's DLC files in-place.
+
+    Use this when one video in a basepath needs to be (re-)corrected
+    independently, for example after an accidental overwrite. The function
+    backs up the individual csv/h5/pickle files to ``backup_folder`` before
+    modifying them. It does **not** touch the ``_backup_complete`` sentinel
+    used by :func:`apply_crop_parameters_to_dlc`.
+
+    Parameters
+    ----------
+    basepath : str
+        Directory containing the DLC csv, h5, pickle, and video files.
+    video_name : str
+        Canonical video stem (as returned by :func:`extract_video_name`).
+        Partial stems are accepted as long as they uniquely identify one file
+        per file type.
+    backup_folder : str, optional
+        Subdirectory inside ``basepath`` for backups. Default is
+        ``'dlc_originals'``.
+
+    Returns
+    -------
+    dict
+        Summary with keys ``video_name``, ``csv``, ``h5``, ``pickle``,
+        ``video``, ``x_min``, ``y_min``, ``h5_key``, and ``backup_dir``.
+
+    Raises
+    ------
+    FileNotFoundError
+        If no matching csv, h5, or pickle file is found for ``video_name``.
+    ValueError
+        If more than one file of a given type matches ``video_name``, or if
+        the h5 file contains an unexpected number of dataset keys.
+    """
+    backup_dir = os.path.join(basepath, backup_folder)
+    os.makedirs(backup_dir, exist_ok=True)
+
+    def _resolve_single(pattern: str, label: str) -> str:
+        matches = glob.glob(pattern)
+        if len(matches) == 0:
+            raise FileNotFoundError(
+                f"No {label} file found matching '{pattern}' for video '{video_name}'."
+            )
+        if len(matches) > 1:
+            raise ValueError(
+                f"Ambiguous {label} files for video '{video_name}': {matches}. "
+                "Provide a more specific video_name."
+            )
+        return matches[0]
+
+    csv_file = _resolve_single(os.path.join(basepath, f"*{video_name}*DLC*.csv"), "csv")
+    h5_file = _resolve_single(os.path.join(basepath, f"*{video_name}*DLC*.h5"), "h5")
+    pickle_file = _resolve_single(os.path.join(basepath, f"*{video_name}*.pickle"), "pickle")
+
+    backup_original_file(csv_file, backup_dir)
+    backup_original_file(h5_file, backup_dir)
+    backup_original_file(pickle_file, backup_dir)
+
+    pkl = pd.read_pickle(pickle_file)
+    cropping = pkl["data"]["cropping_parameters"]
+    x_min = float(cropping[0])
+    y_min = float(cropping[2])
+
+    # Sanity-check: warn if the parameter ordering looks suspicious.
+    # Expected format: [xmin, xmax, ymin, ymax].  A common mis-ordering is
+    # [xmin, ymin, xmax, ymax], in which case cropping[2] would be xmax
+    # (a large value) rather than ymin — producing a huge spurious y-offset.
+    if len(cropping) >= 4:
+        if not (float(cropping[0]) <= float(cropping[1]) and float(cropping[2]) <= float(cropping[3])):
+            warnings.warn(
+                f"cropping_parameters for '{video_name}' do not satisfy "
+                f"[xmin<=xmax, ymin<=ymax]: {list(cropping)}. "
+                "This may indicate a parameter ordering mismatch "
+                "([xmin,ymin,xmax,ymax] instead of [xmin,xmax,ymin,ymax]).",
+                UserWarning,
+                stacklevel=2,
+            )
+
+    h5_keys = inspect_h5_keys(h5_file)
+    if len(h5_keys) != 1:
+        raise ValueError(
+            f"Expected exactly one dataset key in {h5_file}, found {h5_keys}"
+        )
+
+    csv_df = pd.read_csv(csv_file, header=[0, 1, 2], low_memory=False)
+    csv_df = apply_xy_offset_to_dataframe(csv_df, x_min, y_min)
+    csv_df.to_csv(csv_file, index=False)
+    correct_h5_in_place(h5_file, x_min, y_min)
+
+    video_file = update_pickle_with_video_dimensions(pickle_file, basepath, video_name)
+
+    print(f"Saved in-place: {csv_file}")
+    print(f"Saved in-place: {h5_file}")
+
+    return {
+        "video_name": video_name,
+        "csv": csv_file,
+        "h5": h5_file,
+        "pickle": pickle_file,
+        "video": video_file,
+        "x_min": x_min,
+        "y_min": y_min,
+        "h5_key": h5_keys[0],
+        "backup_dir": backup_dir,
+    }
 
 
 def robust_fix_pickle_cropping_parameters(
