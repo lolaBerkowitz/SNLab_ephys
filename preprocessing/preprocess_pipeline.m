@@ -23,7 +23,7 @@
 
 %% paths for individual research projects 
 % laura = 'Y:\laura_berkowitz\VR_ephys\data';
-laura_stim = 'Y:\laura_berkowitz\alz_stim\data';
+% laura_stim = 'Y:\laura_berkowitz\alz_stim\data';
 laura = 'Y:\laura_berkowitz\app_ps1_ephys\data';
 
 %% Multi-animal recording session 
@@ -31,13 +31,13 @@ laura = 'Y:\laura_berkowitz\app_ps1_ephys\data';
 % For SNLab, assumes one animal per active port (64 channel electrodes) as
 % of 2/22
 % subject folder corresponds to port A, B, C, D, respectively
-subject_order = {'hpstim09','hpstim08',[],[]};
+subject_order = {'hpc24','hpc26',[],[]};
 
 % folder where dat files reside that need to be split
-data_path ='Y:\laura_berkowitz\alz_stim\data\to_split\hpstim08_hpstim09_day04_251014_114213';
+data_path ='Y:\laura_berkowitz\app_ps1_ephys\data\to_split\hpc24_day11_hpc26_day09_260507_100423';
 
 % project folder where subjects data should be saved
-save_path = {laura_stim,laura_stim,[],[]}; 
+save_path = {laura,laura,[],[]}; 
     
 % split dat files a
 split_dat(data_path,save_path, subject_order,'trim_dat',false)
@@ -55,7 +55,7 @@ split_dat(data_path,save_path, subject_order,'trim_dat',false)
 % to be analyzed. Let them run overnight while split dat runs. 
 
 %% Single Session Preprocess
-basepath = 'Y:\laura_berkowitz\alz_stim\data\hpstim06\hpstim06_day07_250610_094123';
+basepath = 'Y:\laura_berkowitz\app_ps1_ephys\data\hpc25\hpc25_day07_260504_095632';
 
 %% Check xml/channel mapping: verify channel map, skip bad channels, and save 
 
@@ -109,8 +109,19 @@ basepath = pwd;
 basename = basenameFromBasepath(basepath);
 session = loadSession(basepath,basename);
 
-
+% 
 % % For SNLAB
+% ripples = DetectSWR([session.channelTags.Ripple.channels ,...
+%     session.channelTags.SharpWave.channels ,...
+%     session.channelTags.RippleNoise.channels ],...
+%     'thresSDrip',[.5,.1],...
+%     'thresSDswD',[.25,.5],...
+%     'saveMat',true,...
+%     'check',true,...
+%     'forceDetect',true);
+
+
+% For Soula
 ripples = DetectSWR([session.channelTags.Ripple.channels ,...
     session.channelTags.SharpWave.channels ,...
     session.channelTags.RippleNoise.channels ],...
@@ -119,17 +130,6 @@ ripples = DetectSWR([session.channelTags.Ripple.channels ,...
     'saveMat',true,...
     'check',true,...
     'forceDetect',true);
-
-
-% For Soula
-% ripples = DetectSWR([session.channelTags.Ripple.channels ,...
-%     session.channelTags.SharpWave.channels ,...
-%     session.channelTags.RippleNoise.channels ],...
-%     'thresSDrip',[.5,1],...
-%     'thresSDswD',[.5,1],...
-%     'saveMat',true,...
-%     'check',true,...
-%     'forceDetect',true);
 
 %% Compute basic cell metrics
 basepath=pwd;
@@ -154,15 +154,10 @@ cd('..\..')
 data_path = pwd;
 
 % look for all the cell_metrics.cellinfo.mat files
+
 % files = dir([data_path,'\**\*.cell_metrics.cellinfo.mat']);
 basepath = [];
 basename = [];
-% pull out basepaths and basenames
-% for i = 1:length(files)
-%     basepath{i} = files(i).folder;
-%     basename{i} = basenameFromBasepath(files(i).folder);
-% end
-
 
 df = compile_sessions('Y:\laura_berkowitz\app_ps1_ephys\complete_sessions_10_08_2025.csv');
 
@@ -233,8 +228,8 @@ df = compile_sessions(data_folder);
 % processing (in this case chanMap.mat)
 for i = 1:length(df.basepath)
     try
-    basepath = df.basepath{i}{:};
-    basename = basenameFromBasepath(basepath);
+    basepath = df.basepath{i};
+    [~,basename] = fileparts(basepath);
         if isempty(dir(fullfile(basepath,[basename,'.lfp']))) && ~multishank
             preprocess_session(basepath,'digitalInputs',false,'check_epochs',false,'kilosort',false,'overwrite',false)
             channel_mapping('basepath',basepath)
