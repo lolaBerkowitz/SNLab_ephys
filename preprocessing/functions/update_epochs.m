@@ -20,7 +20,7 @@ p=inputParser;
 addParameter(p,'basepath',pwd); % single or many basepaths in cell array or uses pwd
 addParameter(p,'acquisition_event_flag',false); % overwrite previously saved data (will remove custom fields)
 addParameter(p,'epoch_events',2); % index for where epoch events are saved in digitalIn.events.mat file
-addParameter(p,'overwrite',true); % by default update epochs
+addParameter(p,'overwrite',false); % by default update epochs
 addParameter(p,'annotate',true); % save animal.behavior.mat
 addParameter(p,'ttl_method','pulse') % if ttl is pulse, one event spans i:i+1 rows, else each row is a start.
 % addParameter(p,'maze_size',30); % maze size in cm
