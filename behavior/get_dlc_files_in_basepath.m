@@ -1,4 +1,4 @@
-function dlc_files = get_dlc_files_in_basepath(basepath)
+function [dlc_files, pickle_files] = get_dlc_files_in_basepath(basepath)
 
 % use dir to find all files in basepath
 files = dir(basepath);
@@ -6,6 +6,7 @@ files = files(~ismember({files.name},{'.','..'})); % remove non-files
 
 % get csv files
 csv_files = files(contains({files.name},'.csv'));
+pickle_files = files(contains({files.name},'.pickle')); % only pickle files associated with DLC
 
 % and keep only those with DLC in name
 dlc_files = csv_files(contains({csv_files.name},'DLC'));
