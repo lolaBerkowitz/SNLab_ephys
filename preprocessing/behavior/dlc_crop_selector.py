@@ -273,6 +273,12 @@ def _resolve_target_row(df, basepath=None, video_file=None):
     raise ValueError("Could not uniquely match a row in check_dlc.csv")
 
 
+def _row_has_crop_coordinates(df, row_idx):
+    """Return True when a row already contains all crop coordinate columns."""
+    crop_cols = ["x_min", "x_max", "y_min", "y_max"]
+    return all(col in df.columns and pd.notna(df.loc[row_idx, col]) for col in crop_cols)
+
+
 def select_crop_and_update_csv(
     check_csv_path,
     basepath=None,
@@ -282,6 +288,7 @@ def select_crop_and_update_csv(
     save=True,
     backup=True,
     show_overlay=True,
+    overwrite=False,
     update_dlc_config=False,
     config_col="config_path",
 ):
@@ -299,6 +306,18 @@ def select_crop_and_update_csv(
         video_file = os.path.join(basepath_val, f"{dlc_stem}.avi")
 
     video_file = _normalize_path(video_file)
+    if not overwrite and _row_has_crop_coordinates(df, row_idx):
+        return {
+            "row_index": int(row_idx),
+            "video_file": video_file,
+            "x_min": int(df.loc[row_idx, "x_min"]),
+            "x_max": int(df.loc[row_idx, "x_max"]),
+            "y_min": int(df.loc[row_idx, "y_min"]),
+            "y_max": int(df.loc[row_idx, "y_max"]),
+            "saved": False,
+            "skipped": True,
+        }
+
     preview = load_preview_image(video_file, mode=preview_mode, n_samples=n_samples)
     show_preview(preview, title_prefix=os.path.basename(video_file))
 
@@ -357,6 +376,7 @@ def select_crop_and_update_csv(
         "y_min": int(y_min),
         "y_max": int(y_max),
         "saved": bool(save),
+        "skipped": False,
     }
 
 def get_video_bounds(video_path):
