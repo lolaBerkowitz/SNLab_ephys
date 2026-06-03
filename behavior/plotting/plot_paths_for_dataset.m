@@ -77,7 +77,11 @@ function plot_paths_for_dataset(dataset_path, save_path, varargin)
         end
 
         % Load CellExplorer animal behavior file
-        load(fullfile(basepath, [basename, '.animal.behavior.mat']));
+        if exist(fullfile(basepath, [basename, '.animal.behavior.mat']))
+            load(fullfile(basepath, [basename, '.animal.behavior.mat']));
+        else
+            continue
+        end
 
         % Plot and save epoch figure if missing
         if ~exist(epoch_file, 'file')
