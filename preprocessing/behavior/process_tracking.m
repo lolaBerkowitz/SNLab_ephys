@@ -59,7 +59,7 @@ get_maze_XY('basepath',basepath,'config_path', config_path,'redo_rescale',false)
 tracking.scale_coords(basepath,overwrite_behavior);
 
 % restrict coordintes to remove extramaze tracking points 
-tracking.restrict(basepath,false);
+tracking.restrict(basepath,overwrite_behavior);
     
 end
 
