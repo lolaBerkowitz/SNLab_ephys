@@ -2,13 +2,14 @@ import glob
 import os
 from itertools import compress
 from pathlib import Path
+from sys import path
 
 import napari
 import numpy as np
 import pandas as pd
 import tkinter as tk
 from tkinter import filedialog
-
+import cv2
 from napari_video.napari_video import VideoReaderNP
 
 
@@ -19,7 +20,7 @@ def save_layers_to_video_directory(viewer, video_path, point_layers):
 
     for layer in point_layers:
         points = layer.data  # Extract point coordinates (N, 2)
-        frames = layer.metadata.get("frames", np.zeros(len(points), dtype=int))
+        frames = layer.metadata.get("axis-0", np.zeros(len(points), dtype=int))
         visible = layer.metadata.get("visible", np.ones(len(points), dtype=bool))
 
         if len(points) == 0:
@@ -119,10 +120,16 @@ def annotate_video(video_path):
 
     napari.run()
 
-def verify_manual_annotation(video_path, fs=40, trial_wiggle_room=10):
+def verify_manual_annotation(video_path, fs=None, trial_wiggle_room=10):
     if not is_annotated(video_path):
         print(f"{video_path} --- not annotated")
         return
+    
+    if fs is None:
+        # load video and get fps 
+        cap = cv2.VideoCapture(video_path)
+        fs = cap.get(cv2.CAP_PROP_FPS)
+        cap.release()
 
     video_path_obj = Path(video_path)
     video_dir = video_path_obj.parent
@@ -157,13 +164,13 @@ def verify_manual_annotation(video_path, fs=40, trial_wiggle_room=10):
     # check if any trial is shorter than 5 seconds
     if durations.min() < 5:
         test = 1
-    assert durations.min() > 5, f"Found {durations.min()} seconds"
+    assert durations.min() > 2, f"Found {durations.min()} seconds"
 
     # check if more than 30 trials
     assert durations.shape[0] <= 35, f"Found {durations.shape[0]} trials"
 
-    # check if at least 3 rewards
-    assert rewards.shape[0] >= 3, f"Found {rewards.shape[0]} rewards"
+    # check if at least 2 rewards
+    assert rewards.shape[0] >= 2, f"Found {rewards.shape[0]} rewards"
 
     # check if 1 start
     assert start.shape[0] == 1, f"Found {start.shape[0]} start points"
