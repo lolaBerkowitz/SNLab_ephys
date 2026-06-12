@@ -266,6 +266,8 @@ if __name__ == "__main__":
 
         missing = which_is_missing(video_path)
         if missing:
-            print(f"Missing files for {video_path}: {missing}")
+            for m in missing:
+                print(f"Missing {m}")
+            # print(f"Missing files for {video_path}: {missing}")
         annotate_video(video_path)
         verify_manual_annotation(video_path)
