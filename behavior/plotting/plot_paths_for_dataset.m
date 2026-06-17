@@ -28,7 +28,7 @@ function plot_paths_for_dataset(dataset_path, save_path, varargin)
     p = inputParser;
     addRequired(p, 'dataset_path', @(x) ischar(x) || isstring(x));
     addRequired(p, 'save_path', @(x) ischar(x) || isstring(x));
-    addOptional(p, 'exclude_task_string', {'home_cage_sleep'}, ...
+    addOptional(p, 'exclude_task_string', {'home_cage_sleep','linear_track'}, ...
         @(x) ischar(x) || isstring(x) || iscellstr(x));
     parse(p, dataset_path, save_path, varargin{:});
 
