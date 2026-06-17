@@ -255,19 +255,38 @@ if __name__ == "__main__":
     idx = ~files_series.str.contains("backup") & ~files_series.str.contains("test")
     files = list(compress(files, idx))
 
-    for video_path_i, video_path in enumerate(files):
-        print(f"{video_path} --- {video_path_i} of {len(files)} files")
+failed = []
 
-        video_dir = Path(video_path).parent
+for video_path_i, video_path in enumerate(files):
+    print(f"{video_path} --- {video_path_i} of {len(files)} files")
 
-        if is_annotated(video_path):
+    video_dir = Path(video_path).parent
+
+    if is_annotated(video_path):
+        try:
             verify_manual_annotation(video_path)
-            continue
+        except Exception as e:
+            print(f"  !! ERROR ({type(e).__name__}): {e}")
+            failed.append(video_path)
+        continue
 
-        missing = which_is_missing(video_path)
-        if missing:
-            for m in missing:
-                print(f"Missing {m}")
-            # print(f"Missing files for {video_path}: {missing}")
-        annotate_video(video_path)
+    missing = which_is_missing(video_path)
+    if missing:
+        for m in missing:
+            print(f"Missing {m}")
+    annotate_video(video_path)
+    try:
         verify_manual_annotation(video_path)
+    except Exception as e:
+        print(f"  !! ERROR ({type(e).__name__}): {e}")
+        failed.append(video_path)
+
+if failed:
+    print(f"\n{len(failed)} videos failed — fix them then re-verifying...")
+    input("Press Enter when ready to re-verify failed videos...")
+    for video_path in failed:
+        try:
+            verify_manual_annotation(video_path)
+            print(f"  ✓ fixed: {video_path}")
+        except Exception as e:
+            print(f"  !! still failing ({type(e).__name__}): {e}")
