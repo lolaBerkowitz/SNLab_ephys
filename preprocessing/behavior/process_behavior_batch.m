@@ -7,7 +7,8 @@ p = inputParser;
 p.addParameter('overwrite',false,@islogical)
 p.addParameter('redo_rescale',false,@islogical)
 p.addParameter('query_tag',[],@ischar)
-p.addParameter('primary_coords_dlc',1:2,@isnumeric)
+p.addParameter('primary_coords_dlc',2:3,@isnumeric)
+p.addParameter('process_napari',false,@islogical)
 
 
 p.parse(varargin{:});
@@ -15,11 +16,10 @@ overwrite = p.Results.overwrite;
 redo_rescale = p.Results.redo_rescale;
 query_tag = p.Results.query_tag;
 primary_coords_dlc = p.Results.primary_coords_dlc;
+process_napari = p.Results.process_napari;
 
 % loop through basepaths and run main function
 df = compile_sessions(data_path);
-
-
 
 if ~isempty(query_tag)
     df = df(contains(df.to_check,query_tag),:);
@@ -35,12 +35,25 @@ for i = 1:length(df.basepath)
     if check_folders(basepath)
         file_info = dir(fullfile(basepath, [basename, '.animal.behavior.mat']));
 
+        % if there is a file, but overwrite is true you overwrite.
         if ~isempty(file_info) & overwrite
-            % overwrite the file 
-            main(basepath, metadata_path, overwrite, redo_rescale, primary_coords_dlc)
-        else
+            % overwrite the file
+            process_behavior_folder(basepath,...
+                'metadata_path',metadata_path,...
+                'overwrite',overwrite,...
+                'redo_rescale',redo_rescale,...
+                'primary_coords',primary_coords_dlc,...
+                'process_napari',process_napari)
+
+        elseif isempty(file_info)
             % File does not exist → run main
-            main(basepath, metadata_path, overwrite, redo_rescale, primary_coords_dlc)
+            % overwrite the file
+            process_behavior_folder(basepath,...
+                'metadata_path',metadata_path,...
+                'overwrite',true,... # set to true so everything is written with this run
+                'redo_rescale',redo_rescale,...
+                'primary_coords',primary_coords_dlc,...
+                'process_napari',process_napari)
         end
     else
         disp('Missing DLC for a video')
@@ -51,69 +64,69 @@ end
 end
 
 
-function main(basepath,metadata_path,overwrite,redo_rescale,primary_coords_dlc)
-
-basename = basenameFromBasepath(basepath);
-% check is session file exists, if not make one
-
-
-if  ~exist([basepath,filesep,[basename,'.session.mat']],'file')
-    session = sessionTemplate(basepath);
-    save(fullfile(basepath,[basename,'.session.mat']),'session')
-end
-
-% Make events from DLC
-if ~exist(fullfile(basepath,'digitalin.events.mat'),'file')
-    make_events('basepath',basepath);
-end
-
-% update epochs from digitalIn.events.mat
-update_epochs('basepath',basepath,...
-    'annotate',false,...
-    'overwrite',false,...
-    'ttl_method',[])
-
-
-% general behavior file
-general_behavior_file_SNlab('basepath',basepath,'force_overwrite',overwrite,'primary_coords_dlc',primary_coords_dlc);
-
-% update behavior file from metadata csv
-update_behavior_from_metadata(metadata_path,'basepath',basepath);
-
-get_maze_XY('basepath',basepath,'config_path', 'C:\Users\schafferlab\github\SNLab_ephys\behavior\behavior_configs\',...
-    'overwrite',true,'redo_rescale',false);
-
-% sacle coordinates to cm
-tracking.scale_coords(basepath,overwrite);
-
-% restrict coordintes to remove extramaze tracking points
-tracking.restrict(basepath,false);
-
-end
+% function main(basepath,metadata_path,overwrite,redo_rescale,primary_coords_dlc)
+%
+% basename = basenameFromBasepath(basepath);
+% % check is session file exists, if not make one
+%
+%
+% if  ~exist([basepath,filesep,[basename,'.session.mat']],'file')
+%     session = sessionTemplate(basepath);
+%     save(fullfile(basepath,[basename,'.session.mat']),'session')
+% end
+%
+% % Make events from DLC
+% if ~exist(fullfile(basepath,'digitalin.events.mat'),'file')
+%     make_events('basepath',basepath);
+% end
+%
+% % update epochs from digitalIn.events.mat
+% update_epochs('basepath',basepath,...
+%     'annotate',false,...
+%     'overwrite',false,...
+%     'ttl_method',[])
+%
+%
+% % general behavior file
+% general_behavior_file_SNlab('basepath',basepath,'force_overwrite',overwrite,'primary_coords_dlc',primary_coords_dlc);
+%
+% % update behavior file from metadata csv
+% update_behavior_from_metadata(metadata_path,'basepath',basepath);
+%
+% get_maze_XY('basepath',basepath,'config_path', 'C:\Users\schafferlab\github\SNLab_ephys\behavior\behavior_configs\',...
+%     'overwrite',overwrite,'redo_rescale',false);
+%
+% % sacle coordinates to cm
+% tracking.scale_coords(basepath,overwrite);
+%
+% % restrict coordintes to remove extramaze tracking points
+% tracking.restrict(basepath,overwrite);
+%
+% end
 
 function check = check_folders(basepath)
 % see if DLC files are present for each video
-
-% find all .avi videos and dlc files in basepath
-video_files = dir(fullfile(basepath,'*.avi'));
-video_files = video_files(~cellfun(@(x) ismember(x(1,2),'._'), {video_files.name}));
-video_files = extractBefore({video_files.name},'.avi');
-
-dlc_files = get_dlc_files_in_basepath(basepath);
-dlc_files = extractBefore({dlc_files.name},'DLC');
-
-% no video files, not need to check dlc
-if isempty(video_files)
-    check = false;
-    return
-end
-
-% see if each video has a DLC file
-if sum(contains(video_files,dlc_files)) == length(video_files)
-    check = true;
-else
-    check = false;
-end
+    
+    % find all .avi videos and dlc files in basepath
+    video_files = dir(fullfile(basepath,'*.avi'));
+    video_files = video_files(~cellfun(@(x) ismember(x(1,2),'._'), {video_files.name}));
+    video_files = extractBefore({video_files.name},'.avi');
+    
+    dlc_files = get_dlc_files_in_basepath(basepath);
+    dlc_files = extractBefore({dlc_files.name},'DLC');
+    
+    % no video files, not need to check dlc
+    if isempty(video_files)
+        check = false;
+        return
+    end
+    
+    % see if each video has a DLC file
+    if sum(contains(video_files,dlc_files)) == length(video_files)
+        check = true;
+    else
+        check = false;
+    end
 
 
 end

@@ -27,11 +27,11 @@
 
 % input parser
 p = inputParser;
-p.addParameter('metadata_path','Y:\laura_berkowitz\behavior_validation\appps1_cpp\metadata.csv',@ischar)
-p.addParameter('overwrite',true,@islogical)
+p.addParameter('metadata_path','Y:\laura_berkowitz\behavior_validation\appps1_cheeseboard\metadata.csv',@ischar)
+p.addParameter('overwrite',false,@islogical)
 p.addParameter('redo_rescale',false,@islogical)
 p.addParameter('process_napari',false,@islogical)
-p.addParameter('primary_coords', 4, @isnumeric)
+p.addParameter('primary_coords', 2:3, @isnumeric)
 
 
 p.parse(varargin{:});
