@@ -388,9 +388,12 @@ classdef behavior_funcs
             
             % Scale XY coordinates of rewards, save to session and basepath
             behavior_funcs.scale_napari_coords(basepath,'csv_tag','_start')
+
+            % Scale XY coordinates of rewards, save to session and basepath
+            behavior_funcs.scale_napari_coords(basepath,'csv_tag','_diameter')
             
             % Sync trials to behavior file 
-            behavior_funcs.napari_trials_to_behavior(basepath)
+            % behavior_funcs.napari_trials_to_behavior(basepath)
             
         end
 
@@ -428,9 +431,14 @@ classdef behavior_funcs
             csv_files = my_dir(fullfile(basepath,['*',csv_tag,'.csv']));
 
             if isempty(csv_files)
-                error(['no files found in ', basepath, ': with ',csv_tag,' included in the file extension'])
+                disp(['no files found in ', basepath, ': with ',csv_tag,' included in the file extension'])
+                return
             end
 
+            % Ensure csv_files.name is a cell array even if there is only 1 file
+            if ~iscell(csv_files.name)
+                csv_files.name = {csv_files.name};
+            end
             
             % loop through video
             for file = 1:length(session.behavioralTracking) %loop through folders containing subject videos
