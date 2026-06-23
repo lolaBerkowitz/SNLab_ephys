@@ -1,0 +1,42 @@
+import glob
+import os
+from itertools import compress
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
+
+def trial_duration(folder, fs, subject, day, task):
+    start_path = os.path.join(folder, "start.csv")
+    trial_path = os.path.join(folder, "trials.csv")
+
+    # Read CSVs, using first column as index
+    start = pd.read_csv(start_path)
+    trials = pd.read_csv(trial_path)
+
+    # Extract relevant columns
+    start_vals = start["axis-0"].values
+    stop_vals = trials["axis-0"].values
+
+    # Sanity check
+    if len(start_vals) != len(stop_vals):
+        raise ValueError(f"Start and stop arrays have different lengths: {len(start_vals)} vs {len(stop_vals)}")
+
+    # Convert to seconds
+    starts = start_vals.astype(int) / fs
+    stops = stop_vals.astype(int) / fs
+
+    durations = stops - starts
+
+    # Save output
+    save_path = Path(folder) / f"{subject}_{day}_{task}.csv"
+    pd.DataFrame({
+        "start_time": starts,
+        "stop_time": stops,
+        "duration": durations
+    }).to_csv(save_path, index=False)
+
+if __name__ == "__main__":
+    folder = "/Users/shuwend/Desktop/SN_Research/hpc13"
+    trial_duration(folder, 40, "hpc13", "2", "habituation")
