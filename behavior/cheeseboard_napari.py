@@ -2,7 +2,6 @@ import glob
 import os
 from itertools import compress
 from pathlib import Path
-from sys import path
 
 import napari
 import numpy as np
@@ -20,7 +19,7 @@ def save_layers_to_video_directory(viewer, video_path, point_layers):
 
     for layer in point_layers:
         points = layer.data  # Extract point coordinates (N, 2)
-        frames = layer.metadata.get("axis-0", np.zeros(len(points), dtype=int))
+        frames = layer.metadata.get("frames", np.zeros(len(points), dtype=int))
         visible = layer.metadata.get("visible", np.ones(len(points), dtype=bool))
 
         if len(points) == 0:
@@ -120,7 +119,7 @@ def annotate_video(video_path):
 
     napari.run()
 
-def verify_manual_annotation(video_path, fs=None, trial_wiggle_room=10):
+def verify_manual_annotation(video_path, fs=None):
     if not is_annotated(video_path):
         print(f"{video_path} --- not annotated")
         return
@@ -162,8 +161,7 @@ def verify_manual_annotation(video_path, fs=None, trial_wiggle_room=10):
         print(f"{video_path} --- Found {durations.max()} seconds")
 
     # check if any trial is shorter than 5 seconds
-    if durations.min() < 5:
-        test = 1
+
     assert durations.min() > 2, f"Found {durations.min()} seconds"
 
     # check if more than 30 trials
@@ -255,38 +253,38 @@ if __name__ == "__main__":
     idx = ~files_series.str.contains("backup") & ~files_series.str.contains("test")
     files = list(compress(files, idx))
 
-failed = []
+    failed = []
 
-for video_path_i, video_path in enumerate(files):
-    print(f"{video_path} --- {video_path_i} of {len(files)} files")
+    for video_path_i, video_path in enumerate(files):
+        print(f"{video_path} --- {video_path_i} of {len(files)} files")
 
-    video_dir = Path(video_path).parent
+        video_dir = Path(video_path).parent
 
-    if is_annotated(video_path):
+        if is_annotated(video_path):
+            try:
+                verify_manual_annotation(video_path)
+            except Exception as e:
+                print(f"  !! ERROR ({type(e).__name__}): {e}")
+                failed.append(video_path)
+            continue
+
+        missing = which_is_missing(video_path)
+        if missing:
+            for m in missing:
+                print(f"Missing {m}")
+        annotate_video(video_path)
         try:
             verify_manual_annotation(video_path)
         except Exception as e:
             print(f"  !! ERROR ({type(e).__name__}): {e}")
             failed.append(video_path)
-        continue
 
-    missing = which_is_missing(video_path)
-    if missing:
-        for m in missing:
-            print(f"Missing {m}")
-    annotate_video(video_path)
-    try:
-        verify_manual_annotation(video_path)
-    except Exception as e:
-        print(f"  !! ERROR ({type(e).__name__}): {e}")
-        failed.append(video_path)
-
-if failed:
-    print(f"\n{len(failed)} videos failed — fix them then re-verifying...")
-    input("Press Enter when ready to re-verify failed videos...")
-    for video_path in failed:
-        try:
-            verify_manual_annotation(video_path)
-            print(f"  ✓ fixed: {video_path}")
-        except Exception as e:
-            print(f"  !! still failing ({type(e).__name__}): {e}")
+    if failed:
+        print(f"\n{len(failed)} videos failed — fix them then re-verifying...")
+        input("Press Enter when ready to re-verify failed videos...")
+        for video_path in failed:
+            try:
+                verify_manual_annotation(video_path)
+                print(f"  ✓ fixed: {video_path}")
+            except Exception as e:
+                print(f"  !! still failing ({type(e).__name__}): {e}")
