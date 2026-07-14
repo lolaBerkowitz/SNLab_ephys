@@ -25,19 +25,21 @@
 % laura = 'Y:\laura_berkowitz\VR_ephys\data';
 % laura_stim = 'Y:\laura_berkowitz\alz_stim\data';
 laura = 'Y:\laura_berkowitz\app_ps1_ephys\data';
+haoyang = 'X:\HaoyangDu\aging_ephys\data';
 
 %% Multi-animal recording session 
 % For sessions that record from multiple headstages from separate animals.
 % For SNLab, assumes one animal per active port (64 channel electrodes) as
 % of 2/22
 % subject folder corresponds to port A, B, C, D, respectively
-subject_order = {'hpc24','hpc26',[],[]};
+subject_order = {[],'aging05','aging06',[]};
 
 % folder where dat files reside that need to be split
-data_path ='Y:\laura_berkowitz\app_ps1_ephys\data\to_split\hpc24_day11_hpc26_day09_260507_100423';
+data_path ='X:\HaoyangDu\aging_ephys\data\to_split\aging05_day24_portB_aging06_day24_portC_260713_091131';
 
 % project folder where subjects data should be saved
-save_path = {laura,laura,[],[]}; 
+%save_path = {laura,laura,[],[]}; 
+save_path = {[],haoyang,haoyang,[]}; 
     
 % split dat files a
 split_dat(data_path,save_path, subject_order,'trim_dat',false)
@@ -71,7 +73,7 @@ preprocess_session(basepath,'digitalInputs',true,'kilosort',false,'tracking',fal
 % If running kilosort separately for single shank (A164 poly2)
 process_kilosort(basepath)
 % multiple shank 
-preprocess_session(basepath,'digitalInputs',true,'kilosort',true,'tracking',false,'specialChannels',[],'multishank',true)
+preprocess_session(basepath,'digitalInputs',false,'kilosort',true,'tracking',false,'specialChannels',[],'multishank',true)
 % If running kilosort separately for multiple shanks
 process_kilosort(basepath,'multishank',true)
 
