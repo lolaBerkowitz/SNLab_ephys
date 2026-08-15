@@ -104,38 +104,118 @@ for i = 1:length(behav_files)
 end
 
 end
+function session = add_dlc_files( ...
+    session, dlc_files, pickle_files, video_name, epoch, idx)
+%ADD_DLC_FILES Add DLC tracking information to session structure.
+%
+% Associates a video file with its corresponding DeepLabCut output and
+% pickle metadata file, then adds tracking information and cropping
+% parameters to the behavioralTracking field.
+%
+% Parameters
+% ----------
+% session : struct
+%     CellExplorer-style session structure.
+% dlc_files : cell array
+%     List of DeepLabCut output files.
+% pickle_files : cell array
+%     List of DeepLabCut pickle metadata files.
+% video_name : cell array
+%     Video filename associated with the current epoch.
+% epoch : numeric
+%     Epoch associated with the video.
+% idx : numeric
+%     Index into session.behavioralTracking.
+%
+% Returns
+% -------
+% session : struct
+%     Updated session structure containing DLC tracking information.
 
-function session = add_dlc_files(session,dlc_files,pickle_files,video_name,epoch,idx)
-
-% if found update behavioralTracking field
 disp('Adding DLC tracking now')
 
-% Associate a video file for a specific video
+% Get video filename and basename used for matching
+video_file = video_name{1};
+video_base = extractBefore(video_file, '.avi');
 
-if any(contains(dlc_files,'.avi'))
-    dlc_file = video_name;
+%% Associate DLC file
+
+% Some datasets use the AVI file directly rather than a separate DLC file
+if any(contains(dlc_files, '.avi'))
+    dlc_file = video_file;
 else
-    dlc_file = dlc_files(contains(extractBefore(dlc_files,'DLC'),extractBefore(video_name,'.avi')));
-    pickle_file = pickle_files(contains(extractBefore(dlc_files,'DLC'),extractBefore(video_name,'.avi')));
-    dlc_file = dlc_file{:};
-    pickle_file = pickle_file{:};
-end
-%Pull up video
-videoObj = VideoReader(fullfile(session.general.basePath,video_name{1}));
+    dlc_idx = contains( ...
+        extractBefore(dlc_files, 'DLC'), ...
+        video_base ...
+    );
 
-% get model parameters for file
-% crop_params = tracking.grab_dlc_crop(dlc_file); 
+    if ~any(dlc_idx)
+        error( ...
+            'add_dlc_files:NoDLCFile', ...
+            'No DLC file found matching video: %s', ...
+            video_file ...
+        );
+    end
+
+    if sum(dlc_idx) > 1
+        warning( ...
+            'add_dlc_files:MultipleDLCFiles', ...
+            ['Multiple DLC files match video %s. ' ...
+             'Using the first match.'], ...
+            video_file ...
+        );
+    end
+
+    dlc_file = dlc_files{find(dlc_idx, 1, 'first')};
+end
+
+%% Associate pickle file
+
+% Match against pickle_files directly rather than assuming that
+% dlc_files and pickle_files have identical ordering.
+pickle_idx = contains( ...
+    extractBefore(pickle_files, 'DLC'), ...
+    video_base ...
+);
+
+if ~any(pickle_idx)
+    error( ...
+        'add_dlc_files:NoPickleFile', ...
+        'No pickle file found matching video: %s', ...
+        video_file ...
+    );
+end
+
+if sum(pickle_idx) > 1
+    warning( ...
+        'add_dlc_files:MultiplePickleFiles', ...
+        ['Multiple pickle files match video %s. ' ...
+         'Using the first match.'], ...
+        video_file ...
+    );
+end
+
+pickle_file = pickle_files{find(pickle_idx, 1, 'first')};
+
+%% Get video metadata
+
+videoObj = VideoReader( ...
+    fullfile(session.general.basePath, video_file) ...
+);
+
+%% Get DLC cropping parameters
+
 crop_params = get_crop_from_pickle(pickle_file);
 
-% save to session file
-session.behavioralTracking{1, idx}.filenames = dlc_file;
-session.behavioralTracking{1, idx}.epoch  = epoch;
-session.behavioralTracking{1, idx}.equipment  = 'FireFlyS';
-session.behavioralTracking{1, idx}.type  = 'DLC';
-session.behavioralTracking{1, idx}.notes  = video_name{1};
-session.behavioralTracking{1, idx}.framerate  = videoObj.FrameRate;
-session.behavioralTracking{1, idx}.crop_params = crop_params;
+%% Save tracking information to session structure
 
+session.behavioralTracking{1, idx}.filenames = dlc_file;
+session.behavioralTracking{1, idx}.epoch = epoch;
+session.behavioralTracking{1, idx}.equipment = 'FireFlyS';
+session.behavioralTracking{1, idx}.type = 'DLC';
+session.behavioralTracking{1, idx}.notes = video_file;
+session.behavioralTracking{1, idx}.framerate = videoObj.FrameRate;
+session.behavioralTracking{1, idx}.crop_params = crop_params;
 
 end
 
