@@ -13,7 +13,7 @@ function optoStim = make_opto_stimulation_file(basepath,varargin)
 p = inputParser;
 addParameter(p,'stim_channel',7,@isnumeric) %snlab rig wiring for opto digitalin events
 addParameter(p,'detect_channel',6,@isnumeric) %snlab rig wiring for opto digitalin events
-addParameter(p,'write_both',false,@islogical)
+addParameter(p,'write_both',true,@islogical)
 addParameter(p,'detector','IED_60-80_Franksboard',@ischar) %snlab rig wiring for opto digitalin events
 
 parse(p,varargin{:});
